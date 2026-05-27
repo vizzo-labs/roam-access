@@ -1,18 +1,55 @@
-# Roam Access — landing page
+<p align="center">
+  <img src="assets/roam-logo-primary.png" alt="Roam Access" width="340" />
+</p>
 
-Pre-launch landing page for **Roam Access**, a community-driven accessibility
-discovery platform for people with disability (PWD) in Australia.
+<p align="center">
+  <strong>Find venues that actually work for you.</strong><br />
+  Australia's first accessibility discovery platform, built with and for the disability community.
+</p>
 
-The page has three jobs: act as a credibility anchor for grant applications and
-outreach, drive visitors to the user-research survey (primary CTA), and capture
-email signups (secondary CTA).
+<p align="center">
+  🌐 <a href="https://roamaccess.com.au">roamaccess.com.au</a> &nbsp;·&nbsp; Status: <strong>pre-launch</strong> (in research, launching 2026)
+</p>
 
-## Stack
+---
 
-Plain static HTML — **no build step**. Tailwind is loaded via the Play CDN and
-fonts (Inter + JetBrains Mono) from Google Fonts, so the site is just files you
-can open or serve anywhere. This is what makes it trivially hostable on GitHub
-Pages.
+## What is Roam Access?
+
+Roam Access helps people with disability (PWD) discover, review and share venues
+across Australia based on **real accessibility**, not what venues claim, but what
+they actually deliver. It is built with the disability community, for the
+disability community.
+
+This repository currently holds the **pre-launch landing page**. Its three jobs:
+
+1. Be a credibility anchor for grant applications and outreach.
+2. Drive visitors to the user-research survey (primary call to action).
+3. Capture email signups from interested PWD and venues.
+
+> **Heads up:** this repo will grow into the **monorepo** for the whole project
+> once product development starts. See [Where this is heading](#where-this-is-heading).
+
+---
+
+## Tech stack
+
+Plain **static HTML/CSS/JS**, no build step. Tailwind is loaded via the Play CDN
+and fonts (Inter + JetBrains Mono) from Google Fonts, so the whole thing is just
+files that can be opened or served anywhere. That is what makes it trivially
+hostable on GitHub Pages today.
+
+| Concern | Choice |
+| --- | --- |
+| Markup | Semantic HTML5 |
+| Styling | Tailwind (Play CDN) + a small custom CSS layer with design tokens |
+| Fonts | Inter (UI/body), JetBrains Mono (numbers, eyebrows) |
+| Hosting | GitHub Pages, custom domain `roamaccess.com.au` |
+| Forms | Google Forms (newsletter + research + venue interest) |
+| Analytics | None yet (privacy-respecting analytics planned) |
+
+---
+
+## Repository structure (today)
 
 ```
 .
@@ -21,107 +58,180 @@ Pages.
 ├── accessibility.html  # Accessibility Statement
 ├── 404.html            # branded, noindex "page not found"
 ├── robots.txt          # allows all crawlers; points to the sitemap
-├── sitemap.xml         # single-URL XML sitemap
+├── sitemap.xml         # XML sitemap (home + legal pages)
 ├── CNAME               # custom domain for GitHub Pages (roamaccess.com.au)
+├── .nojekyll           # serve files as-is (skip Jekyll)
 ├── assets/
-│   ├── roam-appicon-teal.svg    # favicon (scalable, brand mark r/a on teal)
+│   ├── roam-appicon-teal.svg    # favicon (scalable)
 │   ├── roam-appicon-teal.png    # favicon / apple-touch-icon fallback
 │   ├── roam-logo-primary.png    # logo (Organization.logo in JSON-LD)
 │   └── roam-og.png              # 1200x630 social-share image (og:image)
-├── .nojekyll           # tell GitHub Pages to serve files as-is (skip Jekyll)
 └── README.md
 ```
 
-## Run locally
+## Where this is heading
 
-Just open `index.html` in a browser, or serve the folder:
+When product development begins, this repo becomes a **monorepo**. The likely
+shape (subject to change as the team forms):
+
+```
+roam-access/
+├── apps/
+│   ├── web/        # marketing site + this landing page
+│   ├── app/        # the Roam Access product (PWA / native)
+│   └── api/        # backend services
+├── packages/
+│   ├── ui/         # shared design system (brand tokens + components)
+│   └── config/     # shared lint / ts / build config
+├── package.json    # workspace root
+└── README.md
+```
+
+Today the landing page lives at the repo **root** so GitHub Pages can serve it
+with zero config. When the monorepo lands, the landing page moves under
+`apps/web` and Pages deploys via a GitHub Actions workflow instead.
+
+---
+
+## Design tokens
+
+The brand palette is WCAG-validated and shared across every surface (and will
+seed the future `packages/ui` design system). Contrast ratios are measured on
+the paper background.
+
+| Token | Hex | Use | Contrast |
+| --- | --- | --- | --- |
+| Teal | `#0A4F4F` | primary brand, CTAs, headings | 8.89:1 (AAA) |
+| Teal deep | `#073838` | button hover | n/a |
+| Rust | `#9C2D0E` | accent, the `/` slash, secondary CTAs | 7.14:1 (AA) |
+| Paper | `#FAF9F6` | primary background | n/a |
+| Stone | `#EDEAE2` | secondary background | n/a |
+| Charcoal | `#1A1A1A` | body text | 16.1:1 (AAA) |
+| Slate | `#5A5651` | secondary text | 6.91:1 (AAA) |
+| Hairline | `#E5E2DA` | borders | n/a |
+
+The palette was checked against the four common types of colour vision
+deficiency (deuteranopia, protanopia, tritanopia, achromatopsia). Rule:
+**colour is never the only signal**, it is always paired with text or an icon.
+
+---
+
+## Local development
+
+No tooling required. Open `index.html` in a browser, or serve the folder:
 
 ```bash
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
 
-## Deploy to GitHub Pages
+---
 
-1. Push this repo to GitHub.
-2. Repo **Settings → Pages**.
-3. Under **Build and deployment**, set **Source: Deploy from a branch**, pick
-   your branch (e.g. `main`) and folder **`/ (root)`**, then **Save**.
-4. The site goes live at `https://<user>.github.io/<repo>/` within a minute or two.
+## Deployment
 
-No Actions workflow is needed — GitHub Pages serves the static files directly.
+Hosted on **GitHub Pages** from the `main` branch, `/ (root)` folder. Pushing to
+`main` redeploys automatically; no Actions workflow needed.
 
-### Custom domain (`roamaccess.com.au`)
+**Custom domain (`roamaccess.com.au`):** the `CNAME` file already configures it.
+Point DNS at GitHub Pages with these apex records, then tick **Enforce HTTPS** in
+Settings → Pages once the certificate is issued:
 
-The `CNAME` file already points the Pages site at `roamaccess.com.au`. To finish:
+```
+A     185.199.108.153
+A     185.199.109.153
+A     185.199.110.153
+A     185.199.111.153
+AAAA  2606:50c0:8000::153
+AAAA  2606:50c0:8001::153
+AAAA  2606:50c0:8002::153
+AAAA  2606:50c0:8003::153
+```
 
-1. In your DNS, add either an `ALIAS`/`ANAME` (or four `A` records to GitHub's
-   IPs `185.199.108–111.153`) for the apex `roamaccess.com.au`, or a `CNAME`
-   record for `www` → `<user>.github.io`.
-2. In **Settings → Pages → Custom domain**, confirm `roamaccess.com.au` and tick
-   **Enforce HTTPS**.
+If the domain ever changes, find-and-replace `roamaccess.com.au` across
+`index.html`, `privacy.html`, `accessibility.html`, `404.html`, `sitemap.xml`,
+`robots.txt` and `CNAME`.
 
-All SEO URLs (canonical, `og:url`, sitemap, robots, JSON-LD) are already absolute
-on `https://roamaccess.com.au/`. **If the domain ever changes, find-and-replace
-`roamaccess.com.au` across `index.html`, `404.html`, `sitemap.xml`, `robots.txt`
-and `CNAME`.**
-
-## Before launch — things to wire up
-
-These are intentional placeholders in `index.html`:
-
-- **Survey link** — every "Take the survey" CTA points to `#survey-coming-soon`.
-  Replace with the real survey URL.
-- **Email form** — currently shows an in-component success state only and does
-  not POST anywhere. Search for the `TODO` comment in the `<script>` to wire it
-  to Mailchimp / ConvertKit / etc.
-- **LinkedIn / Privacy Policy / Accessibility Statement** links point to `#`.
-  When LinkedIn exists, also add its URL to `Organization.sameAs` in the JSON-LD
-  (there's a `TODO` next to it).
-- **ABN** placeholder in the footer.
-
-## SEO
-
-On-page SEO is built in and absolute to `https://roamaccess.com.au/`:
-
-- **Title & meta description** tuned for the primary query ("accessible venues
-  in Australia") while keeping the brand first.
-- **Canonical** + `hreflang` (`en-au` / `x-default`) + `robots`
-  (`index, follow, max-image-preview:large`).
-- **Open Graph + Twitter** tags with a purpose-built **1200×630** share image
-  (`assets/roam-og.png`), including `og:image:alt`, dimensions and `og:locale`.
-- **Schema.org JSON-LD** (`@graph`: `Organization` + `WebSite` + `WebPage`) so
-  search engines understand the entity, its area served (Australia) and logo.
-- **`robots.txt`** (allows all, references the sitemap) and **`sitemap.xml`**.
-- **`404.html`** is `noindex` so error pages never get indexed.
-- Semantic HTML, one `<h1>`, logical headings and descriptive link text already
-  carry strong on-page signals.
-
-**After go-live:** verify the domain in Google Search Console + Bing Webmaster,
-submit `https://roamaccess.com.au/sitemap.xml`, and check the card with the
-[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and
-[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/).
-
-**Biggest remaining win (performance/Core Web Vitals):** the page uses the
-Tailwind Play CDN, which ships a large runtime and compiles in the browser
-(slower LCP, possible layout shift). Pre-compiling Tailwind to a static CSS file
-would meaningfully help ranking — it keeps the site equally GitHub-Pages-hostable
-but adds a build step. Happy to do this on request.
+---
 
 ## Accessibility (the whole point)
 
-This is an accessibility brand, so the page itself is built to be exemplary —
-WCAG 2.2 AA as the floor, AAA where it's reachable. The palette was reworked to
-a WCAG-validated brand v2 (teal `#0A4F4F` 8.89:1 AAA, rust `#9C2D0E` 7.14:1 AA,
-slate `#5A5651` 6.91:1 AAA on paper), verified to stay distinguishable under
-deuteranopia / protanopia / tritanopia / achromatopsia.
+This is an accessibility brand, so the site is built to be exemplary: **WCAG 2.2
+AA** as the floor, AAA where reachable. Highlights:
 
-The headline feature is a **built-in Accessibility settings panel** (floating
-button, bottom-right): text size (100/112/125/150%), higher-contrast mode, and a
-reduce-motion override — all persisted per device in `localStorage`. The page
-dogfoods what the product stands for.
+- A **built-in accessibility settings panel**: text size (100/112/125/150%),
+  higher-contrast mode and a reduce-motion override, persisted per device.
+- Three skip links, semantic landmarks, one `<h1>` with logical heading order.
+- Visible, background-aware focus indicators; 48px+ tap targets; 18px+ body text.
+- Always-underlined links, `aria-current` nav, `prefers-reduced-motion` and
+  `prefers-contrast` support.
+- Accessible form: visible label, plain-English validation, `aria-live` success.
+- A "Need this in another format?" offer in the footer.
 
-See the **"What was implemented for accessibility"** notes in the handoff for
-the full list (skip links, focus management, `aria-current`, semantic landmarks,
-form validation with plain-English errors, "Need this in another format?" offer,
-etc.).
+The public commitment, with known gaps, lives in
+[`accessibility.html`](accessibility.html). Working principle: **if it is not
+accessible, it is not done.**
+
+---
+
+## SEO
+
+On-page SEO is built in and absolute to `https://roamaccess.com.au/`: tuned title
+and meta description, canonical + `hreflang`, Open Graph / Twitter tags with a
+purpose-built 1200x630 share image, Schema.org JSON-LD (`Organization` +
+`WebSite` + `WebPage`, with social profiles in `sameAs`), `robots.txt`, an XML
+`sitemap.xml`, and a `noindex` 404 page.
+
+After go-live: verify the domain in Google Search Console + Bing, submit the
+sitemap, and check the share card in the Facebook and LinkedIn debuggers.
+
+---
+
+## Pre-launch checklist
+
+- [ ] Configure DNS for `roamaccess.com.au` and enable Enforce HTTPS.
+- [ ] Fill the **ABN** placeholders (footer + Privacy Policy).
+- [ ] Reconcile the Privacy Policy with reality (analytics provider, mailing-list
+      provider, hosting) before publishing it as fact.
+- [ ] Add the real **Privacy Policy** body where products collect more data at launch.
+- [ ] Install privacy-respecting analytics (e.g. Plausible) if/when wanted.
+
+---
+
+## Forms
+
+The site talks to three Google Forms:
+
+| Action | Where | Form |
+| --- | --- | --- |
+| Research survey | "Take the survey" CTAs | `forms.gle/2vSfnNySe9ycRjys9` |
+| Venue interest | "Register your interest" | `forms.gle/UmEkrXcyvNmVSdXm8` |
+| Newsletter | "Stay in the loop" | posts to the form's `formResponse` endpoint |
+
+The newsletter form submits silently via `fetch` (no page reload) and falls back
+to a normal POST if JavaScript is off.
+
+---
+
+## Contributing
+
+Once the team forms, contributions go through pull requests. Two non-negotiables:
+
+1. **Accessibility first.** Every change keeps the site WCAG 2.2 AA or better.
+   Test with the keyboard, a screen reader, and at 200% zoom.
+2. **Honest, plain English.** Follow the brand voice: warm, direct, no jargon,
+   and never overselling where we are.
+
+---
+
+## Contact
+
+- **Email:** helloroamaccess@gmail.com
+- **LinkedIn:** https://www.linkedin.com/company/roam-access
+- **Instagram:** https://www.instagram.com/roamaccess/
+
+---
+
+## License
+
+© 2026 Roam Access. All rights reserved. Open-source licensing is to be decided;
+ask before reusing.
