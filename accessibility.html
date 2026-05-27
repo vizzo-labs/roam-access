@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en-AU" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Accessibility Statement: Roam Access</title>
+  <meta name="description" content="Roam Access aims for WCAG 2.2 AA as a minimum. What's working, what isn't perfect yet, and how to tell us when we get it wrong." />
+  <meta name="theme-color" content="#FAF9F6" />
+  <link rel="canonical" href="https://roamaccess.com.au/accessibility.html" />
+  <meta name="robots" content="index, follow" />
+  <link rel="icon" type="image/svg+xml" href="assets/roam-appicon-teal.svg" />
+  <link rel="icon" type="image/png" href="assets/roam-appicon-teal.png" />
+  <link rel="apple-touch-icon" href="assets/roam-appicon-teal.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --teal:#0A4F4F; --teal-deep:#073838; --rust:#9C2D0E;
+      --paper:#FAF9F6; --stone:#EDEAE2; --charcoal:#1A1A1A; --slate:#5A5651; --hairline:#E5E2DA;
+    }
+    *{box-sizing:border-box}
+    html{font-size:18px; scroll-behavior:smooth}
+    @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition-duration:.001ms !important} }
+    body{
+      margin:0; font-family:'Inter',system-ui,sans-serif;
+      background:var(--paper); color:var(--charcoal);
+      font-size:1.0625rem; line-height:1.65;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; text-wrap:pretty;
+    }
+    a{color:var(--teal); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1.5px}
+    a:hover{text-decoration-thickness:2.5px}
+    :focus-visible{outline:3px solid var(--charcoal); outline-offset:3px; border-radius:4px}
+    .skip-link{position:absolute; left:1rem; top:-100px; background:var(--teal); color:var(--paper); padding:.875rem 1.25rem; border-radius:8px; font-weight:600; z-index:100; transition:top .15s ease; display:inline-flex; align-items:center; min-height:48px}
+    .skip-link:focus{top:1rem}
+    header.site{position:sticky; top:0; z-index:50; background:rgba(250,249,246,.95); backdrop-filter:saturate(140%) blur(8px); border-bottom:1px solid var(--hairline)}
+    header.site .bar{max-width:48rem; margin:0 auto; padding:0 1.25rem; min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:1rem}
+    header.site a.logo{display:inline-flex; align-items:center; min-height:44px; padding:6px 4px; text-decoration:none}
+    header.site a.back{display:inline-flex; align-items:center; gap:.4rem; min-height:44px; font-weight:600; font-size:1rem; text-decoration:underline; text-underline-offset:4px}
+    main{max-width:48rem; margin:0 auto; padding:3rem 1.25rem 4rem}
+    h1{font-size:clamp(2rem,5vw,3rem); letter-spacing:-0.035em; line-height:1.08; font-weight:700; margin:0 0 .5rem}
+    .docmeta{font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.8125rem; color:var(--slate); letter-spacing:.02em; margin:0 0 1.5rem; line-height:1.6}
+    h2{font-size:1.5rem; letter-spacing:-0.02em; line-height:1.2; font-weight:700; margin:2.5rem 0 .75rem}
+    p{margin:0 0 1rem; max-width:68ch}
+    ul{margin:0 0 1rem; padding-left:1.4rem; max-width:68ch}
+    li{margin:.35rem 0}
+    strong{font-weight:600}
+    hr.rule{border:0; border-top:1px solid var(--hairline); margin:2.5rem 0}
+    .intro{font-size:1.1875rem; max-width:68ch}
+    .sign{margin-top:2rem; font-weight:600}
+    footer.site{border-top:1px solid var(--hairline); background:var(--stone)}
+    footer.site .inner{max-width:48rem; margin:0 auto; padding:2rem 1.25rem; font-size:.9375rem; color:var(--slate)}
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="site">
+    <div class="bar">
+      <a href="/" class="logo" aria-label="Roam Access home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="150" height="36" role="img" aria-label="Roam Access">
+          <title>Roam Access</title>
+          <g transform="translate(110, 150)">
+            <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="0" y="0">roam</text>
+            <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#9C2D0E" x="293" y="0">/</text>
+            <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="338" y="0">access</text>
+          </g>
+        </svg>
+      </a>
+      <a href="/" class="back">Back to home <span aria-hidden="true">→</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <h1>Accessibility Statement</h1>
+    <p class="docmeta">Last updated: May 2026<br />Version 1.0 (Pre-launch / Landing page)</p>
+
+    <h2>Our commitment</h2>
+    <p>Roam Access exists because accessibility information in Australia is broken. We can't fix that problem if our own website fails the people we're trying to serve.</p>
+    <p>So we're holding ourselves to a high standard from day one, and we're being honest about where we are now versus where we're aiming.</p>
+    <p>This statement tells you:</p>
+    <ul>
+      <li>What standard we aim for</li>
+      <li>What's working</li>
+      <li>What we know isn't perfect yet</li>
+      <li>How to tell us when we get it wrong</li>
+    </ul>
+
+    <h2>Our standard</h2>
+    <p>We aim for <strong>WCAG 2.2 Level AA</strong> as our minimum baseline, with AAA where practical. This is the standard recommended by the Australian Human Rights Commission and used by the Australian Government's Digital Service Standard.</p>
+    <p>What this means in practice:</p>
+    <ul>
+      <li>Sufficient colour contrast for all text (4.5:1 minimum)</li>
+      <li>Body text at 18px or larger</li>
+      <li>All interactive elements reachable by keyboard alone</li>
+      <li>All images have meaningful alt text</li>
+      <li>Forms have visible labels</li>
+      <li>Site works fully with screen readers (VoiceOver, NVDA, TalkBack, JAWS)</li>
+      <li>Site works at 200% zoom without breaking</li>
+      <li>Reduced motion is respected</li>
+      <li>Colour is never the only way to convey meaning; we always pair it with icons and text</li>
+    </ul>
+
+    <h2>What's working</h2>
+    <p>This landing page has been built with these things in place:</p>
+    <ul>
+      <li>Semantic HTML structure with proper headings and landmarks</li>
+      <li>Skip-to-content link as the first focusable element</li>
+      <li>All text passes WCAG 2.2 AA contrast (most passes AAA)</li>
+      <li>All interactive elements are at least 44x44 pixels (touch-friendly)</li>
+      <li>Visible focus indicators on all interactive elements</li>
+      <li>Forms have visible labels, never placeholder-only</li>
+      <li>The colour palette was tested against all four common types of colour blindness before launch</li>
+      <li>Respects <code>prefers-reduced-motion</code> for users who don't want animations</li>
+      <li>Works fully with keyboard navigation</li>
+    </ul>
+
+    <h2>What we know isn't perfect yet</h2>
+    <p>We're a small pre-launch team. We're not going to pretend everything is flawless.</p>
+    <p>Things we haven't done yet:</p>
+    <ul>
+      <li><strong>Independent accessibility audit.</strong> We've tested with our own checks and tools. We haven't yet engaged a third-party accessibility specialist or PWD user testing, but we will before the product launches.</li>
+      <li><strong>Screen reader testing across all platforms.</strong> We've tested with VoiceOver (macOS, iOS) and NVDA (Windows). We haven't yet tested with JAWS or TalkBack (Android) extensively.</li>
+      <li><strong>Full WCAG 2.2 AAA compliance.</strong> We hit AAA where we can but the AA baseline is what we guarantee.</li>
+      <li><strong>Multi-language support.</strong> Currently English only. We're aware this excludes some Australians.</li>
+      <li><strong>Sign language (Auslan) content.</strong> Not yet available. We're thinking about how to do this well.</li>
+    </ul>
+    <p>We're being transparent about these gaps because hiding them would be worse than naming them.</p>
+
+    <h2>How we keep improving</h2>
+    <p>Accessibility isn't something you do once. We commit to:</p>
+    <ul>
+      <li>Testing every new feature with assistive technology before it ships</li>
+      <li>Listening to feedback from PWD and acting on it</li>
+      <li>Independent accessibility audit before the full platform launches</li>
+      <li>Publishing what we learn, including our mistakes</li>
+    </ul>
+    <p>When we update this page, we'll mark what changed and when.</p>
+
+    <h2>Tell us when we get it wrong</h2>
+    <p>If something on this site doesn't work for you, please tell us. We can't fix what we don't know about.</p>
+    <p>The fastest way to reach us:</p>
+    <ul>
+      <li><strong>Email:</strong> <a href="mailto:helloroamaccess@gmail.com?subject=Accessibility%20feedback">helloroamaccess@gmail.com</a></li>
+      <li><strong>Subject line:</strong> "Accessibility feedback"</li>
+    </ul>
+    <p>Tell us:</p>
+    <ul>
+      <li>What you were trying to do</li>
+      <li>What happened (or didn't happen)</li>
+      <li>What device, browser, or assistive technology you were using (if you're comfortable sharing)</li>
+    </ul>
+    <p>You don't need to be technical. "I couldn't tab to the email field on my phone" is exactly the kind of feedback we need.</p>
+    <p>We aim to:</p>
+    <ul>
+      <li>Acknowledge your message within 2 business days</li>
+      <li>Investigate and respond within 7 business days</li>
+      <li>Fix critical accessibility issues within 30 days where possible</li>
+    </ul>
+
+    <h2>Compliance and standards</h2>
+    <p>This statement is provided in accordance with:</p>
+    <ul>
+      <li>The Disability Discrimination Act 1992 (Australia)</li>
+      <li>The Australian Human Rights Commission's World Wide Web Access Disability Discrimination Act Advisory Notes</li>
+      <li>W3C Web Content Accessibility Guidelines (WCAG) 2.2</li>
+    </ul>
+    <p>If you believe we're failing to meet our accessibility obligations under Australian law, you can contact the Australian Human Rights Commission at <a href="https://humanrights.gov.au">humanrights.gov.au</a>.</p>
+
+    <h2>A final note</h2>
+    <p>We're building Roam Access because the gap between what venues promise and what they actually deliver fails people every day. The same standard applies to us.</p>
+    <p>If our website fails you, tell us. If we don't fix it, hold us to it. That accountability is the whole point.</p>
+
+    <p class="sign">Naomi, Romulo, and Mille<br />Roam Access</p>
+
+    <hr class="rule" />
+    <p><a href="privacy.html">Read our Privacy Policy</a></p>
+  </main>
+
+  <footer class="site">
+    <div class="inner">
+      <p>© 2026 Roam Access. ABN [placeholder]. Made in Australia with the disability community.</p>
+    </div>
+  </footer>
+</body>
+</html>

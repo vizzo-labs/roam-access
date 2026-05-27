@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-AU" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Page not found: Roam Access</title>
+  <meta name="robots" content="noindex, follow" />
+  <meta name="theme-color" content="#FAF9F6" />
+  <link rel="icon" type="image/svg+xml" href="/assets/roam-appicon-teal.svg" />
+  <link rel="icon" type="image/png" href="/assets/roam-appicon-teal.png" />
+  <link rel="apple-touch-icon" href="/assets/roam-appicon-teal.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --teal:#0A4F4F; --teal-deep:#073838; --rust:#9C2D0E; --paper:#FAF9F6; --charcoal:#1A1A1A; --slate:#5A5651; }
+    *{box-sizing:border-box}
+    html{font-size:18px}
+    body{
+      margin:0; min-height:100vh; min-height:100dvh;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:1.5rem; padding:2rem 1.25rem; text-align:center;
+      font-family:'Inter',system-ui,sans-serif; background:var(--paper); color:var(--charcoal);
+      line-height:1.6; -webkit-font-smoothing:antialiased;
+    }
+    a:focus-visible{outline:3px solid var(--charcoal); outline-offset:3px; border-radius:4px}
+    h1{font-size:clamp(2rem,6vw,3.25rem); letter-spacing:-0.035em; line-height:1.05; margin:0; max-width:18ch}
+    p{font-size:1.125rem; color:var(--slate); margin:0; max-width:46ch}
+    .home{
+      display:inline-flex; align-items:center; gap:.5rem; min-height:56px; padding:0 1.5rem;
+      background:var(--teal); color:var(--paper); border-radius:8px; font-weight:600;
+      text-decoration:none; transition:background-color .15s ease;
+    }
+    .home:hover{background:var(--teal-deep)}
+  </style>
+</head>
+<body>
+  <a href="/" aria-label="Roam Access home" style="text-decoration:none;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="180" height="44" role="img" aria-label="Roam Access">
+      <title>Roam Access</title>
+      <g transform="translate(110, 150)">
+        <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="0" y="0">roam</text>
+        <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#9C2D0E" x="293" y="0">/</text>
+        <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="338" y="0">access</text>
+      </g>
+    </svg>
+  </a>
+  <h1>This page took a wrong turn.</h1>
+  <p>We couldn't find the page you were after. It may have moved, or the link may be out of date.</p>
+  <a class="home" href="/">
+    Back to home
+    <span aria-hidden="true">→</span>
+  </a>
+</body>
+</html>

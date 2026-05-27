@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="en-AU" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Roam Access: Find accessible venues across Australia</title>
+  <meta name="description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta name="theme-color" content="#FAF9F6" />
+
+  <!-- Canonical & crawl directives -->
+  <link rel="canonical" href="https://roamaccess.com.au/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="alternate" hreflang="en-au" href="https://roamaccess.com.au/" />
+  <link rel="alternate" hreflang="x-default" href="https://roamaccess.com.au/" />
+
+  <!-- Favicon & app icons (brand mark: r/a on teal) -->
+  <link rel="icon" type="image/svg+xml" href="assets/roam-appicon-teal.svg" />
+  <link rel="icon" type="image/png" href="assets/roam-appicon-teal.png" />
+  <link rel="apple-touch-icon" href="assets/roam-appicon-teal.png" />
+
+  <!-- Open Graph / social sharing (used in grant & outreach links) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Roam Access" />
+  <meta property="og:locale" content="en_AU" />
+  <meta property="og:url" content="https://roamaccess.com.au/" />
+  <meta property="og:title" content="Roam Access: Find accessible venues across Australia" />
+  <meta property="og:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta property="og:image" content="https://roamaccess.com.au/assets/roam-og.png" />
+  <meta property="og:image:secure_url" content="https://roamaccess.com.au/assets/roam-og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Roam Access wordmark: roam/access" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Roam Access: Find accessible venues across Australia" />
+  <meta name="twitter:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta name="twitter:image" content="https://roamaccess.com.au/assets/roam-og.png" />
+  <meta name="twitter:image:alt" content="Roam Access wordmark: roam/access" />
+
+  <!-- Structured data (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://roamaccess.com.au/#organization",
+        "name": "Roam Access",
+        "url": "https://roamaccess.com.au/",
+        "email": "helloroamaccess@gmail.com",
+        "description": "Australia's first accessibility discovery platform, built with and for the disability community.",
+        "slogan": "Find venues that actually work for you.",
+        "areaServed": { "@type": "Country", "name": "Australia" },
+        "knowsAbout": ["accessibility", "disability", "accessible venues", "accessible travel"],
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://roamaccess.com.au/assets/roam-logo-primary.png",
+          "width": 1600,
+          "height": 383
+        },
+        "image": "https://roamaccess.com.au/assets/roam-og.png",
+        "sameAs": [
+          "https://www.linkedin.com/company/roam-access",
+          "https://www.instagram.com/roamaccess/"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://roamaccess.com.au/#website",
+        "url": "https://roamaccess.com.au/",
+        "name": "Roam Access",
+        "description": "Australia's first accessibility discovery platform, built with and for the disability community.",
+        "publisher": { "@id": "https://roamaccess.com.au/#organization" },
+        "inLanguage": "en-AU"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://roamaccess.com.au/#webpage",
+        "url": "https://roamaccess.com.au/",
+        "name": "Roam Access: Find accessible venues across Australia",
+        "description": "Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026.",
+        "isPartOf": { "@id": "https://roamaccess.com.au/#website" },
+        "about": { "@id": "https://roamaccess.com.au/#organization" },
+        "inLanguage": "en-AU"
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal:     '#0A4F4F',
+            rust:     '#9C2D0E',
+            paper:    '#FAF9F6',
+            stone:    '#EDEAE2',
+            charcoal: '#1A1A1A',
+            slate:    '#5A5651',
+            'state-blue':  '#1E5F8B',
+            'state-amber': '#854D0E',
+            hairline: '#E5E2DA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ───── Tokens ───── */
+    :root {
+      --teal: #0A4F4F;
+      --teal-deep: #073838;
+      --rust: #9C2D0E;
+      --rust-deep: #7E2208;
+      --paper: #FAF9F6;
+      --stone: #EDEAE2;
+      --charcoal: #1A1A1A;
+      --slate: #5A5651;
+      --hairline: #E5E2DA;
+      --paper-soft: #C9DEDE;       /* eyebrow on teal, passes AA */
+      --state-blue: #1E5F8B;
+
+      /* User-controlled scale (set by the Accessibility panel) */
+      --type-scale: 1;             /* 1 / 1.125 / 1.25 / 1.5 */
+      --base-line: 1.6;
+
+      /* Targets */
+      --tap: 48px;
+      --tap-lg: 56px;
+    }
+
+    /* ───── Motion ───── */
+    html { scroll-behavior: smooth; }
+    [data-motion="reduce"], [data-motion="reduce"] * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    /* ───── Base type ───── */
+    html { font-size: calc(18px * var(--type-scale)); }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--charcoal);
+      font-size: 1.0625rem;             /* ~19.1px base */
+      line-height: var(--base-line);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      text-wrap: pretty;
+      word-spacing: 0.01em;
+      letter-spacing: 0.005em;
+    }
+    /* User wide-set: enable space adjustments without breaking layout (WCAG 1.4.12) */
+    p, li, dd, blockquote { max-width: 70ch; }
+
+    /* ───── Focus indicators (WCAG 2.4.11/13) ───── */
+    *:focus { outline: none; }
+    a:focus-visible, button:focus-visible, input:focus-visible,
+    [tabindex]:focus-visible, summary:focus-visible {
+      outline: 3px solid var(--charcoal);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+    .bg-teal a:focus-visible, .bg-teal button:focus-visible, .bg-teal input:focus-visible,
+    .bg-charcoal a:focus-visible, .bg-charcoal button:focus-visible {
+      outline-color: var(--paper);
+    }
+    /* Don't let sticky header cover anchored focus targets */
+    [id], h1, h2, h3 { scroll-margin-top: 96px; }
+
+    /* ───── Skip links ───── */
+    .skip-links {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; gap: .5rem; padding: 0; z-index: 200;
+    }
+    .skip-links a {
+      position: absolute; left: 1rem; top: -100px;
+      background: var(--teal); color: var(--paper);
+      padding: .875rem 1.25rem; border-radius: 8px;
+      font-weight: 600; font-size: 1rem;
+      transition: top .15s ease;
+      min-height: var(--tap);
+      display: inline-flex; align-items: center;
+    }
+    .skip-links a:nth-of-type(2) { left: 14rem; }
+    .skip-links a:nth-of-type(3) { left: 26rem; }
+    .skip-links a:focus { top: 1rem; }
+
+    /* ───── Headlines ───── */
+    .headline {
+      letter-spacing: -0.035em;
+      font-weight: 700;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+    .headline-sm {
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    /* ───── Buttons ───── */
+    .btn-primary, .btn-rust, .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: var(--tap-lg);
+      padding: 0 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1.0625rem;
+      text-decoration: none;
+      transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .btn-primary { background: var(--teal); color: var(--paper); }
+    .btn-primary:hover { background: var(--teal-deep); }
+    .btn-rust { background: var(--rust); color: var(--paper); }
+    .btn-rust:hover { background: var(--rust-deep); }
+    .btn-outline {
+      background: transparent;
+      color: var(--teal);
+      border: 2px solid var(--teal);
+    }
+    .btn-outline:hover { background: var(--teal); color: var(--paper); }
+
+    /* ───── Inline links, always underlined (WCAG 1.4.1) ───── */
+    .prose a, p a, footer a, nav a.text-link {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 4px;
+    }
+    p a { color: var(--teal); }
+    .bg-teal p a, .bg-charcoal p a { color: var(--paper); }
+    p a:hover { text-decoration-thickness: 2.5px; }
+
+    /* Header/footer nav links: visible affordance even before hover */
+    .nav-link {
+      display: inline-flex; align-items: center;
+      min-height: var(--tap);
+      padding: 0 .75rem;
+      color: var(--charcoal);
+      font-weight: 500;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 6px;
+      transition: text-decoration-color .15s ease, color .15s ease;
+    }
+    .nav-link:hover, .nav-link[aria-current="true"] {
+      text-decoration-color: var(--rust);
+      color: var(--teal);
+    }
+    .nav-link[aria-current="true"] { font-weight: 600; }
+
+    /* Mark indicating link goes elsewhere: external/anchor (kept as text in markup; visual only) */
+    .arrow { display: inline-block; transition: transform .15s ease; }
+    a:hover .arrow { transform: translate(2px, -2px); }
+
+    /* ───── Cards ───── */
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+    }
+    .principle { border-top: 1px solid var(--hairline); }
+
+    /* ───── Eyebrow ───── */
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--slate);
+    }
+
+    /* ───── Slash mark, decorative ───── */
+    .slash-mark {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 2.25rem;
+      color: var(--rust);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    /* ───── Number label ───── */
+    .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      color: var(--rust);
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ───── Hero grid texture ───── */
+    .grid-texture {
+      background-image:
+        linear-gradient(to right, rgba(10,79,79,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(10,79,79,0.05) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0));
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0));
+    }
+
+    /* ───── Email form ───── */
+    .field-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--paper);
+      letter-spacing: 0.01em;
+    }
+    .email-input {
+      background: var(--paper);
+      color: var(--charcoal);
+      border: 2px solid var(--paper);
+      border-radius: 8px;
+      padding: .875rem 1rem;
+      font-size: 1.0625rem;
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+      min-height: var(--tap-lg);
+    }
+    .email-input::placeholder { color: var(--slate); }
+    .email-input:focus-visible {
+      outline: 3px solid var(--paper);
+      outline-offset: 2px;
+      border-color: var(--paper);
+    }
+    .email-input[aria-invalid="true"] {
+      border-color: #FFD9CC;
+      background: #FFF3EE;
+    }
+
+    /* ───── Fade-in for success state ───── */
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+    /* ───── prefers-contrast: more / user high-contrast ───── */
+    @media (prefers-contrast: more) {
+      :root { --hairline: #4A4742; --slate: #2A2825; --paper-soft: #FFFFFF; }
+      .card { border-width: 2px; }
+      .principle { border-top-width: 2px; }
+    }
+    [data-contrast="high"] {
+      --hairline: #4A4742;
+      --slate: #2A2825;
+      --paper-soft: #FFFFFF;
+    }
+    [data-contrast="high"] .card { border-width: 2px; }
+    [data-contrast="high"] .principle { border-top-width: 2px; }
+    [data-contrast="high"] .btn-outline { border-width: 3px; }
+    [data-contrast="high"] .nav-link { text-decoration-color: var(--charcoal); }
+    [data-contrast="high"] .eyebrow { color: var(--charcoal); }
+
+    /* ───── Accessibility Panel ───── */
+    .a11y-toggle {
+      position: fixed; right: 1rem; bottom: 1rem;
+      z-index: 80;
+      width: 56px; height: 56px;
+      border-radius: 999px;
+      background: var(--charcoal);
+      color: var(--paper);
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 2px solid var(--paper);
+      box-shadow: 0 0 0 1px var(--charcoal);
+    }
+    .a11y-toggle:hover { background: var(--teal); box-shadow: 0 0 0 1px var(--teal); }
+    .a11y-toggle:focus-visible { outline: 3px solid var(--rust); outline-offset: 3px; }
+
+    .a11y-panel {
+      position: fixed; right: 1rem; bottom: calc(1rem + 56px + 12px);
+      z-index: 90;
+      width: min(360px, calc(100vw - 2rem));
+      /* Never grow taller than the viewport (matters at 150% text size): cap height and scroll inside. */
+      max-height: calc(100vh - 2rem - 68px);
+      max-height: calc(100dvh - 2rem - 68px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background: var(--paper);
+      color: var(--charcoal);
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      padding: 1.25rem 1.25rem 1rem;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .a11y-panel[hidden] { display: none; }
+    .a11y-panel h2 { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
+    .a11y-row {
+      display: grid; grid-template-columns: 1fr auto; align-items: center;
+      gap: .75rem;
+      padding: .75rem 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .a11y-row:first-of-type { border-top: 0; }
+    .a11y-row .label { font-size: 1rem; font-weight: 500; }
+    .a11y-row .hint { display: block; color: var(--slate); font-size: 0.875rem; line-height: 1.4; }
+    .a11y-seg {
+      display: inline-flex; border: 1px solid var(--hairline); border-radius: 999px; padding: 2px; gap: 2px;
+    }
+    .a11y-seg button {
+      min-height: 36px;
+      padding: 0 .75rem;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--charcoal);
+      font-size: .9375rem;
+      font-weight: 500;
+    }
+    .a11y-seg button[aria-pressed="true"] {
+      background: var(--charcoal);
+      color: var(--paper);
+    }
+    .a11y-switch {
+      position: relative;
+      width: 52px; height: 32px;
+      border-radius: 999px;
+      background: var(--hairline);
+      border: 0;
+      cursor: pointer;
+      transition: background-color .15s ease;
+      flex-shrink: 0;
+    }
+    .a11y-switch::after {
+      content: ""; position: absolute;
+      top: 3px; left: 3px;
+      width: 24px; height: 24px;
+      border-radius: 999px;
+      background: var(--paper);
+      transition: transform .15s ease;
+    }
+    .a11y-switch[aria-checked="true"] { background: var(--teal); }
+    .a11y-switch[aria-checked="true"]::after { transform: translateX(20px); }
+
+    .a11y-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: .5rem; padding-top: .75rem;
+      border-top: 1px solid var(--hairline);
+    }
+    .a11y-foot button {
+      font-size: .9375rem; font-weight: 500;
+      color: var(--teal);
+      padding: .5rem .75rem;
+      min-height: var(--tap);
+      text-decoration: underline; text-decoration-thickness: 1.5px;
+    }
+
+    /* When the panel is open, dim main behind it on small screens (visual only) */
+    @media (max-width: 480px) {
+      .a11y-panel { left: 1rem; right: 1rem; width: auto; }
+    }
+
+    /* Helper */
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 1. SKIP LINKS -->
+  <nav class="skip-links" aria-label="Skip">
+    <a href="#main">Skip to main content</a>
+    <a href="#nav-primary">Skip to navigation</a>
+    <a href="#a11y-toggle">Accessibility settings</a>
+  </nav>
+
+  <!-- 2. HEADER -->
+  <header class="sticky top-0 z-50 border-b border-hairline" style="background: rgba(250,249,246,0.95); backdrop-filter: saturate(140%) blur(8px);">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="flex items-center justify-between" style="min-height:80px;">
+        <a href="#top" aria-label="Roam Access home" class="inline-flex items-center" style="min-height:var(--tap); padding: 8px 4px;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="180" height="44" role="img" aria-label="Roam Access">
+            <title>Roam Access</title>
+            <g transform="translate(110, 150)">
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="0" y="0">roam</text>
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#9C2D0E" x="293" y="0">/</text>
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#0A4F4F" letter-spacing="-5" x="338" y="0">access</text>
+            </g>
+          </svg>
+        </a>
+
+        <nav id="nav-primary" class="hidden md:block" aria-label="Primary">
+          <ul class="flex items-center gap-1">
+            <li><a href="#approach" class="nav-link" data-section="approach">Our approach</a></li>
+            <li><a href="#involved" class="nav-link" data-section="involved">Get involved</a></li>
+            <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="nav-link">Take the survey</a></li>
+            <li><a href="#updates" class="btn-rust ml-2" style="min-height:var(--tap); padding: 0 1.125rem; font-size: 1rem;">Stay updated</a></li>
+          </ul>
+        </nav>
+
+        <button class="md:hidden inline-flex items-center justify-center rounded-lg border border-hairline text-charcoal bg-paper"
+                style="width:48px;height:48px;"
+                aria-label="Open menu"
+                aria-expanded="false"
+                aria-controls="mobile-nav"
+                id="menu-toggle">
+          <svg id="menu-icon-open" width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+            <path d="M0 1h22M0 8h22M0 15h22" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+          </svg>
+          <svg id="menu-icon-close" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" hidden>
+            <path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav id="mobile-nav" class="md:hidden pb-5" aria-label="Mobile" hidden>
+        <ul class="flex flex-col pt-2 border-t border-hairline">
+          <li><a href="#approach" class="nav-link" style="display:flex; padding: .75rem 0;">Our approach</a></li>
+          <li><a href="#involved" class="nav-link" style="display:flex; padding: .75rem 0;">Get involved</a></li>
+          <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="nav-link" style="display:flex; padding: .75rem 0;">Take the survey</a></li>
+          <li><a href="#updates" class="btn-rust mt-3" style="display:flex; min-height:var(--tap-lg);">Stay updated</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- 3. HERO -->
+    <section id="top" class="relative overflow-hidden" aria-labelledby="hero-h">
+      <div class="absolute inset-0 grid-texture pointer-events-none" aria-hidden="true"></div>
+      <div class="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-16 pb-20 md:pt-24 md:pb-28">
+        <div class="max-w-4xl">
+          <p class="eyebrow mb-6">For people with disability in Australia</p>
+          <h1 id="hero-h" class="headline text-charcoal mb-7" style="font-size: clamp(2.5rem, 7vw, 5.5rem);">
+            Find venues that<br class="hidden sm:inline" />
+            actually work<br class="hidden sm:inline" />
+            for you<span class="text-rust" aria-hidden="true">.</span><span class="visually-hidden">.</span>
+          </h1>
+          <p class="text-charcoal max-w-2xl mb-10" style="font-size: 1.25rem; line-height: 1.55;">
+            Australia's first accessibility discovery platform built with and for the disability community.
+          </p>
+          <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+            <a href="https://forms.gle/2vSfnNySe9ycRjys9" class="btn-primary" style="padding: 0 1.5rem; min-height: var(--tap-lg);">
+              <span>Help shape Roam Access by taking the 10-minute survey</span>
+              <span aria-hidden="true" class="ml-3">→</span>
+            </a>
+            <a href="#updates" class="inline-flex items-center text-teal font-semibold" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
+              Or stay in the loop
+              <span aria-hidden="true" class="arrow ml-2">↗</span>
+            </a>
+          </div>
+
+          <p class="mt-12 flex items-center gap-3" style="color: var(--slate); font-size: 0.9375rem;">
+            <span class="inline-block rounded-full" style="width:10px;height:10px;background:var(--rust);" aria-hidden="true"></span>
+            <span class="font-mono" style="letter-spacing: 0.08em;">Currently in research · Launching 2026</span>
+          </p>
+        </div>
+
+        <div class="hidden lg:block absolute right-12 top-24 select-none pointer-events-none" aria-hidden="true">
+          <div class="text-rust" style="font-family:Inter,sans-serif; font-weight:700; font-size:280px; line-height:0.8; letter-spacing:-0.06em; opacity:0.16;">/</div>
+        </div>
+      </div>
+      <div class="border-t" style="border-color: var(--hairline);"></div>
+    </section>
+
+    <!-- 4. THE PROBLEM -->
+    <section class="bg-stone" aria-labelledby="problem-h">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
+        <div class="max-w-3xl mb-14 md:mb-20">
+          <p class="eyebrow mb-5">The problem</p>
+          <h2 id="problem-h" class="headline text-charcoal" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+            Most accessibility info isn't built for you.
+          </h2>
+        </div>
+
+        <ul class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" role="list">
+          <li class="card p-7 md:p-8">
+            <span class="slash-mark mb-7 block" aria-hidden="true">/</span>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Information you can't trust</h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Venues self-report accessibility, and often get it wrong. You arrive, you can't get in, you go home.
+            </p>
+          </li>
+          <li class="card p-7 md:p-8">
+            <span class="slash-mark mb-7 block" aria-hidden="true">/</span>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">One-size-fits-nobody</h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Existing apps focus on wheelchair access. Vision, hearing, sensory, cognitive, and chronic illness needs get ignored.
+            </p>
+          </li>
+          <li class="card p-7 md:p-8">
+            <span class="slash-mark mb-7 block" aria-hidden="true">/</span>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Reviews without lived experience</h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Generic review sites don't know what "accessible bathroom" actually means. People who use mobility aids do.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. OUR APPROACH -->
+    <section id="approach" class="bg-paper" aria-labelledby="approach-h">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
+        <div class="md:grid md:grid-cols-12 md:gap-12 mb-14 md:mb-20">
+          <div class="md:col-span-7">
+            <p class="eyebrow mb-5">Our approach</p>
+            <h2 id="approach-h" class="headline text-charcoal mb-5" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+              Built with the community.<br />Not for them.
+            </h2>
+          </div>
+          <div class="md:col-span-5 md:pt-10">
+            <p class="text-charcoal" style="font-size: 1.1875rem;">
+              Four principles that shape everything we build.
+            </p>
+          </div>
+        </div>
+
+        <ol class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 md:gap-y-14 list-none p-0">
+          <li class="principle pt-8">
+            <p class="num mb-5" aria-hidden="true">01</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.625rem;">
+              <span class="visually-hidden">Principle 1: </span>Lived experience first
+            </h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Every feature is validated with PWD before we build it. No guessing, no assumptions.
+            </p>
+          </li>
+          <li class="principle pt-8">
+            <p class="num mb-5" aria-hidden="true">02</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.625rem;">
+              <span class="visually-hidden">Principle 2: </span>All seven disability categories
+            </h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Mobility, vision, hearing, cognitive, mental health, autism, chronic illness. Equal weight, equal depth.
+            </p>
+          </li>
+          <li class="principle pt-8">
+            <p class="num mb-5" aria-hidden="true">03</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.625rem;">
+              <span class="visually-hidden">Principle 3: </span>Verified, not vibed
+            </h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Community reviews plus anti-fake-review verification. You see real accessibility, not marketing.
+            </p>
+          </li>
+          <li class="principle pt-8">
+            <p class="num mb-5" aria-hidden="true">04</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.625rem;">
+              <span class="visually-hidden">Principle 4: </span>Free for users. Always.
+            </h3>
+            <p class="text-charcoal" style="font-size: 1.0625rem;">
+              Businesses pay for listings. Users never do. The data belongs to the community.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 6. WHO WE ARE -->
+    <section class="bg-stone" aria-labelledby="who-h">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
+        <div class="md:grid md:grid-cols-12 md:gap-12">
+          <div class="md:col-span-5 mb-8 md:mb-0">
+            <p class="eyebrow mb-5">Who we are</p>
+            <h2 id="who-h" class="headline text-charcoal" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+              We're early.<br />We're honest<br />about that.
+            </h2>
+          </div>
+          <div class="md:col-span-7 md:pt-2">
+            <p class="text-charcoal mb-7" style="font-size: 1.1875rem;">
+              Roam Access comes from a team that has spent years working in the disability sector in Australia, watching people struggle with accessibility information that was wrong, missing, or only built for one type of disability. We've been thinking about this for a long time. Now we're building it properly, slowly, with the community shaping every decision.
+            </p>
+            <p style="color: var(--slate); font-size: 1.0625rem;">
+              Currently validating the product with PWD across Australia. If you want to be part of that, <a href="https://forms.gle/2vSfnNySe9ycRjys9">take the survey</a> or <a href="mailto:helloroamaccess@gmail.com">get in touch</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. GET INVOLVED -->
+    <section id="involved" class="bg-paper" aria-labelledby="involved-h">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
+        <div class="max-w-3xl mb-14 md:mb-20">
+          <p class="eyebrow mb-5">Get involved</p>
+          <h2 id="involved-h" class="headline text-charcoal" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+            How to be part of this.
+          </h2>
+        </div>
+
+        <ul class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" role="list">
+          <!-- For PWD -->
+          <li class="card p-7 md:p-8 flex flex-col">
+            <p class="num mb-6">
+              For <abbr title="people with disability" style="text-decoration: none;">PWD</abbr>
+            </p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Shape what we build</h3>
+            <p class="text-charcoal mb-8 grow" style="font-size: 1.0625rem;">
+              Take the survey, join our research community, beta test when we launch.
+            </p>
+            <a href="https://forms.gle/2vSfnNySe9ycRjys9" class="btn-primary">
+              Take the survey <span aria-hidden="true" class="ml-2">→</span>
+            </a>
+          </li>
+
+          <!-- For venues -->
+          <li class="card p-7 md:p-8 flex flex-col">
+            <p class="num mb-6">For venues</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Get verified early</h3>
+            <p class="text-charcoal mb-8 grow" style="font-size: 1.0625rem;">
+              Be one of the first accessibility-verified venues in Australia.
+            </p>
+            <a href="https://forms.gle/UmEkrXcyvNmVSdXm8" class="btn-outline">
+              Register your interest <span aria-hidden="true" class="ml-2">→</span>
+            </a>
+          </li>
+
+          <!-- For supporters -->
+          <li class="card p-7 md:p-8 flex flex-col">
+            <p class="num mb-6">For supporters</p>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Follow the build</h3>
+            <p class="text-charcoal mb-8 grow" style="font-size: 1.0625rem;">
+              Follow our build. We share what we learn, openly.
+            </p>
+            <a href="https://www.linkedin.com/company/roam-access" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-teal font-semibold" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
+              Follow on LinkedIn
+              <span aria-hidden="true" class="arrow ml-2">↗</span>
+              <span class="visually-hidden"> (opens in new tab)</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. EMAIL CAPTURE -->
+    <section id="updates" class="bg-teal text-paper" aria-labelledby="updates-h">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
+        <div class="md:grid md:grid-cols-12 md:gap-12 items-start">
+          <div class="md:col-span-6 mb-10 md:mb-0">
+            <p class="eyebrow mb-5" style="color: var(--paper-soft);">Updates</p>
+            <h2 id="updates-h" class="headline text-paper mb-5" style="font-size: clamp(2.25rem, 5vw, 4rem);">
+              Stay in the loop<span class="text-rust" aria-hidden="true">.</span>
+            </h2>
+            <p class="text-paper max-w-md" style="font-size: 1.25rem; opacity: 0.92;">
+              Quarterly updates. No spam. Unsubscribe whenever.
+            </p>
+          </div>
+
+          <div class="md:col-span-6">
+            <!-- Submits to the "Stay in the loop" Google Form (see the email-form script below). -->
+            <form id="email-form"
+                  action="https://docs.google.com/forms/d/e/1FAIpQLSeMkPqZyLeUkQnJxfqFhL5AoGnYYUW7sv3VnBBL7pTGWTOtKQ/formResponse"
+                  method="post"
+                  novalidate aria-describedby="form-legal" aria-labelledby="updates-h">
+              <label for="email" class="field-label block mb-3">Email address</label>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                  id="email"
+                  name="entry.654661338"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  required
+                  placeholder="you@example.com"
+                  class="email-input flex-1"
+                  aria-required="true"
+                  aria-invalid="false"
+                  aria-describedby="email-error form-legal"
+                />
+                <button type="submit" class="btn-rust" style="padding: 0 1.5rem;">
+                  Subscribe
+                </button>
+              </div>
+              <p id="email-error" class="mt-3 hidden font-medium" style="color: #FFDFD4; font-size: 1rem;" role="alert"></p>
+              <p id="form-legal" class="mt-5 text-paper" style="font-size: 0.9375rem; opacity: 0.85;">
+                By subscribing you agree to our <a href="privacy.html">Privacy Policy</a>. We never share your data.
+              </p>
+            </form>
+
+            <div id="email-success" class="hidden fade-in" role="status" aria-live="polite">
+              <div class="border-2 border-paper/40 rounded-2xl p-7" style="background: rgba(255,255,255,0.08);">
+                <div class="flex items-start gap-4">
+                  <span aria-hidden="true" class="inline-flex items-center justify-center shrink-0 rounded-full" style="width:40px; height:40px; background:#5B8A72;">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M1 7l5 5L17 1" stroke="#FAF9F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <div>
+                    <p class="text-paper font-semibold mb-1" style="font-size: 1.25rem;">Thanks, we'll be in touch.</p>
+                    <p class="text-paper" style="font-size: 1rem; opacity: 0.88;">You'll hear from us next quarter. No spam, ever.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 9. FOOTER -->
+  <footer class="bg-charcoal text-paper" aria-labelledby="footer-h">
+    <h2 id="footer-h" class="visually-hidden">Site footer</h2>
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16 md:py-20">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
+        <div class="md:col-span-5">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="200" height="48" role="img" aria-label="Roam Access" class="mb-6">
+            <title>Roam Access</title>
+            <g transform="translate(110, 150)">
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#FAF9F6" letter-spacing="-5" x="0" y="0">roam</text>
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#9C2D0E" x="293" y="0">/</text>
+              <text font-family="Inter, sans-serif" font-weight="700" font-size="110" fill="#FAF9F6" letter-spacing="-5" x="338" y="0">access</text>
+            </g>
+          </svg>
+          <p class="text-paper max-w-xs mb-8" style="font-size: 1.0625rem; opacity: 0.9;">
+            Find venues that actually work for you.
+          </p>
+          <div class="rounded-2xl p-5" style="background: rgba(250,249,246,0.06); border: 1px solid rgba(250,249,246,0.18);">
+            <p class="font-semibold mb-2" style="font-size: 1rem;">Need this in another format?</p>
+            <p class="text-paper mb-3" style="font-size: 0.9375rem; opacity: 0.85;">
+              We can provide our materials in Plain English, Easy Read, or large print.
+            </p>
+            <a href="mailto:helloroamaccess@gmail.com?subject=Accessible%20format%20request" class="inline-flex items-center font-semibold text-paper" style="min-height: var(--tap); text-decoration: underline; text-underline-offset: 4px; font-size: 0.9375rem;">
+              Email us
+              <span aria-hidden="true" class="ml-2">→</span>
+            </a>
+          </div>
+        </div>
+
+        <nav class="md:col-span-2" aria-label="Project">
+          <p class="eyebrow mb-4" style="color:#BDB8B2;">Project</p>
+          <ul class="flex flex-col gap-1">
+            <li><a href="#approach" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">About</a></li>
+            <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Survey</a></li>
+            <li><a href="#involved" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">For venues</a></li>
+          </ul>
+        </nav>
+
+        <nav class="md:col-span-3" aria-label="Contact">
+          <p class="eyebrow mb-4" style="color:#BDB8B2;">Contact</p>
+          <ul class="flex flex-col gap-1">
+            <li><a href="mailto:helloroamaccess@gmail.com" class="inline-flex items-center text-paper break-all" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">helloroamaccess@gmail.com</a></li>
+            <li><a href="https://www.linkedin.com/company/roam-access" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">LinkedIn <span aria-hidden="true" class="ml-1">↗</span><span class="visually-hidden"> (opens in new tab)</span></a></li>
+            <li><a href="https://www.instagram.com/roamaccess/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Instagram <span aria-hidden="true" class="ml-1">↗</span><span class="visually-hidden"> (opens in new tab)</span></a></li>
+          </ul>
+        </nav>
+
+        <nav class="md:col-span-2" aria-label="Legal">
+          <p class="eyebrow mb-4" style="color:#BDB8B2;">Legal</p>
+          <ul class="flex flex-col gap-1">
+            <li><a href="privacy.html" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Privacy Policy</a></li>
+            <li><a href="accessibility.html" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Accessibility Statement</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="mt-14 pt-8 border-t" style="border-color: rgba(250,249,246,0.16);">
+        <p class="text-paper" style="font-size: 1rem; opacity: 0.7;">
+          © 2026 Roam Access. ABN [placeholder]. Made in Australia with the disability community.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ACCESSIBILITY PANEL -->
+  <div id="a11y-panel" class="a11y-panel" role="dialog" aria-modal="false" aria-labelledby="a11y-h" hidden>
+    <div class="flex items-start justify-between mb-2">
+      <h2 id="a11y-h" class="m-0">Accessibility</h2>
+      <button id="a11y-close" aria-label="Close accessibility settings" style="width:36px; height:36px; border-radius:999px; background:transparent;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>
+      </button>
+    </div>
+    <p style="color: var(--slate); font-size: .9375rem; margin-bottom: .25rem;">Adjust how this page works for you. Your choices are saved on this device.</p>
+
+    <div class="a11y-row">
+      <div>
+        <span class="label">Text size</span>
+        <span class="hint">Scales every word on the page.</span>
+      </div>
+      <div class="a11y-seg" role="radiogroup" aria-label="Text size">
+        <button data-scale="1" aria-pressed="true">A</button>
+        <button data-scale="1.125" aria-pressed="false" style="font-size:1.0625rem;">A</button>
+        <button data-scale="1.25" aria-pressed="false" style="font-size:1.1875rem;">A</button>
+        <button data-scale="1.5" aria-pressed="false" style="font-size:1.375rem;">A</button>
+      </div>
+    </div>
+
+    <div class="a11y-row">
+      <div>
+        <span class="label">Higher contrast</span>
+        <span class="hint">Darkens borders and secondary text.</span>
+      </div>
+      <button id="t-contrast" class="a11y-switch" role="switch" aria-checked="false" aria-label="Higher contrast"></button>
+    </div>
+
+    <div class="a11y-row">
+      <div>
+        <span class="label">Reduce motion</span>
+        <span class="hint">Stops smooth scrolling and transitions.</span>
+      </div>
+      <button id="t-motion" class="a11y-switch" role="switch" aria-checked="false" aria-label="Reduce motion"></button>
+    </div>
+
+    <div class="a11y-foot">
+      <span style="font-size: .8125rem; color: var(--slate);">Saved on this device</span>
+      <button id="a11y-reset" type="button">Reset to defaults</button>
+    </div>
+  </div>
+
+  <button id="a11y-toggle" class="a11y-toggle" aria-label="Open accessibility settings" aria-expanded="false" aria-controls="a11y-panel">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="6.5" r="1.4" fill="currentColor"/>
+      <path d="M7 9.5h10M12 9.5v8M9 17.5l3-5 3 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <script>
+    /* ───── Accessibility settings ───── */
+    (function() {
+      const root = document.documentElement;
+      const STORAGE = 'roam-a11y-v1';
+      const DEFAULTS = { scale: 1, contrast: false, motion: false };
+      let prefs = { ...DEFAULTS };
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE) || 'null');
+        if (saved && typeof saved === 'object') prefs = { ...DEFAULTS, ...saved };
+      } catch (e) {}
+
+      function apply() {
+        root.style.setProperty('--type-scale', String(prefs.scale));
+        root.dataset.contrast = prefs.contrast ? 'high' : '';
+        root.dataset.motion = prefs.motion ? 'reduce' : '';
+        // Reflect in UI
+        document.querySelectorAll('.a11y-seg [data-scale]').forEach(b => {
+          b.setAttribute('aria-pressed', String(parseFloat(b.dataset.scale) === prefs.scale));
+        });
+        const tc = document.getElementById('t-contrast');
+        const tm = document.getElementById('t-motion');
+        if (tc) tc.setAttribute('aria-checked', String(prefs.contrast));
+        if (tm) tm.setAttribute('aria-checked', String(prefs.motion));
+      }
+      function save() {
+        try { localStorage.setItem(STORAGE, JSON.stringify(prefs)); } catch (e) {}
+      }
+
+      // Panel open/close + focus management
+      const toggle = document.getElementById('a11y-toggle');
+      const panel = document.getElementById('a11y-panel');
+      const closeBtn = document.getElementById('a11y-close');
+      function openPanel() {
+        panel.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+        const first = panel.querySelector('[data-scale][aria-pressed="true"]') || panel.querySelector('button');
+        if (first) first.focus();
+        document.addEventListener('keydown', onKey);
+        document.addEventListener('click', onOutside, true);
+      }
+      function closePanel() {
+        panel.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        document.removeEventListener('keydown', onKey);
+        document.removeEventListener('click', onOutside, true);
+        toggle.focus();
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') { e.preventDefault(); closePanel(); }
+      }
+      function onOutside(e) {
+        if (!panel.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) closePanel();
+      }
+      toggle.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
+      closeBtn.addEventListener('click', closePanel);
+
+      // Wire controls
+      document.querySelectorAll('.a11y-seg [data-scale]').forEach(b => {
+        b.addEventListener('click', () => {
+          prefs.scale = parseFloat(b.dataset.scale);
+          apply(); save();
+        });
+      });
+      document.getElementById('t-contrast').addEventListener('click', () => {
+        prefs.contrast = !prefs.contrast; apply(); save();
+      });
+      document.getElementById('t-motion').addEventListener('click', () => {
+        prefs.motion = !prefs.motion; apply(); save();
+      });
+      document.getElementById('a11y-reset').addEventListener('click', () => {
+        prefs = { ...DEFAULTS }; apply(); save();
+      });
+
+      apply();
+    })();
+
+    /* ───── Mobile menu ───── */
+    (function() {
+      const toggle = document.getElementById('menu-toggle');
+      const nav = document.getElementById('mobile-nav');
+      const iconOpen = document.getElementById('menu-icon-open');
+      const iconClose = document.getElementById('menu-icon-close');
+      if (!toggle || !nav) return;
+      function setOpen(open) {
+        if (open) {
+          nav.removeAttribute('hidden');
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.setAttribute('aria-label', 'Close menu');
+          iconOpen.hidden = true; iconClose.hidden = false;
+          document.addEventListener('keydown', onKey);
+        } else {
+          nav.setAttribute('hidden', '');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.setAttribute('aria-label', 'Open menu');
+          iconOpen.hidden = false; iconClose.hidden = true;
+          document.removeEventListener('keydown', onKey);
+        }
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
+      }
+      toggle.addEventListener('click', () => setOpen(nav.hasAttribute('hidden')));
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+    })();
+
+    /* ───── aria-current via IntersectionObserver ───── */
+    (function() {
+      const links = Array.from(document.querySelectorAll('.nav-link[data-section]'));
+      if (!links.length || !('IntersectionObserver' in window)) return;
+      const map = new Map();
+      links.forEach(a => {
+        const el = document.getElementById(a.dataset.section);
+        if (el) map.set(el, a);
+      });
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && e.intersectionRatio > 0.4) {
+            links.forEach(l => l.removeAttribute('aria-current'));
+            const a = map.get(e.target);
+            if (a) a.setAttribute('aria-current', 'true');
+          }
+        });
+      }, { rootMargin: '-30% 0px -50% 0px', threshold: [0, 0.4, 1] });
+      map.forEach((_a, el) => io.observe(el));
+    })();
+
+    /* ───── Email form → Google Forms ─────
+       Posts the email to the "Stay in the loop" Google Form's formResponse endpoint.
+       Note: the request is no-cors, so the response is opaque (we can't read the
+       status). We treat a resolved request as success (optimistic) and only surface
+       an error on a network-level failure (e.g. the user is offline).
+       The <form action>/<input name> mirror this so it still works without JS. */
+    (function() {
+      const form = document.getElementById('email-form');
+      const success = document.getElementById('email-success');
+      const input = document.getElementById('email');
+      const error = document.getElementById('email-error');
+      const submitBtn = form && form.querySelector('button[type="submit"]');
+      if (!form) return;
+
+      const MESSAGES = {
+        valueMissing: 'Please enter your email address.',
+        typeMismatch: 'That doesn’t look like a valid email. Please check and try again.',
+        tooShort: 'That email is too short. Please check and try again.',
+        network: 'Something went wrong sending that. Please check your connection and try again.',
+      };
+
+      function setError(msg, isValidity) {
+        error.textContent = msg;
+        error.classList.remove('hidden');
+        input.setAttribute('aria-invalid', 'true');
+        input.setCustomValidity(isValidity ? msg : '');
+      }
+      function clearError() {
+        error.textContent = '';
+        error.classList.add('hidden');
+        input.setAttribute('aria-invalid', 'false');
+        input.setCustomValidity('');
+      }
+      function showSuccess() {
+        clearError();
+        form.classList.add('hidden');
+        success.classList.remove('hidden');
+        success.setAttribute('tabindex', '-1');
+        success.focus({ preventScroll: true });
+      }
+
+      input.addEventListener('input', clearError);
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        input.setCustomValidity('');
+        if (!input.checkValidity()) {
+          const v = input.validity;
+          const key = Object.keys(MESSAGES).find(k => v[k]);
+          setError(MESSAGES[key] || 'Please check your email address.', true);
+          input.focus();
+          return;
+        }
+        clearError();
+
+        // Build the body from the form's named fields (entry.654661338).
+        const body = new URLSearchParams(new FormData(form));
+
+        // Submitting state (announced to assistive tech via the disabled label change).
+        const originalLabel = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Subscribing…'; }
+
+        try {
+          await fetch(form.action, { method: 'POST', mode: 'no-cors', body });
+          showSuccess();
+        } catch (err) {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+          setError(MESSAGES.network, false);
+          input.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

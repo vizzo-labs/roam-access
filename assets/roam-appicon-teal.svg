@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <rect width="400" height="400" rx="80" fill="#0A4F4F"></rect>
+  <g transform="translate(80, 270)">
+    <text font-family="Inter, Arial, sans-serif" font-weight="700" font-size="160" fill="#FAF9F6" letter-spacing="-8" x="0" y="0">r</text>
+    <text font-family="Inter, Arial, sans-serif" font-weight="700" font-size="160" fill="#FAF9F6" x="92" y="0">/</text>
+    <text font-family="Inter, Arial, sans-serif" font-weight="700" font-size="160" fill="#FAF9F6" letter-spacing="-8" x="172" y="0">a</text>
+  </g>
+</svg>
