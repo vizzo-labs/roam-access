@@ -97,11 +97,12 @@
       overflow: hidden;
     }
     .v2-scroll {
-      flex: 1; overflow-y: auto; overflow-x: hidden;
+      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
       padding-top: var(--ra-shell-top);
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
-    .v2-fixed { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .v2-fixed { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
     /* ── Voice animation ────────────────────────────────────────────────── */
     @keyframes ra-bar { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
@@ -116,12 +117,28 @@
       --ra-tabs-pad: calc(env(safe-area-inset-bottom, 0px) + 12px);
     }
     html:not(.framed) .stage-chrome, html:not(.framed) .phone-hw { display: none; }
-    html:not(.framed) .phone {
-      position: fixed; inset: 0; border: 0; border-radius: 0; box-shadow: none;
-      width: auto; height: auto; transform: none; background: var(--ra-paper);
+    /* iOS Safari rules this layout:
+       — never size the app with `position: fixed; inset: 0`: fixed elements
+         are laid out against the LAYOUT viewport (toolbar collapsed), so the
+         bottom bar renders under the toolbar — and inner scrolling never
+         collapses the toolbar, so it stays buried forever.
+       — 100dvh tracks the VISIBLE viewport instead, and normal flow avoids
+         the fixed-position scroll quirks entirely.
+       — overflow:hidden must sit on BOTH html and body with
+         overscroll-behavior:none, or touch swipes rubber-band the document
+         and the inner scroller feels stuck. */
+    html:not(.framed), html:not(.framed) body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
-    html:not(.framed) .phone-screen { position: absolute; inset: 0; border-radius: 0; }
-    html:not(.framed) body { overflow: hidden; }
+    html:not(.framed) .phone-wrap { width: 100%; height: 100%; }
+    html:not(.framed) .phone {
+      position: relative; border: 0; border-radius: 0; box-shadow: none;
+      width: 100%; height: 100%; height: 100dvh; padding: 0;
+      transform: none; background: var(--ra-paper); box-sizing: border-box;
+    }
+    html:not(.framed) .phone-screen { position: absolute; inset: 0; border-radius: 0; width: auto; height: auto; }
 
     /* ── Desktop: a phone on a stage ────────────────────────────────────── */
     html.framed { --ra-shell-top: 62px; --ra-tabs-pad: 30px; }
