@@ -1,10 +1,12 @@
-# Roam Access — web app pilot
+# Roam Access — pilot demo (v2)
 
-An interactive, front-end-only prototype of the Roam Access product, served as static files at
+Interactive, front-end-only demo of the Roam Access mobile app, served as static files at
 `/app/` alongside the marketing site. No backend, no build step at deploy time.
 
-Imported from the Claude Design project **Roam Access** (`Roam Access Web App.html`), then adapted
-for public deployment.
+Imported from the Claude Design project **Roam Access** (`Roam Access App Pilot v2.html` +
+`app/screens-v2*.jsx`), then adapted into a single working app: on phones it runs full-bleed
+like a native app; on desktop it renders inside a phone frame on a branded stage — built for
+showing to investors from a laptop or a shared link.
 
 ---
 
@@ -12,85 +14,67 @@ for public deployment.
 
 ```
 app/
-  index.html          host page: metadata, fonts, base + responsive CSS, script order
-  src/*.jsx           source of truth — edit these
-  js/*.js             compiled output, committed so the site deploys as-is
-  vendor/*.js         React 18 UMD (production), self-hosted
-  fonts/*.woff2       Inter + JetBrains Mono (variable, latin subset), self-hosted
+  index.html          host page: phone-frame stage, CSS vars, responsive + a11y CSS, script order
+  src/
+    data.jsx          fictional venues, needs taxonomy, demo constants
+    primitives.jsx    live palette, verdict engine, query parser, shared components
+    screens-a.jsx     Welcome · Setup · Home · Voice · Results
+    screens-b.jsx     Map · Venue · AllReviews · Review · Thanks · Saved · Me · A11ySheet
+    app.jsx           root: hash routing, user/world state, prefs
+  js/                 compiled output, committed — the site deploys as-is
+  vendor/             React 18 UMD (production), self-hosted
+  fonts/              Inter + JetBrains Mono (variable, latin), self-hosted
+scripts/stamp-version.mjs   cache-busts js/vendor URLs in index.html on every build
 ```
 
 ## Building
 
-JSX is compiled ahead of time rather than in the browser:
-
 ```bash
 npm install     # once
-npm run build   # app/src/*.jsx -> app/js/*.js
-npm run watch   # rebuild on save
+npm run build   # compiles app/src → app/js AND stamps ?v=<hash> onto script URLs
 ```
 
-**Commit `app/js/` whenever you change `app/src/`.** The deployed site loads `app/js` directly;
-nothing compiles at request time.
+**Commit `app/js/` and `app/index.html` together after every build.** The version stamp is what
+saves visitors from GitHub Pages' 10-minute asset cache pairing new HTML with stale JS.
 
-The design project loaded React *development* builds plus Babel-standalone from unpkg and compiled
-JSX on every page view — roughly 4 MB before first paint. Precompiling and vendoring React brings
-that to ~230 KB, all same-origin.
+Scripts are classic globals loaded in order: `data → primitives → screens-a → screens-b → app`.
 
-## How the scripts fit together
+## Voice search
 
-Plain classic scripts, loaded in order. Each file publishes onto `window`; later files read what
-earlier ones defined. There are no modules and no bundler, so **order in `index.html` matters**:
+Real, with a fallback that cannot fail on stage:
 
-`data → primitives → shell → views → app`
+- Browsers with SpeechRecognition (Chrome, Edge, Safari): the mic actually listens (`en-AU`),
+  shows the live transcript, and runs the parsed query against the venue data.
+- No support / permission denied / nothing heard / permission prompt left hanging: after 7s the
+  screen switches to a labelled scripted demo — types the sample query and runs the same search.
+- `?voice=demo` in the URL forces the scripted path (guaranteed-deterministic pitch).
+- The three example chips are also tappable and run their query instantly.
+
+The whole lifecycle lives in ONE mount-once effect in `V2Voice`. Keep it that way — recognition
+handles, timers and the finished flag are all closure-local, so no re-render can strand the screen.
+
+## The verdict engine
+
+`ra2Verdict(venue, needIds)` in primitives.jsx is the product thesis in one function: facts are
+tagged by need; with needs set, only relevant facts count. A step doesn't stop a deaf user, loud
+music doesn't stop a wheelchair user — so the same venue can be "Works for you" for one person
+and "Has barriers" for another. Demo this by changing needs in Me → Edit.
 
 ## Things that will bite you
 
-**Inline styles beat the stylesheet.** Every component is styled with React inline styles, and
-inline styles cannot carry media queries — so the containers that must reflow (`.ra-shell`,
-`.ra-sidebar`, `.ra-discover-grid`, `.ra-map`, `.ra-two-col`, `.ra-cat-grid`, `.ra-stat-grid`,
-`.ra-card-grid`, `.ra-bottom-nav`) take their layout from classes in `index.html`. If you add
-`display`, `grid-template-columns` or `position` to one of those elements' inline styles, it will
-silently override the media query and the responsive behaviour will stop working.
-
-**`RA_C` is a live object.** The "higher contrast" preference swaps its values in place and the app
-re-renders. Read `RA_C.x` at render time; never destructure it into a module-level constant, or that
-copy will freeze at the startup palette.
-
-**`hair` vs `line`.** `RA_C.hair` is decorative (separators, card edges). `RA_C.line` bounds
-something operable — inputs, chips, option cards, toggles — and is chosen to clear WCAG 3:1 against
-paper. Use `line` for anything a person can interact with.
-
-**Nested interactive elements.** Several rows are a single `<button>` containing something that
-*looks* like a switch. Those use `<RAToggle presentational />`, which renders an inert `<span>`.
-A real control nested inside a button is invalid HTML and gives one setting two tab stops.
-
-## Accessibility
-
-The site publishes a WCAG 2.2 AA commitment, so this app is held to it. Implemented here:
-focus management on route change and in both dialogs (focus in, trap, Escape, restore), real
-labels on every control, radio semantics with arrow keys for text size, a skip link, landmarks and
-heading structure, 44px touch targets, non-text contrast ≥3:1, live regions scoped to short
-announcements, `prefers-reduced-motion` / `prefers-contrast` honoured as defaults, and text scaling
-that actually moves the whole UI.
-
-Re-check after changes: no nested interactives, every control has an accessible name, one `h1` per
-view, and no `aria-live` on a container that wraps a whole view.
+- **`C2` is a live object** (higher-contrast swaps values in place). Read `C2.x` at render time;
+  never copy into a module constant.
+- **`hair` vs `line`**: `hair` is decorative, `line` bounds anything operable (3:1 on paper).
+- **Layout classes** (`.v2-screen`, `.v2-scroll`, `--ra-shell-top`, `--ra-tabs-pad`) live in
+  index.html because inline styles can't carry media queries — don't duplicate those properties
+  inline or they'll silently win.
+- **Phone chrome** (island, status bar, clock, home indicator) is desktop-only decoration in
+  index.html, `aria-hidden`, hidden under 700px where real device chrome exists.
+- **State**: `ra2-user`, `ra2-world`, `ra2-a11y` in localStorage. "Restart the demo" in Me clears
+  the first two — use it between pitches.
 
 ## Sample data
 
-`src/data.jsx` is illustrative. The page is `noindex, nofollow` and carries a permanent sample-data
-banner rendered server-side, plus per-item labelling on reviews, verification counts and venue
-contact details.
-
-**All eight venues are fictional** — invented names at invented street addresses. Suburbs and
-categories are realistic so the demo reads true; the businesses are not. **Keep it that way.** An
-invented access rating attached to a real, named business is a published claim about that business,
-and this file is served from the live commercial domain. If real venues are ever needed here, the
-only safe basis is a first-party published access statement from that venue, quoted with a source
-link and a "last checked" date — never invented notes, and never invented first-person reviews.
-
-## Re-syncing from Claude Design
-
-Source files map 1:1 to the design project: `webapp/data.jsx` → `src/data.jsx`, and so on;
-`src/app.jsx` is the inline `<script type="text/babel">` block from `Roam Access Web App.html`.
-Diff before overwriting — the adaptations above are not in the design project and would be lost.
+All venues are fictional — invented names and addresses. Keep it that way: an invented access
+claim attached to a real, named business is a published claim about that business. The page is
+`noindex`, the stage footer and Welcome/Venue/Me screens say "fictional sample data".

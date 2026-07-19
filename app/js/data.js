@@ -1,330 +1,499 @@
-// Sample data for the Roam Access web prototype.
+// Roam Access pilot v2 — sample data.
 //
-// Every venue here is FICTIONAL — invented name, invented street address. None
-// of them is a real business, and none of this is real accessibility
-// information. That is deliberate and must stay that way: this file is served
-// from the live domain, and an invented access rating attached to a real,
-// named business is a claim about that business. Keep the suburbs and the
-// categories realistic; keep the venues made up.
+// Every venue is FICTIONAL — invented name, invented address. None of them is
+// a real business and none of this is real accessibility information. Keep it
+// that way: this ships on the live domain, and an invented access claim
+// attached to a real, named business is a published claim about that business.
 
-const RA_CATEGORIES = [{
+// ── Needs (first-person, as in the setup screen) ──────────────────────────
+const RA2_NEEDS = [{
   id: 'mobility',
-  title: 'Mobility',
-  sub: 'Step-free, lifts, ramps, wide doorways'
+  label: 'I use a wheelchair or mobility aid',
+  tags: ['stepfree', 'bathroom'],
+  chip: 'Wheelchair access',
+  short: 'wheelchair access'
 }, {
   id: 'vision',
-  title: 'Vision',
-  sub: 'Braille, signage, lighting, screen-readers'
+  label: "I'm blind or have low vision",
+  tags: ['vision'],
+  chip: 'Low vision friendly',
+  short: 'vision support'
 }, {
   id: 'hearing',
-  title: 'Hearing',
-  sub: 'Hearing loops, captions, low background noise'
-}, {
-  id: 'cognitive',
-  title: 'Cognitive',
-  sub: 'Plain signage, predictable layouts'
-}, {
-  id: 'mental',
-  title: 'Mental health',
-  sub: 'Quiet rooms, low-stimulation areas'
+  label: "I'm deaf or hard of hearing",
+  tags: ['hearing'],
+  chip: 'Hearing support',
+  short: 'hearing support'
 }, {
   id: 'autism',
-  title: 'Autism / sensory',
-  sub: 'Low lighting, quiet hours, sensory maps'
+  label: "I'm autistic or sensory-sensitive",
+  tags: ['quiet'],
+  chip: 'Sensory-friendly',
+  short: 'quiet spaces'
+}, {
+  id: 'cognitive',
+  label: 'Easy-to-understand places help me',
+  tags: ['simple'],
+  chip: 'Easy to navigate',
+  short: 'simple layouts'
+}, {
+  id: 'mental',
+  label: 'Calm, low-stress places help me',
+  tags: ['calm'],
+  chip: 'Calm spaces',
+  short: 'calm spaces'
 }, {
   id: 'chronic',
-  title: 'Chronic illness',
-  sub: 'Seating, rest areas, climate, food needs'
+  label: 'I need seats and rest spots (fatigue, pain)',
+  tags: ['seats'],
+  chip: 'Seats & rest spots',
+  short: 'seating'
 }];
 
-// 8 invented venues across Sydney. Coords are arbitrary positions on the demo map.
-const RA_VENUES = [{
+// ── Venues ────────────────────────────────────────────────────────────────
+// facts: works / check / barriers. `t` is the plain-language line, `s` a short
+// form for result cards, `tags` say which needs the fact touches (empty tags =
+// applies to everyone).
+const RA2_VENUES = [{
   id: 'tin-whistle',
   name: 'Tin Whistle Coffee',
   kind: 'Cafe',
+  cat: 'food',
   area: 'Surry Hills',
-  addr: '18 Cobbler Lane, Surry Hills NSW',
-  coords: [0.36, 0.42],
-  dist: '420m',
+  mins: 5,
+  coords: [0.44, 0.56],
   verified: 12,
-  cover: 'coffee · cafe interior',
-  status: {
-    mobility: 'accessible',
-    vision: 'accessible',
-    hearing: 'partial',
-    cognitive: 'accessible',
-    mental: 'unverified',
-    autism: 'partial',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Step-free entry, wide aisles, accessible loo on premises',
-    vision: 'High-contrast menu, well-lit, Braille on bathrooms',
-    hearing: 'Hearing loop at counter; ambient noise can be high at peak',
-    cognitive: 'Clear signage, predictable ordering flow',
-    mental: 'No data yet — be the first to share',
-    autism: 'Quiet hour Wed 9–11am. Music loud at peak',
-    chronic: 'Seating available, dietary options labelled'
-  },
+  note: 'Quiet after 2pm',
+  works: [{
+    t: 'Roll straight in — no step, wide door',
+    s: 'Step-free entry',
+    tags: ['stepfree']
+  }, {
+    t: 'Accessible bathroom on the ground floor',
+    s: 'Accessible bathroom',
+    tags: ['bathroom']
+  }, {
+    t: 'Staff will read the menu aloud if you ask',
+    s: 'Menu read aloud',
+    tags: ['vision']
+  }, {
+    t: 'Quiet, calm space after 2pm',
+    s: 'Quiet after 2pm',
+    tags: ['quiet', 'calm']
+  }, {
+    t: 'Seats with backs, and a bench outside for a rest',
+    s: 'Plenty of seating',
+    tags: ['seats']
+  }],
+  check: [{
+    t: 'Music can be loud before 2pm — ask staff to lower it',
+    s: 'Loud before 2pm',
+    tags: ['quiet']
+  }, {
+    t: 'No hearing loop at the counter',
+    s: 'No hearing loop',
+    tags: ['hearing']
+  }],
+  barriers: [],
   reviews: [{
     id: 'r1',
     who: 'Wheelchair user',
+    tag: 'Wheelchair',
     when: '3 days ago',
-    cat: 'mobility',
-    rating: 'accessible',
+    v: 'works',
+    helpful: 4,
     text: 'Walked straight in — no step, wide enough for my chair. Loo is roomy too. Counter is a touch high but staff offered to help.'
   }, {
     id: 'r2',
     who: 'Hearing aid user',
+    tag: 'Deaf',
     when: '1 week ago',
-    cat: 'hearing',
-    rating: 'partial',
-    text: 'Hearing loop at the counter is great. Tables further back get drowned out by the espresso machine — sit near the window.'
+    v: 'check',
+    helpful: 3,
+    text: 'No loop at the counter, but staff were happy to write things down. Tables near the window are quietest.'
   }, {
     id: 'r3',
     who: 'Autistic person',
+    tag: 'Autistic',
     when: '2 weeks ago',
-    cat: 'autism',
-    rating: 'partial',
-    text: 'Wed 9–11am quiet hour is real and lovely. Other times can be overwhelming. They will turn music down if asked.'
+    v: 'check',
+    helpful: 6,
+    text: 'After 2pm it is genuinely calm and lovely. Mornings can be overwhelming. They will turn the music down if you ask.'
+  }, {
+    id: 'r4',
+    who: 'Blind person',
+    tag: 'Blind / low vision',
+    when: '3 weeks ago',
+    v: 'works',
+    helpful: 5,
+    text: 'Staff read the specials to me without being asked twice. Layout is simple to learn — tables along the left wall.'
+  }]
+}, {
+  id: 'copper-kettle',
+  name: 'Copper Kettle Espresso',
+  kind: 'Cafe',
+  cat: 'food',
+  area: 'Redfern',
+  mins: 8,
+  coords: [0.3, 0.3],
+  verified: 9,
+  note: 'Calm back room',
+  works: [{
+    t: 'Step-free entry from the laneway',
+    s: 'Step-free entry',
+    tags: ['stepfree']
+  }, {
+    t: 'Calm back room away from the machines',
+    s: 'Calm back room',
+    tags: ['quiet', 'calm']
+  }, {
+    t: 'Large-print menu at the counter',
+    s: 'Large-print menu',
+    tags: ['vision']
+  }],
+  check: [{
+    t: 'Bathroom is standard size — accessible one is next door at the library',
+    s: 'Bathroom next door',
+    tags: ['bathroom']
+  }],
+  barriers: [],
+  reviews: [{
+    id: 'r1',
+    who: 'Person with chronic illness',
+    tag: 'Chronic illness',
+    when: '5 days ago',
+    v: 'works',
+    helpful: 2,
+    text: 'The back room is a lifesaver — soft chairs, no queue noise. Staff let me sit as long as I needed.'
+  }]
+}, {
+  id: 'little-wren',
+  name: 'Little Wren Coffee',
+  kind: 'Cafe',
+  cat: 'food',
+  area: 'Chippendale',
+  mins: 12,
+  coords: [0.58, 0.22],
+  verified: 4,
+  note: 'Bathroom being verified',
+  works: [{
+    t: 'Wide entry with a gentle ramp',
+    s: 'Ramped entry',
+    tags: ['stepfree']
+  }, {
+    t: 'Courtyard is quiet on weekdays',
+    s: 'Quiet courtyard',
+    tags: ['quiet', 'calm']
+  }],
+  check: [{
+    t: 'Bathroom not verified yet — 2 community members are checking',
+    s: 'Bathroom not verified yet',
+    tags: ['bathroom']
+  }],
+  barriers: [],
+  reviews: []
+}, {
+  id: 'ironbark',
+  name: 'Ironbark Roasters',
+  kind: 'Cafe',
+  cat: 'food',
+  area: 'Surry Hills',
+  mins: 10,
+  coords: [0.24, 0.68],
+  verified: 7,
+  note: 'Step at entry',
+  works: [{
+    t: 'Staff are friendly and will bring orders to the door',
+    s: 'Staff help at door',
+    tags: []
+  }],
+  check: [{
+    t: 'Very loud at peak times',
+    s: 'Loud at peak',
+    tags: ['quiet', 'calm']
+  }],
+  barriers: [{
+    t: 'Step at the entry — about 15cm, no ramp',
+    s: 'Step at entry',
+    tags: ['stepfree']
+  }, {
+    t: 'Narrow doorway — under 76cm',
+    s: 'Narrow doorway',
+    tags: ['stepfree']
+  }],
+  reviews: [{
+    id: 'r1',
+    who: 'Wheelchair user',
+    tag: 'Wheelchair',
+    when: '1 month ago',
+    v: 'barrier',
+    helpful: 8,
+    text: 'Could not get in. The step is too high and the doorway is narrow. Staff were kind about it, but the building is the building.'
+  }]
+}, {
+  id: 'foundry',
+  name: 'The Foundry Museum',
+  kind: 'Museum',
+  cat: 'arts',
+  area: 'Ultimo',
+  mins: 6,
+  coords: [0.36, 0.4],
+  verified: 22,
+  note: 'Sensory mornings Sun 9–11am',
+  works: [{
+    t: 'Lifts to every floor, wide gallery aisles',
+    s: 'Lifts everywhere',
+    tags: ['stepfree']
+  }, {
+    t: 'Accessible bathrooms on all floors',
+    s: 'Accessible bathrooms',
+    tags: ['bathroom']
+  }, {
+    t: 'Audio guide and large-print labels throughout',
+    s: 'Audio guide',
+    tags: ['vision']
+  }, {
+    t: 'Captioned video and monthly Auslan tours',
+    s: 'Auslan tours',
+    tags: ['hearing']
+  }, {
+    t: 'Sensory mornings every Sunday 9–11am',
+    s: 'Sensory mornings',
+    tags: ['quiet']
+  }, {
+    t: 'Simple map, plenty of staff to ask',
+    s: 'Easy to navigate',
+    tags: ['simple']
+  }, {
+    t: 'Seats in every gallery',
+    s: 'Seats throughout',
+    tags: ['seats']
+  }],
+  check: [],
+  barriers: [],
+  reviews: [{
+    id: 'r1',
+    who: 'Parent of autistic child',
+    tag: 'Autistic',
+    when: '4 days ago',
+    v: 'works',
+    helpful: 9,
+    text: 'Sunday sensory morning was the first museum trip we have finished in years. Lights low, no announcements, quiet room ready.'
+  }, {
+    id: 'r2',
+    who: 'Wheelchair user',
+    tag: 'Wheelchair',
+    when: '2 weeks ago',
+    v: 'works',
+    helpful: 5,
+    text: 'Every floor reachable, wide aisles, and the staff actually know where the lifts are. Rare.'
   }]
 }, {
   id: 'harbour-playhouse',
   name: 'The Harbour Playhouse',
-  kind: 'Venue',
+  kind: 'Theatre',
+  cat: 'music',
   area: 'Dawes Point',
-  addr: '3 Lantern Wharf, Dawes Point NSW',
-  coords: [0.62, 0.18],
-  dist: '1.2km',
+  mins: 15,
+  coords: [0.62, 0.14],
   verified: 38,
-  cover: 'theatre exterior',
-  status: {
-    mobility: 'accessible',
-    vision: 'accessible',
-    hearing: 'accessible',
-    cognitive: 'accessible',
-    mental: 'partial',
-    autism: 'partial',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Lifts to all public levels. Accessible bathrooms on every floor.',
-    vision: 'Audio described performances bookable. Braille programs available.',
-    hearing: 'Hearing loops in all performance halls. Captioned shows monthly.',
-    cognitive: 'Pre-visit social stories on website. Staff briefed.',
-    mental: 'Quiet rooms backstage on request',
-    autism: 'Sensory performances run quarterly',
-    chronic: 'Seating available throughout, climate controlled'
-  },
-  reviews: [{
-    id: 'r1',
-    who: 'Wheelchair user',
-    when: '5 days ago',
-    cat: 'mobility',
-    rating: 'accessible',
-    text: 'Truly accessible. Staff knew exactly where the accessible entrance and lifts were. Booking the wheelchair seat was simple.'
+  note: 'Audio described shows monthly',
+  works: [{
+    t: 'Lifts to all levels, wheelchair seats bookable online',
+    s: 'Wheelchair seating',
+    tags: ['stepfree']
   }, {
-    id: 'r2',
-    who: 'Blind person',
-    when: '2 weeks ago',
-    cat: 'vision',
-    rating: 'accessible',
-    text: 'The audio described matinee was excellent, and the pre-show touch tour was a real treat. Will be back.'
-  }]
-}, {
-  id: 'ironbark-roasters',
-  name: 'Ironbark Roasters',
-  kind: 'Cafe',
-  area: 'Surry Hills',
-  addr: '61 Marlowe Street, Surry Hills NSW',
-  coords: [0.42, 0.55],
-  dist: '650m',
-  verified: 7,
-  cover: 'industrial cafe',
-  status: {
-    mobility: 'notAccess',
-    vision: 'partial',
-    hearing: 'partial',
-    cognitive: 'unverified',
-    mental: 'unverified',
-    autism: 'notAccess',
-    chronic: 'partial'
-  },
-  notes: {
-    mobility: 'Narrow doorway. Step at entry. No accessible loo on premises.',
-    vision: 'Dim lighting at back. Menu printed small.',
-    hearing: 'Very loud at peak. No hearing loop.',
-    cognitive: 'No data yet',
-    mental: 'No data yet',
-    autism: 'High stimulation environment. No quiet hour.',
-    chronic: 'Limited seating, can be busy'
-  },
+    t: 'Hearing loops in every hall',
+    s: 'Hearing loops',
+    tags: ['hearing']
+  }, {
+    t: 'Audio described performances monthly',
+    s: 'Audio described',
+    tags: ['vision']
+  }, {
+    t: 'Quiet room off the foyer',
+    s: 'Quiet room',
+    tags: ['quiet', 'calm']
+  }],
+  check: [{
+    t: 'Foyer is crowded at interval — staff can seat you early',
+    s: 'Crowded at interval',
+    tags: ['quiet', 'calm']
+  }],
+  barriers: [],
   reviews: [{
     id: 'r1',
-    who: 'Wheelchair user',
-    when: '1 month ago',
-    cat: 'mobility',
-    rating: 'notAccess',
-    text: 'Could not get in. The step is too high and the doorway is narrow. Staff were kind about it, but the building is the building.'
+    who: 'Blind person',
+    tag: 'Blind / low vision',
+    when: '1 week ago',
+    v: 'works',
+    helpful: 7,
+    text: 'Audio description was flawless and the pre-show touch tour made the set real for me. Booking was easy by phone.'
   }]
-}, {
-  id: 'foundry-museum',
-  name: 'The Foundry Museum',
-  kind: 'Museum',
-  area: 'Ultimo',
-  addr: '2 Kiln Street, Ultimo NSW',
-  coords: [0.22, 0.65],
-  dist: '2.1km',
-  verified: 22,
-  cover: 'museum entrance',
-  status: {
-    mobility: 'accessible',
-    vision: 'accessible',
-    hearing: 'accessible',
-    cognitive: 'accessible',
-    mental: 'accessible',
-    autism: 'accessible',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Lifts everywhere. Wide gallery aisles. Accessible loos on all floors.',
-    vision: 'Audio guide. Large-print labels at every exhibit.',
-    hearing: 'Captioned video throughout. Auslan tours monthly.',
-    cognitive: 'Visual story PDF on website. Map is simple.',
-    mental: 'Sensory rest zone near east entrance.',
-    autism: 'Low-stimulation mornings every Sunday 9–11am.',
-    chronic: 'Plenty of seating, cafe on site, climate controlled.'
-  },
-  reviews: []
 }, {
   id: 'salt-line',
   name: 'The Salt Line',
   kind: 'Bar',
+  cat: 'food',
   area: 'Circular Quay',
-  addr: 'Lower Promenade, Circular Quay NSW',
-  coords: [0.65, 0.21],
-  dist: '1.3km',
+  mins: 14,
+  coords: [0.72, 0.48],
   verified: 14,
-  cover: 'harbour bar',
-  status: {
-    mobility: 'accessible',
-    vision: 'partial',
-    hearing: 'partial',
-    cognitive: 'accessible',
-    mental: 'unverified',
-    autism: 'notAccess',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Step-free along the promenade. Accessible loo nearby.',
-    vision: 'Outdoor lighting variable',
-    hearing: 'Open-air, ambient harbour noise',
-    cognitive: 'Clear menu, simple ordering',
-    mental: 'No data yet',
-    autism: 'Crowded peak hours, music loud',
-    chronic: 'Seating outdoors, weather dependent'
-  },
+  note: 'Crowded at peak — go early',
+  works: [{
+    t: 'Step-free along the promenade',
+    s: 'Step-free entry',
+    tags: ['stepfree']
+  }, {
+    t: 'Accessible bathroom 50m away',
+    s: 'Bathroom nearby',
+    tags: ['bathroom']
+  }],
+  check: [{
+    t: 'Very crowded and loud at peak hours — early evening is calmer',
+    s: 'Crowded at peak',
+    tags: ['quiet', 'calm']
+  }, {
+    t: 'Outdoor seating only — weather dependent',
+    s: 'Outdoor only',
+    tags: ['seats']
+  }],
+  barriers: [],
   reviews: []
 }, {
-  id: 'hotel-marigold',
+  id: 'marigold',
   name: 'Hotel Marigold',
   kind: 'Hotel',
+  cat: 'stay',
   area: 'Surry Hills',
-  addr: '9 Threadneedle Street, Surry Hills NSW',
-  coords: [0.5, 0.6],
-  dist: '900m',
+  mins: 9,
+  coords: [0.52, 0.66],
   verified: 9,
-  cover: 'boutique hotel',
-  status: {
-    mobility: 'accessible',
-    vision: 'unverified',
-    hearing: 'partial',
-    cognitive: 'accessible',
-    mental: 'accessible',
-    autism: 'accessible',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Accessible rooms on level 1 with roll-in shower',
-    vision: 'Standard signage, no Braille reported',
-    hearing: 'Visual fire alarm in accessible rooms only',
-    cognitive: 'Helpful front-desk staff, simple keycards',
-    mental: 'Calm lobby, optional housekeeping',
-    autism: 'Low-stimulation common spaces',
-    chronic: 'Lift to all floors, in-room kettle and fridge'
-  },
+  note: 'Roll-in shower rooms on level 1',
+  works: [{
+    t: 'Accessible rooms with roll-in showers on level 1',
+    s: 'Roll-in showers',
+    tags: ['stepfree', 'bathroom']
+  }, {
+    t: 'Calm lobby, housekeeping on request only',
+    s: 'Calm lobby',
+    tags: ['calm', 'quiet']
+  }, {
+    t: 'Lift to all floors',
+    s: 'Lift access',
+    tags: ['stepfree', 'seats']
+  }],
+  check: [{
+    t: 'Visual fire alarms in accessible rooms only — ask when booking',
+    s: 'Ask about visual alarms',
+    tags: ['hearing']
+  }],
+  barriers: [],
   reviews: []
 }, {
-  id: 'headland-wildlife',
+  id: 'headland',
   name: 'Headland Wildlife Park',
-  kind: 'Park / attraction',
+  kind: 'Park',
+  cat: 'parks',
   area: 'Mosman',
-  addr: 'Cliffside Road, Mosman NSW',
-  coords: [0.78, 0.08],
-  dist: '6.4km',
+  mins: 25,
+  coords: [0.78, 0.1],
   verified: 31,
-  cover: 'wildlife park path',
-  status: {
-    mobility: 'partial',
-    vision: 'accessible',
-    hearing: 'accessible',
-    cognitive: 'accessible',
-    mental: 'accessible',
-    autism: 'accessible',
-    chronic: 'partial'
-  },
-  notes: {
-    mobility: 'Some steep paths. Manual wheelchairs may struggle on the upper loop.',
-    vision: 'Touch encounters bookable. Audio guide available.',
-    hearing: 'Captioned signage throughout',
-    cognitive: 'Maps clear, plenty of staff',
-    mental: 'Quiet spaces along the rainforest walk',
-    autism: 'Sensory bags available at entry',
-    chronic: 'Long distances; mobility scooter hire available'
-  },
+  note: 'Sensory bags at entry',
+  works: [{
+    t: 'Sensory bags free at the entry gate',
+    s: 'Sensory bags',
+    tags: ['quiet']
+  }, {
+    t: 'Audio guide and touch encounters bookable',
+    s: 'Touch encounters',
+    tags: ['vision']
+  }, {
+    t: 'Captioned signs throughout',
+    s: 'Captioned signs',
+    tags: ['hearing']
+  }, {
+    t: 'Quiet spots along the rainforest walk',
+    s: 'Quiet rainforest walk',
+    tags: ['calm', 'quiet']
+  }],
+  check: [{
+    t: 'Some paths are steep — the upper loop is hard work in a manual chair',
+    s: 'Steep upper paths',
+    tags: ['stepfree']
+  }, {
+    t: 'Long distances — scooter hire available at the gate',
+    s: 'Long distances',
+    tags: ['seats']
+  }],
+  barriers: [],
   reviews: []
 }, {
-  id: 'lyric-arcade',
+  id: 'lyric',
   name: 'The Lyric Arcade',
   kind: 'Shopping',
+  cat: 'arts',
   area: 'CBD',
-  addr: '120 Verity Street, Sydney NSW',
-  coords: [0.3, 0.32],
-  dist: '1.6km',
+  mins: 11,
+  coords: [0.4, 0.2],
   verified: 19,
-  cover: 'heritage arcade',
-  status: {
-    mobility: 'accessible',
-    vision: 'accessible',
-    hearing: 'partial',
-    cognitive: 'partial',
-    mental: 'unverified',
-    autism: 'partial',
-    chronic: 'accessible'
-  },
-  notes: {
-    mobility: 'Lifts at multiple points. Tile floors smooth.',
-    vision: 'Generous lighting. Maps in large print at info desk.',
-    hearing: 'No hearing loop reported',
-    cognitive: 'Heritage layout can be confusing',
-    mental: 'No data yet',
-    autism: 'Echoey acoustics, busy at peak',
-    chronic: 'Seating throughout, cafes for breaks'
-  },
+  note: 'Echoey at peak times',
+  works: [{
+    t: 'Lifts at both ends, smooth floors',
+    s: 'Lift access',
+    tags: ['stepfree']
+  }, {
+    t: 'Large-print maps at the info desk',
+    s: 'Large-print maps',
+    tags: ['vision']
+  }, {
+    t: 'Benches along the arcade',
+    s: 'Seats throughout',
+    tags: ['seats']
+  }],
+  check: [{
+    t: 'Heritage layout can be confusing — staff at info desk help',
+    s: 'Confusing layout',
+    tags: ['simple']
+  }, {
+    t: 'Echoey acoustics, busy at lunchtime',
+    s: 'Echoey at peak',
+    tags: ['quiet', 'hearing']
+  }],
+  barriers: [],
   reviews: []
 }];
-const RA_DEFAULT_USER = {
-  signedIn: false,
-  name: 'Naomi',
-  email: 'naomi@example.com',
-  initials: 'NA',
-  city: 'Sydney',
-  memberSince: 'May 2026',
-  accessProfile: ['mobility', 'vision', 'autism'],
-  // categories that matter
-  livedExperience: 'wheelchair user',
-  savedIds: ['harbour-playhouse', 'foundry-museum', 'hotel-marigold']
+
+// ── Browse tiles ──────────────────────────────────────────────────────────
+const RA2_TILES = [{
+  id: 'food',
+  label: 'Food & drink',
+  cats: ['food']
+}, {
+  id: 'parks',
+  label: 'Parks & outdoors',
+  cats: ['parks']
+}, {
+  id: 'arts',
+  label: 'Arts & museums',
+  cats: ['arts']
+}, {
+  id: 'music',
+  label: 'Music & events',
+  cats: ['music']
+}];
+const RA2_DEMO_QUERY = 'Find a quiet cafe with step-free entry near me';
+const RA2_VOICE_EXAMPLES = ['“Cafes with accessible bathrooms”', '“Museums with Auslan tours”', '“Somewhere quiet for lunch”'];
+const RA2_DEFAULT_STATS = {
+  reviews: 12,
+  helped: 38,
+  votes: 214
 };
-window.RA_CATEGORIES = RA_CATEGORIES;
-window.RA_VENUES = RA_VENUES;
-window.RA_DEFAULT_USER = RA_DEFAULT_USER;
+Object.assign(window, {
+  RA2_NEEDS,
+  RA2_VENUES,
+  RA2_TILES,
+  RA2_DEMO_QUERY,
+  RA2_VOICE_EXAMPLES,
+  RA2_DEFAULT_STATS
+});

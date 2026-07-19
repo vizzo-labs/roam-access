@@ -1,24 +1,23 @@
-// Roam Access — web app root. Owns routing, user state, venue data and a11y prefs.
+// Roam Access pilot v2 — root. Routing, user + world state, a11y prefs.
 (function () {
-const { useState, useEffect, useCallback, useMemo, useRef } = React;
+const { useState, useEffect, useCallback } = React;
 
-const PREFS_KEY = 'ra-webapp-a11y';
-const USER_KEY  = 'ra-webapp-user';
+const USER_KEY  = 'ra2-user';
+const WORLD_KEY = 'ra2-world';
+const PREFS_KEY = 'ra2-a11y';
 
 const VIEW_TITLES = {
-  discover:   'Discover',
-  saved:      'Saved places',
-  reviews:    'Your contributions',
-  profile:    'Profile',
-  onboarding: 'Set up your profile',
-  venue:      'Venue details',
-  review:     'Write a review',
+  welcome: 'Welcome', setup: 'Set your needs', 'setup-name': 'Your name',
+  home: 'Home', voice: 'Voice search', results: 'Search results', map: 'Map',
+  venue: 'Venue details', reviews: 'Community reviews', review: 'Write a review',
+  thanks: 'Thank you', saved: 'Saved places', me: 'Your profile',
 };
+const ROUTES = Object.keys(VIEW_TITLES);
+// Dark (teal) screens — the phone-frame status bar swaps to light text.
+const DARK_VIEWS = ['voice', 'thanks'];
 
-// ── Persistence ───────────────────────────────────────────────────────────
 function readJSON(key) {
-  try { return JSON.parse(localStorage.getItem(key) || 'null'); }
-  catch (e) { return null; }
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; }
 }
 function writeJSON(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
@@ -27,227 +26,188 @@ function writeJSON(key, value) {
 function initialPrefs() {
   const saved = readJSON(PREFS_KEY);
   if (saved) return saved;
-  // With nothing stored, start from what the OS already says about this
-  // person rather than reporting "off" for settings that are in fact on.
   const mq = q => typeof window.matchMedia === 'function' && window.matchMedia(q).matches;
-  return {
-    scale: 1,
-    contrast: mq('(prefers-contrast: more)'),
-    motion: mq('(prefers-reduced-motion: reduce)'),
-  };
+  return { scale: 1, contrast: mq('(prefers-contrast: more)'), motion: mq('(prefers-reduced-motion: reduce)') };
 }
 
-function initialUser() {
-  const saved = readJSON(USER_KEY);
-  if (saved) return saved;
-  // A cold visitor is a visitor — not a signed-in stranger whose disabilities
-  // and saved venues they inherit.
-  return { ...window.RA_DEFAULT_USER, signedIn: false, accessProfile: [], savedIds: [] };
-}
+const DEFAULT_WORLD = {
+  saved: ['foundry', 'tin-whistle'],
+  myReviews: {},          // venueId -> [review]
+  reviewed: [],           // venueIds already 1-tap reviewed
+  visitedId: 'tin-whistle',
+};
 
-// ── Routing ───────────────────────────────────────────────────────────────
-// The hash is the single source of truth, so Back/Forward work, and a venue
-// can be linked and shared.
-const ROUTES = ['discover', 'saved', 'reviews', 'profile', 'onboarding', 'venue', 'review'];
-
-function parseHash() {
+// Returns null for hashes that aren't app routes (e.g. the skip link's
+// #ra-main) — the caller keeps the current screen instead of resetting.
+function parseHashOrNull() {
   const raw = (window.location.hash || '').replace(/^#\/?/, '');
   const [view, id] = raw.split('/');
-  if (!ROUTES.includes(view)) return { view: 'discover', venueId: null };
-  return { view, venueId: id ? decodeURIComponent(id) : null };
+  if (!ROUTES.includes(view)) return null;
+  let decoded = null;
+  if (id) { try { decoded = decodeURIComponent(id); } catch (e) { decoded = null; } }
+  return { view, id: decoded };
+}
+function parseHash() {
+  return parseHashOrNull() || { view: 'home', id: null };
 }
 
 function App() {
   const [route, setRoute] = useState(parseHash);
-  const [venues, setVenues] = useState(() => window.RA_VENUES);
-  const [user, setUser] = useState(initialUser);
-  const [search, setSearch] = useState('');
-  const [authOpen, setAuthOpen] = useState(false);
-  const [a11yOpen, setA11yOpen] = useState(false);
+  const [user, setUser] = useState(() => readJSON(USER_KEY));
+  const [world, setWorld] = useState(() => ({ ...DEFAULT_WORLD, ...(readJSON(WORLD_KEY) || {}) }));
+  const [query, setQuery] = useState(null);
   const [prefs, setPrefs] = useState(initialPrefs);
+  const [a11yOpen, setA11yOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
-  const { view } = route;
-  const selectedVenueId = route.venueId || venues[0].id;
+  // First run goes through onboarding, whatever the URL says.
+  const onboarded = !!(user && user.done);
+  const view = !onboarded && !['welcome', 'setup', 'setup-name'].includes(route.view) ? 'welcome' : route.view;
+  const selectedId = route.id;
 
-  // ── a11y preferences: one write path, so the switches can never claim a
-  // state the app is not actually in.
-  const applyPrefs = useCallback((next) => {
+  // Accepts partial updates and merges over a ref, so two changes landing in
+  // the same tick can never clobber each other.
+  const prefsRef = React.useRef(prefs);
+  const applyPrefs = useCallback((partial) => {
+    const next = { ...prefsRef.current, ...partial };
+    prefsRef.current = next;
     setPrefs(next);
     const el = document.documentElement;
     el.style.setProperty('--ra-scale', String(next.scale));
     el.dataset.raContrast = next.contrast ? 'high' : '';
     el.dataset.raMotion = next.motion ? 'reduce' : '';
-    window.RASetContrast(next.contrast);
+    window.RA2SetContrast(next.contrast);
     writeJSON(PREFS_KEY, next);
   }, []);
 
-  useEffect(() => { applyPrefs(prefs); /* on mount only */ }, []); // eslint-disable-line
-
-  useEffect(() => { writeJSON(USER_KEY, user); }, [user]);
+  useEffect(() => { applyPrefs(prefs); }, []); // eslint-disable-line
+  useEffect(() => { if (user) writeJSON(USER_KEY, user); }, [user]);
+  useEffect(() => { writeJSON(WORLD_KEY, world); }, [world]);
 
   useEffect(() => {
-    const onHash = () => setRoute(parseHash());
+    const onHash = () => {
+      const next = parseHashOrNull();
+      if (next) setRoute(next); // ignore non-route hashes (skip link target etc.)
+    };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  // Phone-frame chrome (status bar / home indicator) follows dark screens.
+  useEffect(() => {
+    document.documentElement.dataset.raDark = DARK_VIEWS.includes(view) ? '1' : '';
+  }, [view]);
+
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
+    const t = setTimeout(() => setToast(null), 3600);
     return () => clearTimeout(t);
   }, [toast]);
 
-  useEffect(() => {
-    function onKey(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        const el = document.getElementById('ra-search');
-        if (el) el.focus();
-      }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  // Where the venue screen's back button returns to: the last list-like view
+  // the user opened a venue from (home, results, map or saved).
+  const venueOriginRef = React.useRef('home');
 
   const goto = useCallback((nextView, id) => {
-    window.RA_NAVIGATED = true;
+    window.RA2_NAVIGATED = true;
+    if (nextView === 'venue') {
+      const from = parseHash().view;
+      if (['home', 'results', 'map', 'saved'].includes(from)) venueOriginRef.current = from;
+    }
     const hash = id ? `#/${nextView}/${encodeURIComponent(id)}` : `#/${nextView}`;
     if (window.location.hash === hash) setRoute(parseHash());
     else window.location.hash = hash;
-    window.scrollTo(0, 0);
   }, []);
 
   const app = {
-    view, selectedVenueId, user, search, venues,
-    goto,
-    setUser,
-    openVenue: (id) => goto('venue', id),
-    openReview: (id) => goto('review', id),
-    toggleSave: (id) => {
-      const ids = new Set(user.savedIds);
-      const adding = !ids.has(id);
-      adding ? ids.add(id) : ids.delete(id);
-      setUser({ ...user, savedIds: Array.from(ids) });
-      setToast(adding ? 'Saved to your places.' : 'Removed from your places.');
-    },
-    addReview: (venueId, review) => {
-      setVenues(prev => prev.map(v => v.id === venueId
-        ? { ...v, reviews: [{ ...review, id: `me-${Date.now()}`, mine: true }, ...v.reviews] }
-        : v));
-    },
-    signOut: () => {
-      setUser({ ...window.RA_DEFAULT_USER, signedIn: false, accessProfile: [], savedIds: [] });
-      goto('discover');
-      setToast('Signed out.');
-    },
+    view, selectedId, user, world, query,
+    venueOrigin: venueOriginRef.current,
+    goto, setUser,
     toast: setToast,
     openA11y: () => setA11yOpen(true),
+
+    runSearch: (parsed) => {
+      setQuery(parsed);
+      goto('results');
+    },
+
+    toggleSave: (id) => {
+      setWorld(w => {
+        const saved = w.saved.includes(id) ? w.saved.filter(x => x !== id) : [...w.saved, id];
+        setToast(w.saved.includes(id) ? 'Removed from your places.' : 'Saved to your places.');
+        return { ...w, saved };
+      });
+    },
+
+    markVisited: (id) => {
+      setWorld(w => (w.visitedId === id ? w : { ...w, visitedId: id }));
+    },
+
+    addReview: (venueId, kind) => {
+      const needIds = user?.needs || [];
+      const firstNeed = RA2_NEEDS.find(n => needIds.includes(n.id));
+      const WHO = {
+        mobility: ['Wheelchair user', 'Wheelchair'], vision: ['Blind / low-vision person', 'Blind / low vision'],
+        hearing: ['Deaf / hard-of-hearing person', 'Deaf'], autism: ['Autistic person', 'Autistic'],
+        cognitive: ['Community member', 'All'], mental: ['Community member', 'All'],
+        chronic: ['Person with chronic illness', 'Chronic illness'],
+      };
+      const [who, tag] = (firstNeed && WHO[firstNeed.id]) || ['Community member', 'All'];
+      const review = {
+        id: `me-${Date.now()}`,
+        who, tag,
+        when: 'just now', v: kind, helpful: 0,
+        text: { works: 'It worked for me — I could get in, get around, and enjoy it.',
+                check: 'I managed, but with workarounds worth knowing about.',
+                barrier: 'I couldn’t use the venue as I needed.' }[kind],
+      };
+      setWorld(w => ({
+        ...w,
+        myReviews: { ...w.myReviews, [venueId]: [review, ...(w.myReviews[venueId] || [])] },
+        reviewed: w.reviewed.includes(venueId) ? w.reviewed : [...w.reviewed, venueId],
+      }));
+      setUser(u => u ? {
+        ...u,
+        stats: {
+          reviews: (u.stats?.reviews ?? RA2_DEFAULT_STATS.reviews) + 1,
+          helped: (u.stats?.helped ?? RA2_DEFAULT_STATS.helped) + 1,
+          votes: u.stats?.votes ?? RA2_DEFAULT_STATS.votes,
+        },
+      } : u);
+    },
+
+    resetDemo: () => {
+      try { localStorage.removeItem(USER_KEY); localStorage.removeItem(WORLD_KEY); } catch (e) {}
+      setUser(null);
+      setWorld({ ...DEFAULT_WORLD });
+      setQuery(null);
+      goto('welcome');
+      setToast('Demo reset — fresh start.');
+    },
   };
 
-  const a11yPanel = (
-    <RAA11yPanel open={a11yOpen} onClose={() => setA11yOpen(false)}
-                 prefs={prefs} onChange={applyPrefs}/>
-  );
+  // Ensure new users start with stats.
+  useEffect(() => {
+    if (user && user.done && !user.stats) setUser(u => ({ ...u, stats: { ...RA2_DEFAULT_STATS } }));
+  }, [user]);
 
-  // Route changes are announced deliberately in a small region. The previous
-  // build made all of <main> a live region, which re-read the entire page on
-  // every keystroke and filter toggle.
-  const announcement = (
-    <div className="ra-sr-only" role="status" aria-live="polite">
-      {VIEW_TITLES[view] || ''}
-    </div>
-  );
-
-  if (view === 'onboarding') {
-    return (
-      <div style={{ minHeight: '100vh', background: RA_C.paper }}>
-        {announcement}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
-          padding: '12px 20px', borderBottom: `1px solid ${RA_C.hair}`, flexWrap: 'wrap',
-        }}>
-          <RALogo size={18}/>
-          {/* Onboarding is the longest reading task in the app, so the text-size
-              and contrast controls have to be reachable from it. */}
-          <RABtn kind="ghost" size="sm" onClick={() => setA11yOpen(true)} ariaLabel="Accessibility settings">
-            Accessibility
-          </RABtn>
-        </div>
-        <main id="ra-main" tabIndex={-1}>
-          <RAOnboarding app={app} />
-        </main>
-        {a11yPanel}
-        <RAToast message={toast} />
-      </div>
-    );
-  }
+  const screens = {
+    welcome: V2Welcome, setup: V2Setup, 'setup-name': V2SetupName,
+    home: V2Home, voice: V2Voice, results: V2Results, map: V2MapView,
+    venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
+    thanks: V2Thanks, saved: V2SavedView, me: V2Me,
+  };
+  const Screen = screens[view] || V2Home;
 
   return (
-    <div className="ra-shell" style={{ background: RA_C.paper }}>
-      {announcement}
-
-      <RASidebar view={view} goto={goto} user={user} onSignIn={() => setAuthOpen(true)} />
-
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <RATopbar
-          user={user} search={search}
-          onSearch={(v) => { setSearch(v); if (view !== 'discover') goto('discover'); }}
-          onSignIn={() => setAuthOpen(true)}
-          onOpenA11y={() => setA11yOpen(true)}
-          goto={goto}
-        />
-
-        <main id="ra-main" tabIndex={-1} style={{ flex: 1, background: RA_C.paper }}>
-          {view === 'discover' && <RADiscover app={app}/>}
-          {view === 'venue'    && <RAVenue    app={app}/>}
-          {view === 'review'   && <RAReview   app={app}/>}
-          {view === 'saved'    && <RASaved    app={app}/>}
-          {view === 'reviews'  && <RAReviews  app={app}/>}
-          {view === 'profile'  && <RAProfile  app={app}/>}
-        </main>
-
-        <footer style={{
-          borderTop: `1px solid ${RA_C.hair}`,
-          padding: '12px 20px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 8, flexWrap: 'wrap',
-          fontSize: 12.5, color: RA_C.slate,
-          background: RA_C.paper,
-        }}>
-          <span>roam/access · pilot v0.1 · pre-launch</span>
-          <span style={{ display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
-            <button onClick={() => goto('onboarding')} style={FOOTER_LINK}>Re-run onboarding</button>
-            <a href="/" style={FOOTER_LINK}>Main site</a>
-            <a href="/accessibility.html" style={FOOTER_LINK}>Accessibility statement</a>
-          </span>
-        </footer>
-      </div>
-
-      <RABottomNav view={view} goto={goto} />
-
-      <RAAuthModal open={authOpen}
-                   onClose={() => setAuthOpen(false)}
-                   onAuth={(u) => {
-                     setUser({ ...user, ...u, signedIn: true });
-                     setAuthOpen(false);
-                     goto('onboarding');
-                     setToast('Account ready — let’s set up your access profile.');
-                   }}/>
-      {a11yPanel}
-      <RAToast message={toast}/>
+    <div id="ra-main" tabIndex={-1} style={{ position: 'absolute', inset: 0 }}>
+      <div className="ra-sr-only" role="status" aria-live="polite">{VIEW_TITLES[view] || ''}</div>
+      <Screen app={app}/>
+      <V2A11ySheet open={a11yOpen} onClose={() => setA11yOpen(false)} prefs={prefs} onChange={applyPrefs}/>
+      <V2Toast message={toast}/>
     </div>
   );
 }
-
-const FOOTER_LINK = {
-  background: 'transparent', border: 0,
-  padding: '10px 4px', minHeight: 44,
-  display: 'inline-flex', alignItems: 'center',
-  cursor: 'pointer', color: RA_C.slate,
-  textDecoration: 'underline', textUnderlineOffset: 3,
-  fontSize: 'inherit', fontFamily: 'inherit',
-};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);

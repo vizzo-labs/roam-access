@@ -4,8 +4,7 @@
   "version": "0.1.0",
   "description": "Static site for Roam Access. The landing page is hand-authored HTML; the /app pilot is JSX compiled ahead of time so the browser ships no compiler.",
   "scripts": {
-    "build": "babel app/src --out-dir app/js --presets @babel/preset-react",
-    "watch": "babel app/src --out-dir app/js --presets @babel/preset-react --watch"
+    "build": "babel app/src --out-dir app/js --presets @babel/preset-react && node scripts/stamp-version.mjs"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
