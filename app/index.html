@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en-AU" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Roam Access — web app pilot</title>
+  <meta name="description" content="Interactive pilot of the Roam Access web app. Sample data only — not real accessibility information." />
+  <meta name="theme-color" content="#FAF9F6" />
+
+  <!-- Pre-launch prototype carrying illustrative sample data. Deliberately kept out of search. -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/roam-appicon-teal.svg" />
+  <link rel="icon" type="image/png" href="../assets/roam-appicon-teal.png" />
+  <link rel="apple-touch-icon" href="../assets/roam-appicon-teal.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Roam Access" />
+  <meta property="og:title" content="Roam Access — web app pilot" />
+  <meta property="og:description" content="Interactive pilot of the Roam Access web app. Sample data only." />
+
+  <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+
+  <style>
+    /* ── Fonts ────────────────────────────────────────────────────────────
+       Self-hosted rather than loaded from Google. People browsing venue
+       accessibility are disclosing something health-adjacent by doing it, and
+       that should not travel to a third party the privacy policy never named.
+       Both families are variable, so one file covers every weight. */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('fonts/inter-latin-var.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'JetBrains Mono';
+      font-style: normal;
+      font-weight: 100 800;
+      font-display: swap;
+      src: url('fonts/jetbrains-mono-latin-var.woff2') format('woff2');
+    }
+
+    :root {
+      --ra-scale: 1;
+      --ra-paper: #FAF9F6;
+      --ra-char: #1A1A1A;
+      --ra-teal: #0A4F4F;
+      --ra-rust: #9C2D0E;
+      --ra-hair: #E5E2DA;
+      --ra-line: #8A8680;
+      --ra-topbar-h: 69px;
+    }
+
+    /* The in-app "higher contrast" switch swaps the JS palette; these mirror
+       it for the rules that live in CSS rather than in inline styles. */
+    :root[data-ra-contrast="high"] {
+      --ra-hair: #4A4742;
+      --ra-line: #5A5651;
+    }
+
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      color: var(--ra-char);
+      background: var(--ra-paper);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    p { line-height: 1.55; }
+    a { color: var(--ra-teal); }
+
+    /* ── Text size ────────────────────────────────────────────────────────
+       The app styles everything with px-valued React inline styles, so scaling
+       the root font-size alone would move almost nothing. `zoom` scales type
+       and the space around it together — which is what a low-vision reader
+       actually wants — and reaches every component without rewriting a
+       thousand inline styles. */
+    #root { zoom: var(--ra-scale); }
+    html { font-size: calc(16px * var(--ra-scale)); }
+
+    /* ── Reduced motion ───────────────────────────────────────────────────
+       Honoured from the OS by default, and forceable from the in-app panel for
+       people whose OS setting is off or out of reach. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    [data-ra-motion="reduce"] *,
+    [data-ra-motion="reduce"] *::before,
+    [data-ra-motion="reduce"] *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* ── Focus ────────────────────────────────────────────────────────────
+       Never removed, only replaced with an indicator strong enough to read on
+       every surface in the palette. */
+    :focus-visible {
+      outline: 3px solid var(--ra-char);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+    [data-ra-oncolor] :focus-visible { outline-color: var(--ra-paper); }
+
+    /* The rating cards hide a native radio; the visible card has to show the
+       focus that lands on the input inside it. */
+    .ra-radio-card:focus-within {
+      outline: 3px solid var(--ra-char);
+      outline-offset: 2px;
+    }
+
+    ::placeholder { color: #5A5651; opacity: 1; }
+    :root[data-ra-contrast="high"] ::placeholder { color: #3A3733; }
+
+    .ra-skip {
+      position: absolute; left: 8px; top: -80px; z-index: 300;
+      background: var(--ra-char); color: var(--ra-paper);
+      padding: 12px 18px; border-radius: 10px;
+      font-size: 16px; font-weight: 600; text-decoration: none;
+      transition: top .12s ease;
+    }
+    .ra-skip:focus { top: 8px; color: var(--ra-paper); }
+
+    .ra-sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+
+    /* ── Sample-data disclosure ───────────────────────────────────────────
+       Server-rendered rather than drawn by React, so it is on screen before the
+       app boots and stays there if the app never boots at all. Sized from
+       --ra-scale so it grows with the rest of the page instead of shrinking
+       into insignificance at large text. */
+    .ra-demo-banner {
+      background: #7E2208; color: #FAF9F6;
+      padding: calc(10px * var(--ra-scale)) 20px;
+      font-size: calc(14px * var(--ra-scale));
+      line-height: 1.45;
+      display: flex; gap: calc(10px * var(--ra-scale)); align-items: baseline;
+      justify-content: center; flex-wrap: wrap; text-align: center;
+    }
+    .ra-demo-banner strong { font-weight: 700; }
+    .ra-demo-banner a {
+      color: #FAF9F6; text-decoration: underline; text-underline-offset: 3px;
+      display: inline-block; padding: 4px 0;
+    }
+
+    .ra-noscript { max-width: 640px; margin: 80px auto; padding: 0 24px; font-size: 17px; line-height: 1.6; }
+
+    /* ── Layout ───────────────────────────────────────────────────────────
+       Every component style in this app is a React inline style, and inline
+       styles cannot carry media queries. The containers that must reflow take
+       their layout from these classes instead, and their inline styles
+       deliberately omit the same properties — an inline style would win. */
+
+    .ra-shell { display: flex; min-height: 100dvh; }
+
+    .ra-sidebar {
+      display: flex; flex-direction: column;
+      width: 240px; flex-shrink: 0;
+      position: sticky; top: 0; align-self: flex-start;
+      max-height: 100dvh; overflow-y: auto;
+    }
+
+    .ra-topbar-inner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .ra-topbar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
+
+    .ra-discover-grid { display: grid; grid-template-columns: minmax(400px, 1fr) 1.05fr; }
+    .ra-discover-list { border-right: 1px solid var(--ra-hair); }
+    .ra-map {
+      position: sticky; top: var(--ra-topbar-h);
+      height: calc(100dvh - var(--ra-topbar-h));
+    }
+
+    .ra-two-col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: start; }
+    .ra-sticky-aside { position: sticky; top: calc(var(--ra-topbar-h) + 20px); }
+    .ra-cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+    .ra-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .ra-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+    .ra-a11y-panel { position: fixed; right: 20px; top: 76px; z-index: 90; width: min(360px, calc(100vw - 32px)); }
+
+    .ra-bottom-nav { display: none; }
+
+    @media (max-width: 1000px) {
+      .ra-discover-grid { grid-template-columns: 1fr; }
+      .ra-discover-list { border-right: 0; }
+      .ra-map {
+        /* `relative`, never `static`: the pins, legend and backdrop inside are
+           absolutely positioned and would otherwise escape this box and paint
+           over the whole page. */
+        position: relative;
+        height: 55vh; min-height: 340px;
+        border-bottom: 1px solid var(--ra-hair);
+      }
+      .ra-two-col { grid-template-columns: 1fr; gap: 20px; }
+      .ra-sticky-aside { position: static; }
+    }
+
+    @media (max-width: 900px) {
+      .ra-shell {
+        flex-direction: column;
+        /* Clear the fixed bottom bar so the last row is never trapped under it. */
+        padding-bottom: calc(64px + env(safe-area-inset-bottom));
+      }
+      .ra-sidebar { display: none; }
+
+      .ra-bottom-nav {
+        display: flex;
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+        background: var(--ra-paper);
+        border-top: 1px solid var(--ra-line);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+
+      /* A corner popover has nowhere to go on a phone; a bottom sheet does. */
+      .ra-a11y-panel {
+        right: 0; left: 0; bottom: calc(64px + env(safe-area-inset-bottom));
+        top: auto; width: auto;
+        border-radius: 16px 16px 0 0;
+        max-height: 70dvh; overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .ra-hide-sm { display: none; }
+    }
+
+    @media (prefers-contrast: more) {
+      :focus-visible { outline-width: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="ra-skip" href="#ra-main">Skip to main content</a>
+
+  <div class="ra-demo-banner" role="note">
+    <span><strong>Sample data.</strong> This is a design pilot. Venue names, ratings and reviews are illustrative examples, not real accessibility information about real businesses.</span>
+    <a href="/">Back to roamaccess.com.au</a>
+  </div>
+
+  <div id="root"></div>
+
+  <noscript>
+    <div class="ra-noscript">
+      <h1>Roam Access web app pilot</h1>
+      <p>This interactive pilot needs JavaScript to run. Everything Roam Access publishes about the product itself is on the main site, which works without JavaScript.</p>
+      <p><a href="/">Go to roamaccess.com.au</a> &middot; <a href="/accessibility.html">Accessibility statement</a></p>
+    </div>
+  </noscript>
+
+  <!-- React is vendored rather than pulled from a CDN: one less third party
+       between our users and the page, no cross-origin request carrying their
+       IP, and it still works on a flaky connection. -->
+  <script src="vendor/react.production.min.js"></script>
+  <script src="vendor/react-dom.production.min.js"></script>
+
+  <!-- Compiled from app/src/*.jsx by `npm run build`. Load order matters:
+       each file reads globals published by the ones before it. -->
+  <script src="js/data.js"></script>
+  <script src="js/primitives.js"></script>
+  <script src="js/shell.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

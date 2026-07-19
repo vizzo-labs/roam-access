@@ -1,0 +1,15 @@
+{
+  "name": "roam-access-site",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Static site for Roam Access. The landing page is hand-authored HTML; the /app pilot is JSX compiled ahead of time so the browser ships no compiler.",
+  "scripts": {
+    "build": "babel app/src --out-dir app/js --presets @babel/preset-react",
+    "watch": "babel app/src --out-dir app/js --presets @babel/preset-react --watch"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
+    "@babel/preset-react": "^7.27.1"
+  }
+}
