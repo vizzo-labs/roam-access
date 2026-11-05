@@ -36,17 +36,29 @@ app/manifest.ts       PWA manifest (icons in public/icons, generated from assets
 app/admin/            testers, reviews, hide/show — ADMIN_EMAILS only
 app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved · venues/[id]/reviews
 components/pilot/
-  legacy.jsx          the demo's screens, ported; data now comes from `app`
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
   PilotMap.jsx        real map; pins are buttons, list view stays primary
   WebLayout.jsx       desktop web app: header + panel + map
   pwa.js              service worker registration + install prompt
+  ui/                 primitives: palette (C2 live object, F2, M2), Logo, Mic, Verdict,
+                      Shell + TabBar, Buttons, Switch, Plate, TileIcon, Toast, Dictate,
+                      useDialog (focus trap), useHeading (focus on navigation)
+  screens/            one file per screen: Welcome, Setup, SetupName, Home, Voice, Results,
+                      Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet
+                      (+ useVenueReviews)
 lib/
+  pilot/match.js      verdict engine + query parsing (ra2Verdict, ra2Search, ra2ParseQuery)
   pilot-data.ts       needs, review questions, browse tiles, pilot area
   venues.ts           reviews → facts (works / check / barriers) per need
   data.ts             all database access
-  db/schema.ts        venues · profiles · reviews · saved
-scripts/seed-osm.ts   imports places from OpenStreetMap (idempotent)
+  db/url.ts           which database: prod only when VERCEL_ENV=production, else dev
+  db/schema.ts        typed mirror of migrations/: venues · profiles · reviews · saved
+migrations/           additive SQL migrations, YYYYMMDDHHMM_<slug>.sql
+scripts/
+  migrate.ts          applies pending migrations (runs before every build)
+  db-describe.ts      `\d`-style schema dump
+  seed-osm.ts         imports places from OpenStreetMap (idempotent)
+  test-user.ts        Clerk test users for headless testing
 ```
 
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
@@ -55,14 +67,55 @@ you". OpenStreetMap accessibility tags show up as "Check first — not yet confi
 ## Develop
 
 ```bash
-npm install
-npx vercel env pull .env.local --yes   # DATABASE_URL, CLERK_*, ADMIN_EMAILS
+npm ci
+npx vercel@latest link --yes --project roam-access --scope romys-projects-10ffa6cd
+npx vercel@latest env pull .env.local --yes   # DATABASE_URL, DEV_DATABASE_URL, CLERK_*, ADMIN_EMAILS
+npm run db:migrate   # apply pending migrations to the dev database
+npm run db:seed      # (re)import Manly places from OpenStreetMap into the dev database
 npm run dev
-npm run db:push    # apply lib/db/schema.ts to Neon
-npm run db:seed    # (re)import Manly places from OpenStreetMap
 ```
 
-Deploy from the **repo root**: `npx vercel deploy --prod`.
+Conventions for contributors and agents (honesty and accessibility rules, testing, PRs):
+the root [`AGENTS.md`](../../AGENTS.md).
+
+### Two databases
+
+| Where | Database |
+| --- | --- |
+| Vercel production (`VERCEL_ENV=production`) | `DATABASE_URL` — production Neon |
+| Vercel previews, local dev/build, scripts | `DEV_DATABASE_URL` — dev Neon |
+
+One rule, in `lib/db/url.ts` (`pickDatabaseUrl()`), used by the app and every script. If
+`DEV_DATABASE_URL` is missing outside production it falls back to `DATABASE_URL` and warns.
+
+### Migrations
+
+Schema changes are plain SQL files in `migrations/` named `YYYYMMDDHHMM_<slug>.sql`,
+**additive only** (`CREATE … IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`), never edited after
+merge. `lib/db/schema.ts` mirrors them for typed queries. `drizzle-kit push` is not used.
+
+```bash
+npm run db:status     # applied / pending, changes nothing
+npm run db:migrate    # apply pending files, each in a transaction, recorded in _migrations
+npm run db:describe   # columns, constraints, indexes, applied migrations
+```
+
+`npm run build` runs `db:migrate` first (`prebuild`), so a production build on Vercel
+migrates production and preview/local builds migrate the dev database. `SKIP_MIGRATIONS=1`
+skips it. The first file, `202611060000_baseline.sql`, is the schema as it stood when
+migrations were introduced: a no-op on production, builds the dev database from empty.
+
+### Test users
+
+Headless sign-up is blocked by Clerk's bot protection, so tests sign in with Backend-API
+test users (`<name>+clerk_test@example.com`):
+
+```bash
+npm run test-user -- create my-feature --port 3456   # prints a one-time /sign-in?__clerk_ticket=… URL
+npm run test-user -- delete my-feature               # Clerk user + dev-DB rows
+```
+
+Deploys: the orchestrator deploys production from the repo root (`npx vercel deploy --prod`).
 
 ## Before inviting more testers
 

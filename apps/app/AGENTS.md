@@ -1,3 +1,17 @@
+# apps/app — the pilot
+
+Repo-wide rules (honesty, accessibility, database + migrations, testing, PRs) are in the
+root [`AGENTS.md`](../../AGENTS.md) — read it first. The layout and commands are in
+[`README.md`](README.md).
+
+Quick reminders:
+- DB access goes through `lib/db` (`getDb()`, `pickDatabaseUrl()`); dev DB unless
+  `VERCEL_ENV=production`.
+- Schema changes = a new additive SQL file in `migrations/` + mirror it in `lib/db/schema.ts`.
+  No `drizzle-kit push`.
+- Screens live in `components/pilot/screens/`, primitives in `components/pilot/ui/`, the
+  verdict/search logic in `lib/pilot/match.js`.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
