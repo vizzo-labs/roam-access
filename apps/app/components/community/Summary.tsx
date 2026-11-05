@@ -1,4 +1,5 @@
 import { SUMMARY_LABEL, type SummaryKind, type VenueSummary } from '@/lib/data/summary';
+import { factSource } from '@/lib/trust/labels';
 
 const ICON = { works: '✓', check: '!', barrier: '✗' } as const;
 const PILL_ICON: Record<SummaryKind, string> = { works: '✓', check: '!', barrier: '✗', unknown: '?' };
@@ -42,9 +43,7 @@ export function FactList({ s, max }: { s: VenueSummary; max?: number }) {
           <span>
             <span className="ra-sr-only">{KIND_WORD[kind]}: </span>
             {fact.t}
-            <span className="pub-src">
-              {fact.src === 'community' ? 'Source: people in the Roam Access pilot' : 'Source: OpenStreetMap — not yet confirmed'}
-            </span>
+            <span className="pub-src">Source: {factSource(fact)}</span>
           </span>
         </li>
       ))}

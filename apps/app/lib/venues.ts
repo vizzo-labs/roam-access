@@ -28,7 +28,8 @@ export type Fact = {
 
 // One line per visible review: whose needs, what it answered, when. No ids,
 // no names — enough to say "Based on 3 wheelchair users · 6 weeks ago".
-export type Evidence = { n: NeedId[]; f: FeatureId[]; at: string };
+// Quick answers add a line with q: true and no needs (none are stored with them).
+export type Evidence = { n: NeedId[]; f: FeatureId[]; at: string; q?: true };
 
 export type VenueVM = {
   id: string; name: string; kind: string; cat: string; area: string;
@@ -122,20 +123,20 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     const tags = [f.id];
     if (c.yes > c.no) {
       const q = viaQuick(c.quickYes, c.yes);
-      works.push({ t: f.yes + q, s: `${f.yesShort} — ${reports(c.yes)}${q}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature', quick: c.quickYes || undefined });
+      works.push({ t: f.yes, s: `${f.yesShort} — ${reports(c.yes)}${q}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature', quick: c.quickYes || undefined });
     } else if (c.no > c.yes) {
       // Confirmed absence: specific, counted, and the first reason shown.
       const q = viaQuick(c.quickNo, c.no);
-      const fact: Fact = { t: f.no + q, s: `${f.noShort} — ${reports(c.no)}${q}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence', quick: c.quickNo || undefined };
+      const fact: Fact = { t: f.no, s: `${f.noShort} — ${reports(c.no)}${q}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence', quick: c.quickNo || undefined };
       let severity = f.noSeverity;
       if (f.id === 'stepfree' && altYesTotal > (altNone?.k ?? 0)) {
         // A step at the main door, but a step-free way in elsewhere: worth
         // knowing before you go, not a dead end.
-        fact.t = 'Steps at the main entrance' + q;
+        fact.t = 'Steps at the main entrance';
         fact.s = `Step at main entrance, step-free way in ${altYes[0].where} — ${reports(c.no)}${q}`;
         severity = 'check';
       } else if (f.id === 'stepfree' && altNone) {
-        fact.t = 'Steps at the entry, and no other step-free way in' + q;
+        fact.t = 'Steps at the entry, and no other step-free way in';
         fact.n = Math.max(c.no, altNone.k);
         fact.last = newest([c.lastNo, altNone.last])!;
         fact.s = `No step-free way in — ${reports(fact.n)}`;
@@ -203,6 +204,9 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     ])],
     at: iso(r.createdAt),
   }));
+  for (const a of quick) {
+    if (FEATURE_IDS.includes(a.feature as FeatureId)) ev.push({ n: [], f: [a.feature as FeatureId], at: iso(a.updatedAt), q: true });
+  }
   const lastReview = latest ? iso(latest.createdAt) : null;
 
   return {

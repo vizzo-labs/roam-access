@@ -9,6 +9,7 @@ import { getDb, schema } from '../db';
 import { buildVenueVM, type Fact, type VenueVM } from '../venues';
 import { RA2_NEEDS, type NeedId } from '../pilot-data';
 import { ra2Verdict } from '../pilot/match';
+import { getConfirmationStats } from './trust';
 
 const { venues, reviews, microAnswers } = schema;
 
@@ -36,11 +37,12 @@ export async function getVenueSummary(id: string): Promise<VenueSummary | null> 
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const [rs, qs] = await Promise.all([
+  const [rs, qs, confirm] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
     db.select().from(microAnswers).where(and(eq(microAnswers.venueId, id), eq(microAnswers.hidden, false))),
+    getConfirmationStats(id),
   ]);
-  const venue = buildVenueVM(v, rs, qs);
+  const venue = buildVenueVM(v, rs, confirm.get(id), qs);
   const needs = RA2_NEEDS.map(n => {
     const verdict = ra2Verdict(venue, [n.id]) as { kind: SummaryKind; why: string };
     return {
@@ -53,10 +55,10 @@ export async function getVenueSummary(id: string): Promise<VenueSummary | null> 
     ...venue.works.map(fact => ({ kind: 'works' as const, fact })),
     ...venue.check.map(fact => ({ kind: 'check' as const, fact })),
   ];
-  const times = [...rs.map(r => +r.createdAt), ...qs.map(q => +q.updatedAt)];
   return {
     venue, needs, facts, reviews: rs.length, quick: qs.length,
-    updated: times.length ? new Date(Math.max(...times)) : null,
+    // Newest review, quick answer or "Still accurate? Yes".
+    updated: venue.lastConfirmed ? new Date(venue.lastConfirmed) : null,
   };
 }
 

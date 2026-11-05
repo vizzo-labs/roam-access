@@ -44,6 +44,9 @@ export function factSource(f: Fact, now = Date.now()) {
   if (f.src !== 'community') return SOURCE_NAME[f.src];
   if (!f.n) return SOURCE_NAME.community;
   const when = f.last ? ` · latest ${since(f.last, now)}` : '';
+  // Quick answers ("Help fill the gaps") are always named as such.
+  if (f.quick && f.quick === f.n) return `${n(f.n, 'quick answer', 'quick answers')} from the community${when}`;
+  if (f.quick) return `${n(f.n, 'report', 'reports')} from the community, ${f.quick} by quick answer${when}`;
   return `${n(f.n, 'report', 'reports')} from the community${when}`;
 }
 
@@ -60,17 +63,21 @@ function needTags(needIds: string[]): FeatureId[] {
  * one of their needs (anyone can say "there's a step").
  */
 export function verdictBasis(venue: VenueLike, verdict: VerdictLike, needIds: string[]) {
-  const ev = venue.ev || [];
+  const all = venue.ev || [];
   const tags = needTags(needIds);
   const shares = (e: Evidence) => e.n.some(x => needIds.includes(x));
-  const relevant = needIds.length ? ev.filter(e => shares(e) || e.f.some(f => tags.includes(f))) : ev;
+  const touching = needIds.length ? all.filter(e => shares(e) || e.f.some(f => tags.includes(f))) : all;
+  // Quick answers are counted separately: they carry no needs.
+  const ev = all.filter(e => !e.q);
+  const relevant = touching.filter(e => !e.q);
+  const quick = touching.length - relevant.length;
   const same = needIds.length ? relevant.filter(shares) : [];
-  const latest = relevant.reduce<string | null>((m, e) => (!m || e.at > m ? e.at : m), null);
+  const latest = touching.reduce<string | null>((m, e) => (!m || e.at > m ? e.at : m), null);
   const facts = [...verdict.works, ...verdict.checks, ...verdict.barriers];
   const hasOsm = facts.some(f => f.src === 'osm');
   return {
-    people: relevant.length, sameNeeds: same.length, latest, hasOsm,
-    osmOnly: !relevant.length && hasOsm,
+    people: relevant.length, quick, sameNeeds: same.length, latest, hasOsm,
+    osmOnly: !touching.length && hasOsm,
     otherReviews: ev.length - relevant.length,
   };
 }
@@ -92,8 +99,12 @@ function whoLabel(people: number, sameNeeds: number, needIds: string[]) {
 /** Venue page: the full source line under the verdict. */
 export function verdictSource(venue: VenueLike, verdict: VerdictLike, needIds: string[], now = Date.now()) {
   const b = verdictBasis(venue, verdict, needIds);
-  if (b.people) {
-    return `Based on ${whoLabel(b.people, b.sameNeeds, needIds)} · latest ${since(b.latest!, now)}`
+  if (b.people || b.quick) {
+    const who = [
+      b.people ? whoLabel(b.people, b.sameNeeds, needIds) : null,
+      b.quick ? n(b.quick, 'quick answer', 'quick answers') : null,
+    ].filter(Boolean).join(' and ');
+    return `Based on ${who} · latest ${since(b.latest!, now)}`
       + (b.hasOsm ? ' · plus OpenStreetMap (unconfirmed)' : '');
   }
   if (b.osmOnly) return 'Only OpenStreetMap (unconfirmed) — nobody in the pilot has checked yet';
@@ -104,10 +115,14 @@ export function verdictSource(venue: VenueLike, verdict: VerdictLike, needIds: s
 /** Result cards and the map card: the same, shorter. */
 export function verdictSourceShort(venue: VenueLike, verdict: VerdictLike, needIds: string[], now = Date.now()) {
   const b = verdictBasis(venue, verdict, needIds);
-  if (b.people) {
+  if (b.people || b.quick) {
     const same = !needIds.length || !b.sameNeeds ? ''
       : b.sameNeeds === b.people ? ' with your needs' : `, ${b.sameNeeds} with your needs`;
-    return `${n(b.people, 'person', 'people')}${same} · ${since(b.latest!, now)}${b.hasOsm ? ' · + OpenStreetMap' : ''}`;
+    const who = [
+      b.people ? `${n(b.people, 'person', 'people')}${same}` : null,
+      b.quick ? n(b.quick, 'quick answer', 'quick answers') : null,
+    ].filter(Boolean).join(' + ');
+    return `${who} · ${since(b.latest!, now)}${b.hasOsm ? ' · + OpenStreetMap' : ''}`;
   }
   if (b.osmOnly) return 'OpenStreetMap (unconfirmed)';
   return 'No reviews for your needs yet';
