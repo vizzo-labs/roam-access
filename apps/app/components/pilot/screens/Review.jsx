@@ -11,6 +11,7 @@ import { useV2Heading } from '../ui/useHeading';
 import { ra2NeedTags } from '@/lib/pilot/match';
 import { EntranceQuestion } from '../trust/EntranceQuestion';
 import { ReviewPhotos, useReviewPhotos, PhotoSuggestion } from '../photos/ReviewPhotos';
+import { SensoryQuestions, EMPTY_SENSORY } from '../sensory/SensoryQuestions';
 
 // ─────────────────────────────────────────────────────────────
 // REVIEW — one tap required, everything else optional
@@ -24,6 +25,7 @@ function V2ReviewView({ app }) {
   const [entranceAlt, setEntranceAlt] = React.useState(null);
   const [entranceNote, setEntranceNote] = React.useState('');
   const [sending, setSending] = React.useState(false);
+  const [sensory, setSensory] = React.useState(EMPTY_SENSORY);
   const photos = useReviewPhotos(v.id);
   const photoBlock = photos.busy
     ? 'Wait for your photos to finish uploading.'
@@ -52,7 +54,7 @@ function V2ReviewView({ app }) {
     // The entrance follow-up only counts when the main way in has steps.
     const entrance = features.stepfree === 'no' && entranceAlt
       ? { entranceAlt, entranceNote: entranceAlt === 'none' ? '' : entranceNote } : {};
-    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, photos: photos.payload });
+    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, photos: photos.payload, sensory });
     if (ok) app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
     else setSending(false);
   }
@@ -138,6 +140,8 @@ function V2ReviewView({ app }) {
             </React.Fragment>
           ))}
         </section>
+
+        <SensoryQuestions value={sensory} onChange={setSensory} needs={app.user?.needs || []}/>
 
         <div style={{ marginTop: 18 }}>
           <label htmlFor="rev-note" style={{ display: 'block', fontSize: 17, fontWeight: 700, marginBottom: 8, fontFamily: F2 }}>

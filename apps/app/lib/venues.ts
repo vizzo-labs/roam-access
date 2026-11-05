@@ -8,6 +8,8 @@
 import type { EntranceAlt, MicroAnswer, Review, Venue } from './db/schema';
 import { RA2_FEATURES, RA2_NEEDS, FEATURE_IDS, type FeatureId, type NeedId, type VerdictKind } from './pilot-data';
 import { ENTRANCE_ALTS } from './trust/entrance';
+import type { SensoryVM } from './sensory/summary';
+import { optionOf, slotLabel } from './sensory/defs';
 
 // Where a fact comes from. Only 'community' can make a place "Works for you";
 // 'osm' is always shown as unconfirmed. 'venue' is reserved for "Venue says"
@@ -44,6 +46,9 @@ export type VenueVM = {
   // Quick answers ("Help fill the gaps"): one yes/no about one feature. They
   // count toward that feature's facts and are always labelled as such.
   quick: number;
+  // Noise, light, crowds and quiet times (#17) — built in lib/data.ts from
+  // reviews + check-ins. Describes the place; never changes the verdict.
+  sensory?: SensoryVM | null;
 };
 
 export type ConfirmationStat = { last: Date | string; count: number };
@@ -243,6 +248,12 @@ export function buildReviewVM(r: Review, viewerId: string, now = Date.now()): Re
     .map(f => `${r.features[f.id] === 'yes' ? '✓' : '✗'} ${r.features[f.id] === 'yes' ? f.yesShort : f.noShort}`);
   const alt = ENTRANCE_ALTS.find(a => a.id === r.entranceAlt);
   if (alt) feats.push(`${alt.id === 'none' ? '✗' : '✓'} ${alt.short}${r.entranceNote?.trim() ? ` (“${clip(r.entranceNote, 80)}”)` : ''}`);
+  // Sensory answers (#17): "Quiet · Soft or natural light · Few people".
+  for (const [dim, val] of [['noise', r.sensoryNoise], ['light', r.sensoryLight], ['crowd', r.sensoryCrowd]] as const) {
+    const o = optionOf(dim, val);
+    if (o) feats.push(o.fact);
+  }
+  if (r.quietTimes?.length) feats.push(`Usually quiet: ${r.quietTimes.map(s => slotLabel(s).toLowerCase()).join(', ')}`);
   return {
     id: r.id,
     who: needs[0] ? needs[0].who + (needs.length > 1 ? ` (+${needs.length - 1})` : '') : 'Community member',

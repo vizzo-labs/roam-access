@@ -17,6 +17,8 @@ import { AskPlace } from '../ask/AskPlace';
 import { useVenueSays, VenueSays, VenueFooterLinks } from './VenueSays';
 import { useTrackVenueView } from '../track';
 import { VenueAccessExtras, VenueReportsBanner } from '../layers/VenueAccessExtras';
+import { SensorySummary } from '../sensory/SensorySummary';
+import { WhatToExpect } from '../sensory/WhatToExpect';
 
 // ─────────────────────────────────────────────────────────────
 // VENUE — verdict first, plain language, detail on demand
@@ -113,6 +115,10 @@ function V2VenueView({ app }) {
         <FactList kind="check" facts={verdict.checks} style={{ marginBottom: 16 }}/>
 
         <Freshness key={v.id} app={app} venue={v}/>
+
+        {/* sensory content (F6 #17) — describes the place, never the verdict */}
+        <WhatToExpect key={'story-' + v.id} app={app} venue={v}/>
+        <SensorySummary key={'sensory-' + v.id} app={app} venue={v}/>
 
         <VenuePhotos app={app} venueId={v.id}/>
 
