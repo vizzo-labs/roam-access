@@ -23,10 +23,10 @@ export function NeedsTable({ m }: { m: CouncilMetrics }) {
   return (
     <div className="pt-table-wrap">
       <table>
-        <caption>Information gaps by access need — whole pilot area</caption>
+        <caption>Information gaps and verdicts by access need — whole pilot area (verdicts as a person with only that need sees them)</caption>
         <thead><tr>
           <th scope="col">Access need</th><th scope="col" className="num">Places with info</th><th scope="col" className="num">Without info</th>
-          <th scope="col" className="num">Gap</th><th scope="col" className="num">Confirmed working</th><th scope="col" className="num">Barriers reported</th>
+          <th scope="col" className="num">Gap</th><th scope="col" className="num">“Works for you”</th><th scope="col" className="num">“Has barriers”</th>
           <th scope="col" className="num">Demand ({m.demandDays} days)</th><th scope="col" className="num">Unmet demand</th>
         </tr></thead>
         <tbody>

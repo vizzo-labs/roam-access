@@ -11,6 +11,7 @@ import { eq, gte, sql } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { RA2_NEEDS, type NeedId } from '../pilot-data';
 import { buildVenueVM } from '../venues';
+import { ra2Verdict } from '../pilot/match'; // the app's own verdict engine (plain JS)
 import { coversNeed } from './coverage';
 import { ATIC_CATEGORIES, FEATURE_TO_ATIC, NEED_TO_ATIC, type AticId } from '../standards/atic';
 
@@ -65,9 +66,10 @@ export async function getCouncilMetrics() {
   for (const v of vs) {
     const vr = byVenue.get(v.id) || [];
     coveredBy.set(v.id, new Set(RA2_NEEDS.map(n => n.id).filter(id => vr.some(r => coversNeed(r, id)))));
+    // The verdict a person with only this need would see — the same engine as the app.
     const vm = buildVenueVM(v, vr);
-    const tagged = (fs: { tags: string[]; src: string }[]) => new Set(RA2_NEEDS.filter(n => fs.some(f => f.src === 'community' && f.tags.some(t => (n.tags as string[]).includes(t)))).map(n => n.id));
-    facts.set(v.id, { works: tagged(vm.works), barriers: tagged(vm.barriers) });
+    const kinds = RA2_NEEDS.map(n => [n.id, (ra2Verdict(vm, [n.id]) as { kind: string }).kind] as const);
+    facts.set(v.id, { works: new Set(kinds.filter(k => k[1] === 'works').map(k => k[0])), barriers: new Set(kinds.filter(k => k[1] === 'barrier').map(k => k[0])) });
   }
 
   // Demand: views + search impressions by people with each need.

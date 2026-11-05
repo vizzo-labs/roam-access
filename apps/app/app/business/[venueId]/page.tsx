@@ -88,7 +88,7 @@ async function Inner({ params, searchParams }: Pick<PageProps<'/business/[venueI
         <>
           <h3>Questions nobody has answered yet</h3>
           <p className="muted small">Most wanted first. You can’t answer these for the community — but you can explain them in your access statement, and invite customers to review.</p>
-          <ul>{d.missing.map(m => <li key={m.id}>{m.question}{m.demand ? ` — asked about by people who looked ${m.demand} ${m.demand === 1 ? 'time' : 'times'}` : ''}</li>)}</ul>
+          <ul>{d.missing.map(m => <li key={m.id}>{m.question}{m.demand ? ` — ${m.demand} ${m.demand === 1 ? 'view or search' : 'views or searches'} by people who need this` : ''}</li>)}</ul>
         </>
       )}
 
@@ -169,7 +169,7 @@ async function Inner({ params, searchParams }: Pick<PageProps<'/business/[venueI
               <p className="hint" id={`card-${c.id}-hint`}>For example: “Thanks — we’ll keep the table by the door free for you.”</p>
               <textarea id={`card-${c.id}`} name="response" maxLength={500} aria-describedby={`card-${c.id}-hint`} defaultValue={c.venueResponse ?? ''}/>
               <div className="btn-row">
-                <button className="btn" type="submit">Send reply</button>
+                <button className="btn" type="submit">{c.venueResponse ? 'Update reply' : 'Send reply'}</button>
                 {c.status === 'sent' && <button className="btn ghost" type="submit" name="markRead" value="1">Mark as read</button>}
               </div>
             </form>

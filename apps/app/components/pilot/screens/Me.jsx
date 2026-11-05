@@ -108,6 +108,7 @@ function V2Me({ app }) {
             <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </a>
+        <MePortals/>
 
         {rows.slice(-2).map(r => (
           <button key={r.l} onClick={r.fn} style={{
@@ -126,7 +127,6 @@ function V2Me({ app }) {
             </svg>
           </button>
         ))}
-        <MePortals/>
 
         <p style={{ fontFamily: M2, fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: C2.slate, textAlign: 'center', margin: '16px 0 0' }}>
           Roam Access pilot · Manly · map data © OpenStreetMap contributors

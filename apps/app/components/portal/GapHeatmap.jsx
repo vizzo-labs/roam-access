@@ -60,7 +60,7 @@ export function GapHeatmap({ grid, needs }) {
         map.addLayer({ id: 'gaps-line', type: 'line', source: 'gaps', paint: { 'line-color': '#1A1A1A', 'line-width': 1 } });
         map.addLayer({
           id: 'gaps-label', type: 'symbol', source: 'gaps',
-          layout: { 'text-field': ['get', 'label'], 'text-size': 13, 'text-font': ['Noto Sans Bold'], 'text-allow-overlap': true },
+          layout: { 'text-field': ['get', 'label'], 'text-size': 13, 'text-font': ['Noto Sans Bold'], 'text-allow-overlap': false },
           paint: {
             'text-color': ['case', ['==', ['get', 'dark'], 1], '#FAF9F6', '#1A1A1A'],
             'text-halo-color': ['case', ['==', ['get', 'dark'], 1], '#9C2D0E', '#FAF9F6'], 'text-halo-width': 1,

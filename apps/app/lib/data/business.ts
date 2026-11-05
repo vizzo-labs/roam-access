@@ -225,3 +225,16 @@ export async function getVenueDashboard(venueId: string) {
     cards,
   };
 }
+
+// ── Moderation (admin) ───────────────────────────────────────────────────
+export async function listRecentReplies() {
+  return getDb().select({
+    id: venueReplies.id, venueId: venueReplies.venueId, reviewId: venueReplies.reviewId, body: venueReplies.body,
+    hidden: venueReplies.hidden, updatedAt: venueReplies.updatedAt, venueName: venues.name,
+  }).from(venueReplies).innerJoin(venues, eq(venues.id, venueReplies.venueId))
+    .orderBy(desc(venueReplies.updatedAt)).limit(100);
+}
+
+export async function setReplyHidden(id: string, hidden: boolean) {
+  await getDb().update(venueReplies).set({ hidden }).where(eq(venueReplies.id, id));
+}

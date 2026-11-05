@@ -38,7 +38,6 @@ function V2NeedsCard({ app }) {
   const [note, setNote] = React.useState('');
   const [visitOn, setVisitOn] = React.useState('');
   const [busy, setBusy] = React.useState(false);
-  const [status, setStatus] = React.useState('');
   const [big, setBig] = React.useState(false);
 
   React.useEffect(() => {
@@ -58,7 +57,7 @@ function V2NeedsCard({ app }) {
   const phone = venue?.phone ? venue.phone.replace(/[^+\d]/g, '') : '';
 
   const toggle = id => setNeeds(n => (n.includes(id) ? n.filter(x => x !== id) : [...n, id]));
-  const say = msg => { setStatus(''); setTimeout(() => setStatus(msg), 30); };
+  const say = msg => app.toast(msg); // the app's live region (V2Toast)
 
   async function save(quiet) {
     try {
@@ -134,7 +133,6 @@ function V2NeedsCard({ app }) {
         <div style={{ height: 10 }}/>
         <V2BigBtn kind="ghost" onClick={() => setBig(true)}>Show it full screen</V2BigBtn>
 
-        <div role="status" aria-live="polite" style={{ minHeight: 24, margin: '14px 0 0', fontSize: 16, fontWeight: 700, color: C2.teal, fontFamily: F2 }}>{status}</div>
 
         {/* edit */}
         <h2 style={h2}>What to include</h2>

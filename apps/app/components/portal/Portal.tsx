@@ -18,7 +18,7 @@ export function Portal({ area, current, children }: { area: string; current?: 'b
       <header className="pt-head">
         <div className="pt-head-in">
           <Link href="/" className="pt-brand" aria-label="Roam Access — open the app">
-            <Logo size={28}/>
+            <Logo size={36}/>
           </Link>
           <span className="pt-brand"><span>{area}</span></span>
           <nav className="pt-nav" aria-label="Sections">

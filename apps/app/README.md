@@ -94,6 +94,26 @@ scripts/
   test-user.ts        Clerk test users for headless testing
 ```
 
+### Venues & councils
+
+- **Businesses** (`/business`): a signed-in owner or staff member claims a place; an admin
+  verifies it in `/admin/venues` (website-domain email, a call to the listed number…). The free
+  venue dashboard (`/business/<venueId>`) shows anonymous views and search appearances by access
+  need, unmet needs, community facts (read-only), an access statement and public replies to
+  reviews — both shown in the app as **“Venue says”**, apart from community facts, never
+  changing a verdict — and the needs cards guests sent.
+- **Needs card** (app screen `#/card`, `#/card/<venueId>`): the tester's needs + a note + visit
+  date, shared by text, email, copy or the share sheet, or sent in-app to a claimed venue
+  (no name). `lib/needs-card.ts`, `lib/data/cards.ts`.
+- **Council** (`/council`, admin-granted `council` role): gap heatmap, unmet needs by suburb,
+  trends, business inclusion, ATIC categories; CSV (`/api/council/export`) and a printable DIAP
+  report (`/council/report`), all from `lib/council/metrics.ts`. Aggregates only.
+- **Open data**: `/api/open-data/venues` (A11yJSON, ODbL) and “Suggest a correction on
+  OpenStreetMap”. See [`docs/standards.md`](docs/standards.md) (also the ATIC mapping).
+- Tables: `venue_claims`, `venue_replies`, `needs_cards`, `user_roles`, `venue_views`
+  (`lib/db/schema-venues.ts`). All user rows cascade from `profiles`, so “Delete my account”
+  removes them; `venue_views` holds counts only, never a user id.
+
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
 you". OpenStreetMap accessibility tags show up as "Check first — not yet confirmed".
 Quick answers ("Help fill the gaps") are a one-question community review: they count toward

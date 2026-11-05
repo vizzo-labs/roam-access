@@ -25,7 +25,7 @@ export async function GET() {
   for (const [k, v] of Object.entries(m.business)) add('business', 'pilot area', '', k, v);
   for (const c of m.grid) for (const [need, gaps] of Object.entries(c.gaps)) add('grid', `${c.suburb} [${c.bounds.map(x => x.toFixed(4)).join(' ')}]`, need, 'withoutInfo', `${gaps}/${c.venues}`);
 
-  const day = m.generatedAt.slice(0, 10);
+  const day = new Date(m.generatedAt).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' }); // YYYY-MM-DD
   const csv = '﻿' + rows.map(r => r.map(esc).join(',')).join('\r\n') + '\r\n';
   return new Response(csv, {
     headers: {

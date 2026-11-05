@@ -5,7 +5,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { Portal, NotAllowed } from '@/components/portal/Portal';
 import { Flash } from '@/components/portal/Flash';
 import { getUserId, isAdmin } from '@/lib/auth';
-import { decideClaim, domainMatches, listClaimsForAdmin, VERIFICATIONS } from '@/lib/data/business';
+import { decideClaim, domainMatches, listClaimsForAdmin, listRecentReplies, setReplyHidden, VERIFICATIONS } from '@/lib/data/business';
 import { grantRole, listRoleHolders, revokeRole } from '@/lib/data/roles-admin';
 import type { ClaimStatus } from '@/lib/db/schema-venues';
 
@@ -43,7 +43,16 @@ async function revoke(form: FormData) {
   redirect('/admin/venues?ok=revoked-role');
 }
 
+async function toggleReply(form: FormData) {
+  'use server';
+  if (!(await isAdmin())) throw new Error('Not allowed');
+  await setReplyHidden(String(form.get('id')), form.get('hidden') === 'true');
+  revalidatePath('/admin/venues');
+  redirect(`/admin/venues?ok=${form.get('hidden') === 'true' ? 'reply-hidden' : 'reply-shown'}#venue-says`);
+}
+
 const MSG: Record<string, string> = {
+  'reply-hidden': 'Hidden — it no longer shows in the app.', 'reply-shown': 'Shown again in the app.',
   approved: 'Claim approved — the venue dashboard is now open to them.', rejected: 'Claim rejected.', revoked: 'Claim revoked.',
   pending: 'Claim moved back to pending.', granted: 'Council role granted.', 'revoked-role': 'Council role removed.',
 };
@@ -62,7 +71,7 @@ export default function AdminVenuesPage({ searchParams }: PageProps<'/admin/venu
 async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'>['searchParams'] }) {
   if (!(await isAdmin())) return <NotAllowed title="Not available">This page is for the pilot team.</NotAllowed>;
   const sp = await searchParams;
-  const [claims, holders] = await Promise.all([listClaimsForAdmin(), listRoleHolders()]);
+  const [claims, holders, replies] = await Promise.all([listClaimsForAdmin(), listRoleHolders(), listRecentReplies()]);
   const ids = [...new Set([...claims.map(c => c.userId), ...holders.map(h => h.userId)])];
   const emails = new Map<string, string>();
   if (ids.length) {
@@ -123,6 +132,29 @@ async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'
         );
       })}
       {!claims.length && <p className="muted">No claims yet.</p>}
+
+      <h2 id="venue-says">“Venue says” — latest</h2>
+      <p className="muted">Statements and replies venues have posted. Hide anything abusive, misleading or that names a reviewer.</p>
+      <div className="pt-table-wrap">
+        <table>
+          <thead><tr><th scope="col">Place</th><th scope="col">Type</th><th scope="col">Text</th><th scope="col">Updated</th><th scope="col"><span className="pt-sr">Action</span></th></tr></thead>
+          <tbody>
+            {replies.map(r => (
+              <tr key={r.id} style={r.hidden ? { opacity: 0.6 } : undefined}>
+                <td>{r.venueName}</td><td>{r.reviewId ? 'Reply to a review' : 'Access statement'}</td>
+                <td style={{ maxWidth: '28rem', whiteSpace: 'pre-line' }}>{r.body}</td><td>{fmt(r.updatedAt)}</td>
+                <td>
+                  <form action={toggleReply}>
+                    <input type="hidden" name="id" value={r.id}/><input type="hidden" name="hidden" value={r.hidden ? 'false' : 'true'}/>
+                    <button className="btn ghost" type="submit">{r.hidden ? 'Show' : 'Hide'}<span className="pt-sr"> {r.reviewId ? 'reply' : 'statement'} from {r.venueName}</span></button>
+                  </form>
+                </td>
+              </tr>
+            ))}
+            {!replies.length && <tr><td colSpan={5}>Nothing yet.</td></tr>}
+          </tbody>
+        </table>
+      </div>
 
       <h2>Council access</h2>
       <p className="muted">People with the council role can open the council dashboard and its DIAP export. Aggregates only — no names, no individual needs.</p>
