@@ -145,3 +145,50 @@ export type Venue = typeof venues.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type ReviewPhoto = typeof reviewPhotos.$inferSelect;
+
+// ── F4 Community growth (migrations/202611061442_community_growth.sql) ──
+// Quick answers: one yes/no per person per place per access question. They
+// count toward that feature's facts and are labelled "quick answer".
+export const microAnswers = pgTable('micro_answers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  feature: text('feature').notNull(),
+  answer: text('answer').$type<'yes' | 'no'>().notNull(),
+  hidden: boolean('hidden').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  uniqueIndex('micro_answers_user_venue_feature_uq').on(t.userId, t.venueId, t.feature),
+  index('micro_answers_venue_idx').on(t.venueId),
+  check('micro_answers_answer_chk', sql`${t.answer} in ('yes', 'no')`),
+]);
+
+export const mappingEvents = pgTable('mapping_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+  area: text('area').notNull().default(''),
+  startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  uniqueIndex('mapping_events_code_uq').on(t.code),
+  check('mapping_events_time_chk', sql`${t.endsAt} > ${t.startsAt}`),
+]);
+
+// Anonymous on the leaderboard unless show_name (opt-in).
+export const mappingEventMembers = pgTable('mapping_event_members', {
+  eventId: uuid('event_id').notNull().references(() => mappingEvents.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  showName: boolean('show_name').notNull().default(false),
+  displayName: text('display_name'),
+  joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  primaryKey({ name: 'mapping_event_members_pk', columns: [t.eventId, t.userId] }),
+  index('mapping_event_members_user_idx').on(t.userId),
+]);
+
+export type MicroAnswer = typeof microAnswers.$inferSelect;
+export type MappingEvent = typeof mappingEvents.$inferSelect;

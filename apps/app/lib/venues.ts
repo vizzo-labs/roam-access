@@ -5,7 +5,7 @@
 // The rule that keeps the product honest: only the community can make a place
 // "work". OpenStreetMap hints are shown as "check first — not yet confirmed".
 
-import type { EntranceAlt, Review, Venue } from './db/schema';
+import type { EntranceAlt, MicroAnswer, Review, Venue } from './db/schema';
 import { RA2_FEATURES, RA2_NEEDS, FEATURE_IDS, type FeatureId, type NeedId, type VerdictKind } from './pilot-data';
 import { ENTRANCE_ALTS } from './trust/entrance';
 
@@ -23,11 +23,13 @@ export type Fact = {
   last?: string;        // ISO date of the most recent of those reports
   kind?: 'feature' | 'absence' | 'entrance' | 'mixed' | 'experience' | 'hint';
   quote?: string;       // the reviewer's own words ("where?" for entrances)
+  quick?: number;       // how many of `n` are quick answers ("Help fill the gaps")
 };
 
 // One line per visible review: whose needs, what it answered, when. No ids,
 // no names — enough to say "Based on 3 wheelchair users · 6 weeks ago".
-export type Evidence = { n: NeedId[]; f: FeatureId[]; at: string };
+// Quick answers add a line with q: true and no needs (none are stored with them).
+export type Evidence = { n: NeedId[]; f: FeatureId[]; at: string; q?: true };
 
 export type VenueVM = {
   id: string; name: string; kind: string; cat: string; area: string;
@@ -39,6 +41,9 @@ export type VenueVM = {
   lastReview: string | null;     // newest visible review
   lastConfirmed: string | null;  // newest review or "Still accurate? Yes"
   confirmations: number;         // people who said "still accurate"
+  // Quick answers ("Help fill the gaps"): one yes/no about one feature. They
+  // count toward that feature's facts and are always labelled as such.
+  quick: number;
 };
 
 export type ConfirmationStat = { last: Date | string; count: number };
@@ -57,23 +62,46 @@ const newest = (ds: (Date | string | null | undefined)[]) => {
   return t.length ? new Date(Math.max(...t)).toISOString() : null;
 };
 
-export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: ConfirmationStat): VenueVM {
+export type FeatureCount = {
+  yes: number; no: number; lastYes?: Date; lastNo?: Date; quickYes: number; quickNo: number;
+};
+
+// Yes/no tallies per access feature from reviews and quick answers. One person
+// counts once per feature — their latest answer — so answering again (or a
+// quick answer after a review) never adds a second vote.
+export function featureCounts(reviews: Review[], quick: MicroAnswer[] = []): Map<FeatureId, FeatureCount> {
+  const latest = new Map<string, { k: FeatureId; val: 'yes' | 'no'; at: Date; quick: boolean }>();
+  const consider = (userId: string, k: string, val: unknown, at: Date, isQuick: boolean) => {
+    if (!FEATURE_IDS.includes(k as FeatureId) || (val !== 'yes' && val !== 'no')) return;
+    const key = `${userId}\u0000${k}`;
+    const prev = latest.get(key);
+    if (!prev || +at >= +prev.at) latest.set(key, { k: k as FeatureId, val, at, quick: isQuick });
+  };
+  for (const r of reviews) for (const [k, val] of Object.entries(r.features || {})) consider(r.userId, k, val, r.createdAt, false);
+  for (const a of quick) consider(a.userId, a.feature, a.answer, a.updatedAt, true);
+  const counts = new Map<FeatureId, FeatureCount>();
+  for (const { k, val, at, quick: isQuick } of latest.values()) {
+    const c = counts.get(k) || { yes: 0, no: 0, quickYes: 0, quickNo: 0 };
+    c[val]++;
+    if (isQuick) c[val === 'yes' ? 'quickYes' : 'quickNo']++;
+    const key = val === 'yes' ? 'lastYes' : 'lastNo';
+    if (!c[key] || at > c[key]!) c[key] = at;
+    counts.set(k, c);
+  }
+  return counts;
+}
+
+// "(quick answer)" when that's all there is, else "(1 by quick answer)".
+const viaQuick = (q: number, all: number) =>
+  !q ? '' : q === all ? ` (${q === 1 ? 'quick answer' : 'quick answers'})` : ` (${q} by quick answer)`;
+
+export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: ConfirmationStat, quick: MicroAnswer[] = []): VenueVM {
   const works: Fact[] = [], check: Fact[] = [], barriers: Fact[] = [];
   const bucket = { works, check, barrier: barriers };
 
-  // 1 · Feature answers ("Step-free way in? yes/no") from every review.
-  type Tally = { yes: number; no: number; lastYes?: Date; lastNo?: Date };
-  const counts = new Map<FeatureId, Tally>();
-  for (const r of reviews) {
-    for (const [k, val] of Object.entries(r.features || {})) {
-      if (!FEATURE_IDS.includes(k as FeatureId) || (val !== 'yes' && val !== 'no')) continue;
-      const c = counts.get(k as FeatureId) || { yes: 0, no: 0 };
-      c[val]++;
-      const key = val === 'yes' ? 'lastYes' : 'lastNo';
-      if (!c[key] || r.createdAt > c[key]!) c[key] = r.createdAt;
-      counts.set(k as FeatureId, c);
-    }
-  }
+  // 1 · Feature answers ("Step-free way in? yes/no") from every review and
+  // quick answer (one person counts once per feature: see featureCounts).
+  const counts = featureCounts(reviews, quick);
 
   // Another way in ("ramp round the side"), so a main-door step doesn't hide it.
   const alts = new Map<EntranceAlt, { k: number; last: Date; quote?: string }>();
@@ -94,16 +122,18 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     if (!c) continue;
     const tags = [f.id];
     if (c.yes > c.no) {
-      works.push({ t: f.yes, s: `${f.yesShort} — ${reports(c.yes)}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature' });
+      const q = viaQuick(c.quickYes, c.yes);
+      works.push({ t: f.yes, s: `${f.yesShort} — ${reports(c.yes)}${q}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature', quick: c.quickYes || undefined });
     } else if (c.no > c.yes) {
       // Confirmed absence: specific, counted, and the first reason shown.
-      const fact: Fact = { t: f.no, s: `${f.noShort} — ${reports(c.no)}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence' };
+      const q = viaQuick(c.quickNo, c.no);
+      const fact: Fact = { t: f.no, s: `${f.noShort} — ${reports(c.no)}${q}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence', quick: c.quickNo || undefined };
       let severity = f.noSeverity;
       if (f.id === 'stepfree' && altYesTotal > (altNone?.k ?? 0)) {
         // A step at the main door, but a step-free way in elsewhere: worth
         // knowing before you go, not a dead end.
         fact.t = 'Steps at the main entrance';
-        fact.s = `Step at main entrance, step-free way in ${altYes[0].where} — ${reports(c.no)}`;
+        fact.s = `Step at main entrance, step-free way in ${altYes[0].where} — ${reports(c.no)}${q}`;
         severity = 'check';
       } else if (f.id === 'stepfree' && altNone) {
         fact.t = 'Steps at the entry, and no other step-free way in';
@@ -116,6 +146,7 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
       check.push({
         t: `Mixed reports on ${f.label}: ${c.yes} yes, ${c.no} no`, s: `Mixed: ${f.label} — ${c.yes} yes, ${c.no} no`,
         tags, src: 'community', n: c.yes + c.no, last: newest([c.lastYes, c.lastNo])!, kind: 'mixed',
+        quick: c.quickYes + c.quickNo || undefined,
       });
     }
   }
@@ -173,6 +204,9 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     ])],
     at: iso(r.createdAt),
   }));
+  for (const a of quick) {
+    if (FEATURE_IDS.includes(a.feature as FeatureId)) ev.push({ n: [], f: [a.feature as FeatureId], at: iso(a.updatedAt), q: true });
+  }
   const lastReview = latest ? iso(latest.createdAt) : null;
 
   return {
@@ -182,8 +216,10 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     osmUrl: `https://www.openstreetmap.org/${venue.osmType}/${venue.osmId}`,
     works, check, barriers, verified: reviews.length, note,
     ev, lastReview,
-    lastConfirmed: newest([lastReview, confirm?.last]),
+    // A quick answer is a fresh first-hand check too.
+    lastConfirmed: newest([lastReview, confirm?.last, ...quick.map(a => a.updatedAt)]),
     confirmations: confirm?.count ?? 0,
+    quick: quick.length,
   };
 }
 

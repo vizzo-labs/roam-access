@@ -13,7 +13,7 @@ export const PIN = {
 };
 
 const NAV = [
-  { id: 'home', label: 'Explore', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks'] },
+  { id: 'home', label: 'Explore', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
   { id: 'saved', label: 'Saved', views: ['saved'] },
   { id: 'me', label: 'Me', views: ['me', 'setup', 'setup-name'] },
 ];

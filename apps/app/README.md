@@ -42,11 +42,20 @@ app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved ·
                       venues/[id]/reviews · venues/[id]/confirm · venues/[id]/issues
                       photos (POST) · photos/[id] (GET, DELETE) · photos/[id]/suggest
                       venues/[id]/photos · venues/[id]/ask
+                      · gaps (places needing one quick answer) · micro-answers (POST)
+app/admin/community/  create mapping days · moderate quick answers
+app/v/[id]/           public access summary (no login, noindex, no personal data)
+  share · card        embed code + QR · printable A5 card / A4 poster (?size=a5|a4)
+  embed               self-contained <iframe> widget (route handler; proxy skips /v/)
+app/join/[code]       join a mapping day (link or QR)
+app/events/[code]/    mapping-day leaderboard (anonymous by default; ?screen=1 refreshes)
+  kit                 printable organiser kit: join poster, checklist, run sheet, script
 components/pilot/
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
   PilotMap.jsx        real map; pins are buttons, list view stays primary
   WebLayout.jsx       desktop web app: header + panel + map
   pwa.js              service worker registration + install prompt
+  community/          GapsPrompt (Home, Thanks) + gapsStore
   ui/                 primitives: palette (C2 live object, F2, M2), Logo, Mic, Verdict,
                       Shell + TabBar, Buttons, Switch, Plate, TileIcon, Toast, Dictate,
                       useDialog (focus trap), useHeading (focus on navigation)
@@ -55,7 +64,8 @@ components/pilot/
                       List/ListRow, SectionHeader, Skeleton, EmptyState, Banner, ActionRow,
                       SegmentedControl/Tabs, Sheet/SnapSheet, Icon — see AGENTS.md
   screens/            one file per screen: Welcome, Setup, SetupName, Home, Voice, Results,
-                      Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet
+                      Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet,
+                      Gaps ("Help fill the gaps")
                       (+ useVenueReviews)
   trust/              source + recency lines, verdict reasons, facts, "Still accurate?",
                       Report a problem, the entrance follow-up question
@@ -69,9 +79,13 @@ lib/
   data/photos.ts      review photos (private Blob) · data/ai-usage.ts daily AI limits
   photos/             kinds + limits (shared) · jpeg.ts strips metadata server-side
   ai/                 model.ts (gateway model + ZDR) · photo-suggest.ts · ask.ts
-  data.ts             all database access
+  data.ts             core database access
+  data/community.ts   quick answers, mapping days, leaderboards
+  data/summary.ts     the public venue summary
+  community/          gap picking (gaps.ts), quick questions, en-AU event dates
   db/url.ts           which database: prod only when VERCEL_ENV=production, else dev
   db/schema.ts        typed mirror of migrations/: venues · profiles · reviews · saved
+                      · micro_answers · mapping_events · mapping_event_members
 migrations/           additive SQL migrations, YYYYMMDDHHMM_<slug>.sql
 scripts/
   migrate.ts          applies pending migrations (runs before every build)
@@ -82,6 +96,9 @@ scripts/
 
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
 you". OpenStreetMap accessibility tags show up as "Check first — not yet confirmed".
+Quick answers ("Help fill the gaps") are a one-question community review: they count toward
+that feature's yes/no tally exactly like a review's optional questions, one vote per person
+per feature (latest answer wins), and every fact they touch says "(quick answer)".
 
 ## Develop
 

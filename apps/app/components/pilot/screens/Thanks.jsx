@@ -5,6 +5,7 @@ import { V2BigBtn } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
 import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
+import { GapsPrompt } from '../community/GapsPrompt';
 
 // ─────────────────────────────────────────────────────────────
 // THANKS — the community loop, made visible
@@ -47,6 +48,8 @@ function V2Thanks({ app }) {
           </div>
         ))}
       </div>
+
+      <GapsPrompt app={app} onColor style={{ padding: '14px 26px 0' }}/>
 
       <div style={{ padding: '24px 26px 30px' }} data-ra-oncolor="">
         <V2BigBtn kind="rust" onClick={() => app.goto('home')}>Done</V2BigBtn>

@@ -27,6 +27,7 @@ import { V2Thanks } from './screens/Thanks';
 import { V2SavedView } from './screens/Saved';
 import { V2Me } from './screens/Me';
 import { V2A11ySheet } from './screens/A11ySheet';
+import { V2Gaps } from './screens/Gaps';
 
 const PREFS_KEY = 'ra2-a11y';
 
@@ -35,6 +36,7 @@ const VIEW_TITLES = {
   home: 'Home', voice: 'Voice search', results: 'Search results', map: 'Map',
   venue: 'Venue details', reviews: 'Community reviews', review: 'Write a review',
   thanks: 'Thank you', saved: 'Saved places', me: 'Your profile',
+  gaps: 'Help fill the gaps',
 };
 const ROUTES = Object.keys(VIEW_TITLES);
 const DARK_VIEWS = ['voice', 'thanks'];
@@ -390,6 +392,18 @@ function PilotScreens({ initial, userId }) {
       }
     },
 
+    // "Help fill the gaps": one yes/no answer. Updates the place's facts.
+    answerQuick: async ({ venueId, feature, answer }) => {
+      try {
+        const r = await api('/api/micro-answers', { method: 'POST', body: JSON.stringify({ venueId, feature, answer }) });
+        if (r.venue) setVenues(vs => vs.map(v => (v.id === venueId ? r.venue : v)));
+        return true;
+      } catch (e) {
+        setToast('Couldn’t save your answer — check your connection and try again.');
+        return false;
+      }
+    },
+
     // From the map's "my location" button (also fires as the tester moves).
     locateFromMap: ({ lat, lng }) => {
       const here = { lat, lng };
@@ -450,6 +464,7 @@ function PilotScreens({ initial, userId }) {
     home: V2Home, voice: V2Voice, results: V2Results, map: V2MapView,
     venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
+    gaps: V2Gaps,
   };
   const Screen = screens[view] || V2Home;
 

@@ -7,7 +7,7 @@ import { getConfirmationStats } from './data/trust';
 import type { EntranceAlt } from './db/schema';
 import { ENTRANCE_ALTS, ENTRANCE_NOTE_MAX } from './trust/entrance';
 
-const { venues, reviews, profiles, saved } = schema;
+const { venues, reviews, profiles, saved, microAnswers } = schema;
 
 export type Me = { name: string; needs: string[]; onboarded: boolean };
 
@@ -20,25 +20,29 @@ export async function ensureProfile(userId: string) {
 
 export async function getVenueVMs(): Promise<VenueVM[]> {
   const db = getDb();
-  const [vs, rs, confirm] = await Promise.all([
+  const [vs, rs, confirm, qs] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
     getConfirmationStats(),
+    db.select().from(microAnswers).where(eq(microAnswers.hidden, false)),
   ]);
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
-  return vs.map(v => buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id)));
+  const quickByVenue = new Map<string, typeof qs>();
+  for (const q of qs) quickByVenue.set(q.venueId, [...(quickByVenue.get(q.venueId) || []), q]);
+  return vs.map(v => buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id), quickByVenue.get(v.id) || []));
 }
 
 export async function getVenueVM(id: string): Promise<VenueVM | null> {
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const [rs, confirm] = await Promise.all([
+  const [rs, confirm, qs] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
     getConfirmationStats(id),
+    db.select().from(microAnswers).where(and(eq(microAnswers.venueId, id), eq(microAnswers.hidden, false))),
   ]);
-  return buildVenueVM(v, rs, confirm.get(id));
+  return buildVenueVM(v, rs, confirm.get(id), qs);
 }
 
 export async function getMyStats(userId: string) {
