@@ -192,3 +192,6 @@ export const mappingEventMembers = pgTable('mapping_event_members', {
 
 export type MicroAnswer = typeof microAnswers.$inferSelect;
 export type MappingEvent = typeof mappingEvents.$inferSelect;
+
+// F5 · venues & councils (venue_claims, venue_replies, needs_cards, user_roles, venue_views)
+export * from './schema-venues';

@@ -10,6 +10,7 @@ import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Search } from '@/lib/pilot/match';
 import { VerdictReasons } from '../trust/VerdictReasons';
+import { useTrackSearch } from '../track';
 
 // ─────────────────────────────────────────────────────────────
 // RESULTS — one verdict per card
@@ -20,6 +21,7 @@ function V2Results({ app }) {
   const all = ra2Search(app.venues, query, app.user?.needs || []);
   const [limit, setLimit] = React.useState(25);
   const results = all.slice(0, limit);
+  useTrackSearch(all);
   const needShorts = RA2_NEEDS.filter(n => (app.user?.needs || []).includes(n.id)).map(n => n.short);
 
   return (

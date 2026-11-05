@@ -14,6 +14,8 @@ import { Freshness } from '../trust/Freshness';
 import { SourceLine } from '../trust/SourceLine';
 import { VenuePhotos } from '../photos/VenuePhotos';
 import { AskPlace } from '../ask/AskPlace';
+import { useVenueSays, VenueSays, VenueFooterLinks } from './VenueSays';
+import { useTrackVenueView } from '../track';
 
 // ─────────────────────────────────────────────────────────────
 // VENUE — verdict first, plain language, detail on demand
@@ -29,6 +31,8 @@ function V2VenueView({ app }) {
   const firstReview = loaded && loaded[0];
 
   React.useEffect(() => { app.markVisited(v.id); }, [v.id]); // eslint-disable-line
+  useTrackVenueView(v.id);
+  const says = useVenueSays(v.id);
 
   const quick = v.quick || 0;
   const nRev = [
@@ -120,6 +124,8 @@ function V2VenueView({ app }) {
         )}
 
         <AskPlace key={v.id} app={app} venue={v}/>
+        {/* "Venue says" — separate from community facts; never changes the verdict */}
+        <VenueSays app={app} venue={v} says={says}/>
 
         {written > 0 ? (
           <V2BigBtn kind="ghost" onClick={() => app.goto('reviews', v.id)}>
@@ -135,13 +141,7 @@ function V2VenueView({ app }) {
           Share your experience
         </V2BigBtn>
 
-        <p style={{ fontSize: 13.5, color: C2.slate, textAlign: 'center', margin: '18px 0 0', lineHeight: 1.5, fontFamily: F2 }}>
-          Place details from{' '}
-          <a href={v.osmUrl} target="_blank" rel="noopener noreferrer" style={{ color: C2.teal, fontWeight: 600 }}>
-            OpenStreetMap<span className="ra-sr-only"> (opens in a new tab)</span>
-          </a>.{' '}
-          <a href="/how-it-works" style={{ color: C2.teal, fontWeight: 600 }}>How Roam Access works</a>
-        </p>
+        <VenueFooterLinks venue={v} says={says}/>
         <p style={{ fontSize: 13.5, textAlign: 'center', margin: '8px 0 0', lineHeight: 1.5, fontFamily: F2 }}>
           <a href={`/v/${encodeURIComponent(v.id)}/share`} target="_blank" rel="noopener" style={{ color: C2.teal, fontWeight: 600 }}>
             Share or print this place’s access summary<span className="ra-sr-only"> (opens in a new tab)</span>

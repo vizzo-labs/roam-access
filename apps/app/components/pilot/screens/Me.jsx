@@ -5,6 +5,7 @@ import { RA2_NEEDS } from '@/lib/pilot-data';
 import { V2Shell } from '../ui/Shell';
 import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
+import { MePortals } from './MePortals';
 
 // ─────────────────────────────────────────────────────────────
 // ME — profile, needs, impact, settings
@@ -17,6 +18,7 @@ function V2Me({ app }) {
 
   const rows = [
     { l: 'Accessibility settings', m: 'Text size · contrast · motion', hi: true, fn: () => app.openA11y() },
+    { l: 'My needs card', m: 'Tell a place what you need before you go', fn: () => app.goto('card') },
     ...(app.installable ? [{ l: 'Install the app', m: 'Add Roam Access to your home screen', hi: false, fn: () => app.install() }] : []),
     { l: 'Invite someone to the pilot', m: 'Every new voice makes the map better', fn: () => app.invite() },
     { l: 'Sign out', m: 'Your reviews and saved places stay', fn: () => app.signOut() },
@@ -124,6 +126,7 @@ function V2Me({ app }) {
             </svg>
           </button>
         ))}
+        <MePortals/>
 
         <p style={{ fontFamily: M2, fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: C2.slate, textAlign: 'center', margin: '16px 0 0' }}>
           Roam Access pilot · Manly · map data © OpenStreetMap contributors

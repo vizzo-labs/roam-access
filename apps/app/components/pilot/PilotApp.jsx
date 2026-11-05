@@ -28,6 +28,7 @@ import { V2SavedView } from './screens/Saved';
 import { V2Me } from './screens/Me';
 import { V2A11ySheet } from './screens/A11ySheet';
 import { V2Gaps } from './screens/Gaps';
+import { V2NeedsCard } from './screens/NeedsCard';
 
 const PREFS_KEY = 'ra2-a11y';
 
@@ -37,6 +38,7 @@ const VIEW_TITLES = {
   venue: 'Venue details', reviews: 'Community reviews', review: 'Write a review',
   thanks: 'Thank you', saved: 'Saved places', me: 'Your profile',
   gaps: 'Help fill the gaps',
+  card: 'My needs card',
 };
 const ROUTES = Object.keys(VIEW_TITLES);
 const DARK_VIEWS = ['voice', 'thanks'];
@@ -465,6 +467,7 @@ function PilotScreens({ initial, userId }) {
     venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
     gaps: V2Gaps,
+    card: V2NeedsCard,
   };
   const Screen = screens[view] || V2Home;
 

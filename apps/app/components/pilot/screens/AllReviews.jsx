@@ -9,6 +9,7 @@ import { V2Verdict } from '../ui/Verdict';
 import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { PhotoGrid, PhotoViewer, SourceBadge } from '../ds';
+import { useVenueSays, VenueReply } from './VenueSays';
 
 // ─────────────────────────────────────────────────────────────
 // ALL REVIEWS — filter by lived experience
@@ -18,6 +19,7 @@ function V2AllReviews({ app }) {
   const h = useV2Heading('reviews-' + v.id);
   const [filter, setFilter] = React.useState('All');
   const { reviews: loaded, error } = useVenueReviews(app, v.id);
+  const says = useVenueSays(v.id);
   const all = loaded || [];
   const filters = ['All', ...RA2_NEEDS.map(n => n.filter)];
   const shown = filter === 'All' ? all : all.filter(r => r.filters.includes(filter));
@@ -75,6 +77,7 @@ function V2AllReviews({ app }) {
                 {r.when}{r.mine ? ' · yours' : ''}
               </span>
             </div>
+            <VenueReply reply={says?.replies?.[r.id]} venueName={v.name}/>
           </article>
         ))}
         {loaded && !shown.length && (
