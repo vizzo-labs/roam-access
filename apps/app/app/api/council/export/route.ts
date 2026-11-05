@@ -21,7 +21,7 @@ export async function GET() {
     for (const n of s.needs) for (const k of ['covered', 'gap', 'gapPct', 'demand', 'unmetDemand', 'barriers'] as const) add('suburb_need', s.suburb, n.label, k, n[k]);
   }
   for (const a of m.byAtic) for (const k of ['covered', 'gap', 'gapPct'] as const) add('atic', 'pilot area', a.label, k, a[k]);
-  for (const t of m.trends) for (const k of ['reviews', 'newTesters', 'venuesCoveredToDate', 'coveredPctToDate'] as const) add('trend', `week of ${t.week}`, '', k, t[k]);
+  for (const t of m.trends) for (const k of ['reviews', 'quickAnswers', 'newTesters', 'venuesCoveredToDate', 'coveredPctToDate'] as const) add('trend', `week of ${t.week}`, '', k, t[k]);
   for (const [k, v] of Object.entries(m.business)) add('business', 'pilot area', '', k, v);
   for (const c of m.grid) for (const [need, gaps] of Object.entries(c.gaps)) add('grid', `${c.suburb} [${c.bounds.map(x => x.toFixed(4)).join(' ')}]`, need, 'withoutInfo', `${gaps}/${c.venues}`);
 

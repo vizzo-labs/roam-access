@@ -33,8 +33,8 @@ Review questions map the same way:
 | Good for low vision? | Blind or low vision |
 | Quiet enough? · Calm, not hectic? · Easy to find your way around? | Cognitive, including autism |
 
-A place counts as covered for an ATIC category when a review answered a question in that
-category, or someone whose need maps **directly** to it reviewed the place. Partial mappings
+A place counts as covered for an ATIC category when a review or quick answer answered a
+question in that category, or someone whose need maps **directly** to it reviewed the place. Partial mappings
 don't count towards coverage.
 
 Two Roam Access needs — calm spaces (mental health) and seating (chronic illness, fatigue) — have
@@ -51,7 +51,8 @@ sign-in, CORS open, cached for 5–10 minutes.
 - **Licence**: ODbL 1.0, with attribution in the response (`license`, `licenseUrl`,
   `attribution`). The places come from OpenStreetMap, so the combined database must stay ODbL.
 - **Public data only**: name, category, address, location, phone, website, OSM ids, and
-  accessibility facts that a **majority** of community answers agree on. Never review text,
+  accessibility facts that a **majority** of community answers agree on (reviews and
+  quick answers, one vote per person — `featureCounts` in `lib/venues.ts`). Never review text,
   reviewer needs, names, "Venue says" content, or OSM's own accessibility tags (those are
   unconfirmed here, and already in OSM).
 - **Mapping** (majority answer → field):

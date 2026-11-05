@@ -50,7 +50,7 @@ async function Inner() {
         Action 2.22 commits Council to “review and update the Access Your Area map on Council website” (years 1–4). Today that map covers
         Council facilities only. This section shows where community-verified information on local businesses and places is still
         missing, so updates can be targeted. A place counts as having information for a need when a person with that need reviewed it,
-        or a reviewer answered a question that matters for it. OpenStreetMap tags are not counted.
+        or someone answered a question that matters for it (in a review or a quick answer). OpenStreetMap tags are not counted.
       </p>
       <SuburbTable m={m}/>
       <NeedsTable m={m}/>
@@ -71,7 +71,7 @@ async function Inner() {
       <h2>Method and data notes</h2>
       <ul>
         <li>Places: {m.summary.venues} venues from OpenStreetMap in Manly, Fairlight, Queenscliff, Balgowlah, Manly Vale and Clontarf.</li>
-        <li>Information comes only from community reviews by pilot testers with disability. Hidden (moderated) reviews are excluded.</li>
+        <li>Information comes only from community reviews and quick answers by pilot testers with disability. Hidden (moderated) contributions are excluded.</li>
         <li>Demand is anonymous: views and search appearances of each place, counted by the viewer’s access needs, over the last {m.demandDays} days. No individual is identifiable from these counts.</li>
         <li>Business replies and statements are shown to the public as “Venue says” and never change a place’s verdict.</li>
         <li>Place data © OpenStreetMap contributors (ODbL). Venue accessibility data is available as open data (A11yJSON, ODbL) at /api/open-data/venues.</li>

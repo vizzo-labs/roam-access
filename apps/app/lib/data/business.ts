@@ -7,14 +7,14 @@ import 'server-only';
 
 import { and, asc, desc, eq, gte, ilike, inArray, isNull, or, sql } from 'drizzle-orm';
 import { getDb, schema } from '../db';
-import { ensureProfile } from '../data';
+import { ensureProfile, getVenueVM } from '../data';
 import { managesVenue } from '../roles';
-import { buildReviewVM, buildVenueVM, ago } from '../venues';
+import { buildReviewVM, ago } from '../venues';
 import { RA2_FEATURES, RA2_NEEDS, type NeedId } from '../pilot-data';
-import { coversNeed } from '../council/coverage';
+import { coveredNeeds } from '../council/coverage';
 import type { ClaimStatus } from '../db/schema-venues';
 
-const { venues, reviews, venueClaims, venueReplies, needsCards, venueViews } = schema;
+const { venues, reviews, microAnswers, venueClaims, venueReplies, needsCards, venueViews } = schema;
 
 export const CLAIM_ROLES = [
   { id: 'owner', label: 'Owner' },
@@ -188,8 +188,10 @@ export async function getVenueDashboard(venueId: string) {
   const venue = await getVenueRow(venueId);
   if (!venue) return null;
   const since = sql`(now() at time zone 'Australia/Sydney')::date - ${DAYS}::int`;
-  const [rs, views, says, cards] = await Promise.all([
+  const [rs, qs, vm, views, says, cards] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, venueId), eq(reviews.hidden, false))).orderBy(desc(reviews.createdAt)),
+    db.select().from(microAnswers).where(and(eq(microAnswers.venueId, venueId), eq(microAnswers.hidden, false))),
+    getVenueVM(venueId), // the same facts the app shows
     db.select({ kind: venueViews.kind, need: venueViews.need, n: sql<number>`sum(${venueViews.count})::int` })
       .from(venueViews).where(and(eq(venueViews.venueId, venueId), gte(venueViews.day, since)))
       .groupBy(venueViews.kind, venueViews.need),
@@ -197,18 +199,17 @@ export async function getVenueDashboard(venueId: string) {
     listCardsForVenue(venueId),
   ]);
   const count = (kind: string, need: string) => views.find(v => v.kind === kind && v.need === need)?.n ?? 0;
-  const vm = buildVenueVM(venue, rs);
+  const covered = coveredNeeds(rs, qs);
   const now = Date.now();
 
   const byNeed = RA2_NEEDS.map(n => {
-    const covered = rs.some(r => coversNeed(r, n.id as NeedId));
-    return { id: n.id, label: n.chip, who: n.whoPlural, views: count('view', n.id), searches: count('search', n.id), covered };
+    return { id: n.id, label: n.chip, who: n.whoPlural, views: count('view', n.id), searches: count('search', n.id), covered: covered.has(n.id as NeedId) };
   });
   const unmet = byNeed.filter(n => !n.covered && (n.views + n.searches) > 0).sort((a, b) => (b.views + b.searches) - (a.views + a.searches));
 
   // Review questions nobody has answered yet, most-wanted first (by the
   // demand of the needs they serve).
-  const answered = new Set(rs.flatMap(r => Object.keys(r.features || {})));
+  const answered = new Set([...rs.flatMap(r => Object.keys(r.features || {})), ...qs.map(q => q.feature)]);
   const missing = RA2_FEATURES.filter(f => !answered.has(f.id)).map(f => {
     const demand = RA2_NEEDS.filter(n => n.tags.includes(f.id)).reduce((s, n) => s + count('view', n.id) + count('search', n.id), 0);
     return { id: f.id, question: f.question, demand };
@@ -219,7 +220,7 @@ export async function getVenueDashboard(venueId: string) {
     days: DAYS,
     totals: { views: count('view', 'any'), searches: count('search', 'any'), reviews: rs.length, cards: cards.length },
     byNeed, unmet, missing,
-    facts: { works: vm.works, check: vm.check, barriers: vm.barriers },
+    facts: { works: vm?.works ?? [], check: vm?.check ?? [], barriers: vm?.barriers ?? [] },
     reviews: rs.map(r => ({ ...buildReviewVM(r, '', now), reply: says.replies[r.id] ?? null })),
     statement: says.statement,
     cards,

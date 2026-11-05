@@ -2,21 +2,31 @@ import 'server-only';
 import { and, eq } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { A11YJSON_LICENSE, toPlaceInfo } from '../standards/a11yjson';
+import { featureCounts } from '../venues';
 
-const { venues, reviews } = schema;
+const { venues, reviews, microAnswers } = schema;
 
 /** Every active venue as A11yJSON PlaceInfo (public data only — see lib/standards/a11yjson.ts). */
 export async function getOpenDataPlaces(baseUrl: string, id?: string) {
   const db = getDb();
   const vWhere = id ? and(eq(venues.active, true), eq(venues.id, id)) : eq(venues.active, true);
   const rWhere = id ? and(eq(reviews.hidden, false), eq(reviews.venueId, id)) : eq(reviews.hidden, false);
-  const [vs, rs] = await Promise.all([
+  const qWhere = id ? and(eq(microAnswers.hidden, false), eq(microAnswers.venueId, id)) : eq(microAnswers.hidden, false);
+  const [vs, rs, qs] = await Promise.all([
     db.select().from(venues).where(vWhere).orderBy(venues.name),
-    db.select({ venueId: reviews.venueId, features: reviews.features }).from(reviews).where(rWhere),
+    db.select().from(reviews).where(rWhere),
+    db.select().from(microAnswers).where(qWhere),
   ]);
-  const byVenue = new Map<string, { features: Record<string, 'yes' | 'no'> }[]>();
-  for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
-  return vs.map(v => toPlaceInfo(v, byVenue.get(v.id) || [], baseUrl));
+  const group = <T extends { venueId: string }>(xs: T[]) => {
+    const m = new Map<string, T[]>();
+    for (const x of xs) m.set(x.venueId, [...(m.get(x.venueId) || []), x]);
+    return m;
+  };
+  const rBy = group(rs), qBy = group(qs);
+  return vs.map(v => {
+    const vr = rBy.get(v.id) || [];
+    return toPlaceInfo(v, featureCounts(vr, qBy.get(v.id) || []), vr.length, baseUrl);
+  });
 }
 
 export const openDataMeta = (count: number) => ({

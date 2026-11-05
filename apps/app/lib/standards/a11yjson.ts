@@ -6,7 +6,8 @@
 // "Venue says" content, or OpenStreetMap accessibility tags (those are already
 // in OSM and unconfirmed here). Licence: ODbL 1.0, like the OSM data it builds on.
 
-import type { Review, Venue } from '../db/schema';
+import type { Venue } from '../db/schema';
+import type { FeatureCount } from '../venues';
 import { RA2_FEATURES, type FeatureId } from '../pilot-data';
 import { osmNoteUrl } from './osm';
 
@@ -28,20 +29,20 @@ const en = (text: string) => ({ en: text });
 
 type Answer = 'yes' | 'no' | 'mixed';
 
-/** Majority community answer per review question (ties = mixed). */
-export function communityAnswers(reviews: Pick<Review, 'features'>[]) {
+/** Majority community answer per review question (ties = mixed), from
+ *  featureCounts() — reviews + quick answers, one vote per person. */
+export function communityAnswers(counts: Map<FeatureId, FeatureCount>) {
   const out: Partial<Record<FeatureId, { answer: Answer; yes: number; no: number }>> = {};
   for (const f of RA2_FEATURES) {
-    let yes = 0, no = 0;
-    for (const r of reviews) { const v = r.features?.[f.id]; if (v === 'yes') yes++; else if (v === 'no') no++; }
-    if (!yes && !no) continue;
-    out[f.id] = { answer: yes > no ? 'yes' : no > yes ? 'no' : 'mixed', yes, no };
+    const c = counts.get(f.id);
+    if (!c || (!c.yes && !c.no)) continue;
+    out[f.id] = { answer: c.yes > c.no ? 'yes' : c.no > c.yes ? 'no' : 'mixed', yes: c.yes, no: c.no };
   }
   return out;
 }
 
-export function toPlaceInfo(v: Venue, reviews: Pick<Review, 'features'>[], baseUrl: string) {
-  const a = communityAnswers(reviews);
+export function toPlaceInfo(v: Venue, counts: Map<FeatureId, FeatureCount>, reviewCount: number, baseUrl: string) {
+  const a = communityAnswers(counts);
   const ans = (id: FeatureId) => a[id]?.answer;
   const bool = (id: FeatureId) => (ans(id) === 'yes' ? true : ans(id) === 'no' ? false : undefined);
 
@@ -58,7 +59,7 @@ export function toPlaceInfo(v: Venue, reviews: Pick<Review, 'features'>[], baseU
   if (bool('quiet') !== undefined) accessibility.isQuiet = bool('quiet');
 
   // Roam Access questions with no exact A11yJSON field travel as namespaced tags.
-  const tags: Record<string, string> = { 'roam:community_reviews': String(reviews.length) };
+  const tags: Record<string, string> = { 'roam:community_reviews': String(reviewCount) };
   for (const f of RA2_FEATURES) {
     const x = a[f.id];
     if (x) tags[`roam:${f.id}`] = `${x.answer} (${x.yes} yes, ${x.no} no)`;
@@ -68,8 +69,8 @@ export function toPlaceInfo(v: Venue, reviews: Pick<Review, 'features'>[], baseU
     name: en(v.name),
     category: CATEGORY[v.kind] ?? 'place',
     address: { text: en([v.address, v.suburb || 'Manly'].filter(Boolean).join(', ')), city: en(v.suburb || 'Manly'), state: en('New South Wales'), stateCode: 'NSW', countryCode: 'AUS' },
-    description: en(reviews.length
-      ? `Accessibility from ${reviews.length} Roam Access community review${reviews.length === 1 ? '' : 's'} by people with disability. Only majority-confirmed facts are included.`
+    description: en(reviewCount || Object.keys(a).length
+      ? `Accessibility from Roam Access community reviews and quick answers by people with disability (${reviewCount} review${reviewCount === 1 ? '' : 's'}). Only majority-confirmed facts are included.`
       : 'No Roam Access community reviews yet.'),
     sourceId: 'roam-access',
     originalId: v.id,

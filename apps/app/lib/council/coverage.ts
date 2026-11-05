@@ -1,4 +1,5 @@
-// "Does the community know anything about this place for this need?" —
+// "Does the community know anything about this place for this need?" (from
+// reviews and quick answers) —
 // the definition of a gap, shared by the council dashboard, the venue
 // dashboard and the export. Only community reviews count: OpenStreetMap tags
 // are unconfirmed and never close a gap.
@@ -13,5 +14,11 @@ export function coversNeed(r: R, need: NeedId) {
   return n.tags.some(t => r.features?.[t] === 'yes' || r.features?.[t] === 'no');
 }
 
-export const coveredNeeds = (reviews: R[]) =>
-  new Set(RA2_NEEDS.map(n => n.id).filter(id => reviews.some(r => coversNeed(r, id))));
+// A quick answer ("Help fill the gaps") on a question that matters for the need.
+export function quickCoversNeed(q: { feature: string; answer: string }, need: NeedId) {
+  const n = RA2_NEEDS.find(x => x.id === need)!;
+  return (n.tags as string[]).includes(q.feature) && (q.answer === 'yes' || q.answer === 'no');
+}
+
+export const coveredNeeds = (reviews: R[], quick: { feature: string; answer: string }[] = []) =>
+  new Set(RA2_NEEDS.map(n => n.id).filter(id => reviews.some(r => coversNeed(r, id)) || quick.some(q => quickCoversNeed(q, id))));

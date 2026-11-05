@@ -37,7 +37,7 @@ async function Inner() {
         <a className="btn" href="/council/report">Printable DIAP report</a>
         <a className="btn outline" href="/api/council/export" download>Download CSV</a>
       </div>
-      <p className="muted small">Updated {generated}. Aggregates only — no names, no individual needs. Only community reviews count as information; OpenStreetMap tags don’t.</p>
+      <p className="muted small">Updated {generated}. Aggregates only — no names, no individual needs. Only community reviews and quick answers count as information; OpenStreetMap tags don’t.</p>
 
       <SummaryStats m={m}/>
 

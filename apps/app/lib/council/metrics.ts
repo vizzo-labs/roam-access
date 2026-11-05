@@ -10,12 +10,12 @@ import 'server-only';
 import { eq, gte, sql } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { RA2_NEEDS, type NeedId } from '../pilot-data';
-import { buildVenueVM } from '../venues';
+import { getVenueVMs } from '../data';
 import { ra2Verdict } from '../pilot/match'; // the app's own verdict engine (plain JS)
-import { coversNeed } from './coverage';
+import { coveredNeeds } from './coverage';
 import { ATIC_CATEGORIES, FEATURE_TO_ATIC, NEED_TO_ATIC, type AticId } from '../standards/atic';
 
-const { venues, reviews, profiles, venueClaims, venueReplies, needsCards, venueViews } = schema;
+const { venues, reviews, profiles, microAnswers, venueClaims, venueReplies, needsCards, venueViews } = schema;
 
 export const DEMAND_DAYS = 90;
 export const TREND_WEEKS = 12;
@@ -43,9 +43,11 @@ function needGap(need: NeedId, label: string, vs: { id: string }[], coveredBy: M
 export async function getCouncilMetrics() {
   const db = getDb();
   const demandSince = sql`(now() at time zone 'Australia/Sydney')::date - ${DEMAND_DAYS}::int`;
-  const [vs, rs, demandRows, testersByWeek, claims, replies, cards, totals] = await Promise.all([
+  const [vs, rs, qs, vms, demandRows, testersByWeek, claims, replies, cards, totals] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
+    db.select().from(microAnswers).where(eq(microAnswers.hidden, false)),
+    getVenueVMs(), // exactly what the app shows (reviews + quick answers)
     db.select({ venueId: venueViews.venueId, kind: venueViews.kind, need: venueViews.need, n: sql<number>`sum(${venueViews.count})::int` })
       .from(venueViews).where(gte(venueViews.day, demandSince)).groupBy(venueViews.venueId, venueViews.kind, venueViews.need),
     db.select({ week: sql<string>`to_char(date_trunc('week', ${profiles.onboardedAt} at time zone 'Australia/Sydney'), 'YYYY-MM-DD')`, n: sql<number>`count(*)::int` })
@@ -58,17 +60,20 @@ export async function getCouncilMetrics() {
   ]);
   const venueIds = new Set(vs.map(v => v.id));
 
-  // Reviews per venue, coverage per venue, community facts per venue.
+  // Reviews and quick answers per venue, coverage per venue, verdicts per venue.
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) if (venueIds.has(r.venueId)) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
+  const quickBy = new Map<string, typeof qs>();
+  for (const q of qs) if (venueIds.has(q.venueId)) quickBy.set(q.venueId, [...(quickBy.get(q.venueId) || []), q]);
+  const hasInfo = (id: string) => (byVenue.get(id) || []).length > 0 || (quickBy.get(id) || []).length > 0;
+  const vmById = new Map(vms.map(vm => [vm.id, vm]));
   const coveredBy = new Map<string, Set<NeedId>>();
   const facts = new Map<string, { works: Set<NeedId>; barriers: Set<NeedId> }>();
   for (const v of vs) {
-    const vr = byVenue.get(v.id) || [];
-    coveredBy.set(v.id, new Set(RA2_NEEDS.map(n => n.id).filter(id => vr.some(r => coversNeed(r, id)))));
+    coveredBy.set(v.id, coveredNeeds(byVenue.get(v.id) || [], quickBy.get(v.id) || []));
     // The verdict a person with only this need would see — the same engine as the app.
-    const vm = buildVenueVM(v, vr);
-    const kinds = RA2_NEEDS.map(n => [n.id, (ra2Verdict(vm, [n.id]) as { kind: string }).kind] as const);
+    const vm = vmById.get(v.id);
+    const kinds = vm ? RA2_NEEDS.map(n => [n.id, (ra2Verdict(vm, [n.id]) as { kind: string }).kind] as const) : [];
     facts.set(v.id, { works: new Set(kinds.filter(k => k[1] === 'works').map(k => k[0])), barriers: new Set(kinds.filter(k => k[1] === 'barrier').map(k => k[0])) });
   }
 
@@ -82,13 +87,14 @@ export async function getCouncilMetrics() {
   }
   const demandOf = (venueId: string, need: NeedId) => demand.get(`${venueId}|${need}`) || 0;
 
-  const reviewed = vs.filter(v => (byVenue.get(v.id) || []).length > 0).length;
+  const reviewed = vs.filter(v => hasInfo(v.id)).length;
   const summary = {
     venues: vs.length,
     venuesReviewed: reviewed,
     reviewedPct: pct(reviewed, vs.length),
     reviews: rs.filter(r => venueIds.has(r.venueId)).length,
-    reviewers: new Set(rs.map(r => r.userId)).size,
+    quickAnswers: qs.filter(q => venueIds.has(q.venueId)).length,
+    reviewers: new Set([...rs.map(r => r.userId), ...qs.map(q => q.userId)]).size,
     testers: totals[0]?.testers ?? 0,
     demand: demandAny,
   };
@@ -99,14 +105,14 @@ export async function getCouncilMetrics() {
   const bySuburb = suburbs.map(s => {
     const sv = vs.filter(v => (v.suburb || 'Manly') === s);
     const needs = RA2_NEEDS.map(n => needGap(n.id, n.chip, sv, coveredBy, demandOf, facts));
-    const sr = sv.filter(v => (byVenue.get(v.id) || []).length > 0).length;
+    const sr = sv.filter(v => hasInfo(v.id)).length;
     return { suburb: s, venues: sv.length, reviewed: sr, reviewedPct: pct(sr, sv.length), needs, unmetDemand: needs.reduce((a, x) => a + x.unmetDemand, 0) };
   }).sort((a, b) => b.venues - a.venues);
 
   // ATIC categories: a place is covered for a category when a review answered
   // a question in it, or someone with a need that maps directly to it reviewed.
   const byAtic = ATIC_CATEGORIES.map(c => {
-    const covered = vs.filter(v => (byVenue.get(v.id) || []).some(r =>
+    const covered = vs.filter(v => (quickBy.get(v.id) || []).some(q => (FEATURE_TO_ATIC[q.feature as keyof typeof FEATURE_TO_ATIC] || []).includes(c.id)) || (byVenue.get(v.id) || []).some(r =>
       Object.entries(r.features || {}).some(([f, val]) => (val === 'yes' || val === 'no') && (FEATURE_TO_ATIC[f as keyof typeof FEATURE_TO_ATIC] || []).includes(c.id))
       || r.needs.some(n => { const m = NEED_TO_ATIC[n as NeedId]; return m && m.fit === 'direct' && m.atic.includes(c.id as AticId); }),
     )).length;
@@ -128,7 +134,7 @@ export async function getCouncilMetrics() {
     const suburb = [...suburbCount.entries()].sort((a, b) => b[1] - a[1])[0][0];
     const gaps: Record<string, number> = {};
     for (const n of RA2_NEEDS) gaps[n.id] = c.venues.filter(id => !coveredBy.get(id)?.has(n.id)).length;
-    gaps.any = c.venues.filter(id => !(byVenue.get(id) || []).length).length;
+    gaps.any = c.venues.filter(id => !hasInfo(id)).length;
     return {
       id: `${c.row}:${c.col}`, suburb, venues: c.venues.length, gaps,
       bounds: [c.col * CELL_LNG, c.row * CELL_LAT, (c.col + 1) * CELL_LNG, (c.row + 1) * CELL_LAT] as [number, number, number, number],
@@ -150,10 +156,12 @@ export async function getCouncilMetrics() {
     weeks.push(t.toISOString().slice(0, 10));
   }
   const firstReview = new Map<string, string>();
-  for (const r of [...rs].sort((a, b) => +a.createdAt - +b.createdAt)) if (venueIds.has(r.venueId) && !firstReview.has(r.venueId)) firstReview.set(r.venueId, weekOf(r.createdAt));
+  const contributions = [...rs.map(r => ({ venueId: r.venueId, at: r.createdAt })), ...qs.map(q => ({ venueId: q.venueId, at: q.createdAt }))];
+  for (const r of contributions.sort((a, b) => +a.at - +b.at)) if (venueIds.has(r.venueId) && !firstReview.has(r.venueId)) firstReview.set(r.venueId, weekOf(r.at));
   const trends = weeks.map(w => ({
     week: w,
     reviews: rs.filter(r => venueIds.has(r.venueId) && weekOf(r.createdAt) === w).length,
+    quickAnswers: qs.filter(q => venueIds.has(q.venueId) && weekOf(q.createdAt) === w).length,
     newTesters: testersByWeek.find(t => t.week === w)?.n ?? 0,
     venuesCoveredToDate: [...firstReview.values()].filter(fw => fw <= w).length,
   })).map(t => ({ ...t, coveredPctToDate: pct(t.venuesCoveredToDate, vs.length) }));

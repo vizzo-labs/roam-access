@@ -12,7 +12,7 @@ export function SummaryStats({ m }: { m: CouncilMetrics }) {
     <div className="pt-grid">
       <Stat n={m.summary.venues} label="places in the pilot area"/>
       <Stat n={pc(m.summary.reviewedPct)} label={`have community information (${m.summary.venuesReviewed})`}/>
-      <Stat n={m.summary.reviews} label="community reviews"/>
+      <Stat n={m.summary.reviews} label={`community reviews (+ ${m.summary.quickAnswers} quick ${m.summary.quickAnswers === 1 ? 'answer' : 'answers'})`}/>
       <Stat n={m.summary.testers} label="testers with disability"/>
       <Stat n={m.summary.demand} label={`place views + search appearances, last ${m.demandDays} days`}/>
     </div>
@@ -121,10 +121,10 @@ export function TrendTable({ m }: { m: CouncilMetrics }) {
     <div className="pt-table-wrap">
       <table>
         <caption>Weekly trends (weeks start Monday, Sydney time)</caption>
-        <thead><tr><th scope="col">Week of</th><th scope="col" className="num">Reviews</th><th scope="col" className="num">New testers</th><th scope="col" className="num">Places with info (to date)</th><th scope="col" className="num">Coverage</th></tr></thead>
+        <thead><tr><th scope="col">Week of</th><th scope="col" className="num">Reviews</th><th scope="col" className="num">Quick answers</th><th scope="col" className="num">New testers</th><th scope="col" className="num">Places with info (to date)</th><th scope="col" className="num">Coverage</th></tr></thead>
         <tbody>
           {m.trends.map(t => (
-            <tr key={t.week}><th scope="row">{fmtWeek(t.week)}</th><td className="num">{t.reviews}</td><td className="num">{t.newTesters}</td><td className="num">{t.venuesCoveredToDate}</td><td className="num">{pc(t.coveredPctToDate)}</td></tr>
+            <tr key={t.week}><th scope="row">{fmtWeek(t.week)}</th><td className="num">{t.reviews}</td><td className="num">{t.quickAnswers}</td><td className="num">{t.newTesters}</td><td className="num">{t.venuesCoveredToDate}</td><td className="num">{pc(t.coveredPctToDate)}</td></tr>
           ))}
         </tbody>
       </table>
