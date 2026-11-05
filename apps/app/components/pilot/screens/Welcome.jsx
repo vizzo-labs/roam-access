@@ -4,7 +4,7 @@ import React from 'react';
 import { V2BigBtn } from '../ui/Buttons';
 import { V2Logo } from '../ui/Logo';
 import { V2Shell } from '../ui/Shell';
-import { C2, F2, M2 } from '../ui/palette';
+import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 
 // ─────────────────────────────────────────────────────────────

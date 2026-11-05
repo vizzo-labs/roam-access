@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
+import { RA2_FEATURES } from '@/lib/pilot-data';
 import { V2BigBtn } from '../ui/Buttons';
 import { V2Dictate } from '../ui/Dictate';
 import { V2Shell } from '../ui/Shell';
 import { V2_VERDICT_META } from '../ui/Verdict';
-import { C2, F2, M2, RA2_INPUT_FONT } from '../ui/palette';
+import { C2, F2, M2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2NeedTags } from '@/lib/pilot/match';
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { V2BigBtn } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
-import { C2, F2, RA2_INPUT_FONT } from '../ui/palette';
+import { C2, F2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 
 // ─────────────────────────────────────────────────────────────

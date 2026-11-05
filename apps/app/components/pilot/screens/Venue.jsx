@@ -5,7 +5,7 @@ import { useVenueReviews } from './useVenueReviews';
 import { V2BigBtn, V2RoundBtn, V2Back } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
 import { V2_VERDICT_META, V2Verdict } from '../ui/Verdict';
-import { C2, F2, M2 } from '../ui/palette';
+import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Verdict } from '@/lib/pilot/match';
 

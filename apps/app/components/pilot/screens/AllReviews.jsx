@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
+import { RA2_NEEDS } from '@/lib/pilot-data';
 import { useVenueReviews } from './useVenueReviews';
 import { V2BigBtn, V2Back } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
 import { V2Verdict } from '../ui/Verdict';
-import { C2, F2 } from '../ui/palette';
+import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 
 // ─────────────────────────────────────────────────────────────

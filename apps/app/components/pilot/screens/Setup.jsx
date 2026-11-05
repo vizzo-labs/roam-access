@@ -4,7 +4,7 @@ import React from 'react';
 import { RA2_NEEDS } from '@/lib/pilot-data';
 import { V2BigBtn } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
-import { C2, F2 } from '../ui/palette';
+import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 
 // ─────────────────────────────────────────────────────────────
