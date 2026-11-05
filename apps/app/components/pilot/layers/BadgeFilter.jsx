@@ -4,27 +4,29 @@
 
 import React from 'react';
 import { BADGES } from '@/lib/layers/defs';
-import { C2, F2 } from '../ui/palette';
-import { Chip } from './bits';
+import { C2 } from '../ui/palette';
+import { ChipGroup, FilterChip, SPACE, TYPE } from '../ds';
 
 export function useBadgeFilter(app) {
   const [on, setOn] = React.useState([]);
   const present = BADGES.filter(b => Object.values(app.layers.badges).some(list => list.some(x => x.badge === b.id)));
   const apply = list => (on.length ? list.filter(v => on.every(id => app.layers.badgesFor(v.id).some(x => x.badge === id))) : list);
-  const toggle = id => setOn(xs => (xs.includes(id) ? xs.filter(x => x !== id) : [...xs, id]));
-  return { on, present, apply, toggle };
+  const set = (id, sel) => setOn(xs => (sel ? [...xs, id] : xs.filter(x => x !== id)));
+  return { on, present, apply, set };
 }
 
 export function BadgeFilter({ filter }) {
   if (!filter.present.length) return null;
   return (
-    <div role="group" aria-labelledby="badge-filter-h" style={{ margin: '0 0 16px', fontFamily: F2 }}>
-      <p id="badge-filter-h" style={{ fontSize: 14, fontWeight: 700, color: C2.char, margin: '0 0 6px' }}>
-        Partner programs <span style={{ fontWeight: 500, color: C2.slate }}>— the partner’s claim; doesn’t change verdicts</span>
+    <div style={{ margin: `0 0 ${SPACE.md}px` }}>
+      <p style={{ ...TYPE.footnote, fontWeight: 700, color: C2.char, margin: '0 0 6px' }}>
+        Partner programs <span style={{ fontWeight: 400, color: C2.slate }}>— the partner’s claim; doesn’t change verdicts</span>
       </p>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {filter.present.map(b => <Chip key={b.id} on={filter.on.includes(b.id)} onClick={() => filter.toggle(b.id)}>{b.short}</Chip>)}
-      </div>
+      <ChipGroup label="Filter by partner program" wrap>
+        {filter.present.map(b => (
+          <FilterChip key={b.id} selected={filter.on.includes(b.id)} onChange={sel => filter.set(b.id, sel)}>{b.short}</FilterChip>
+        ))}
+      </ChipGroup>
     </div>
   );
 }
