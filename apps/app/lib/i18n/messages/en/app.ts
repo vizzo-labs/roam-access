@@ -2,6 +2,7 @@
 // connection and error screens. Keys 'app.*'.
 // Plain, first-person, short sentences; en-AU spelling. See lib/i18n/README.md.
 const app = {
+  'app.skipLink': 'Skip to main content',
   // Screen titles (document title + the screen-change announcement)
   'app.view.setup': 'Set your needs',
   'app.view.setup-name': 'Your name',
