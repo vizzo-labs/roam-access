@@ -2,118 +2,157 @@
 
 import React from 'react';
 import { PilotMap, MapLegend } from '../PilotMap';
-import { V2Mic } from '../ui/Mic';
 import { V2Shell } from '../ui/Shell';
-import { V2_VERDICT_META, V2Verdict } from '../ui/Verdict';
-import { C2, F2 } from '../ui/palette';
+import { V2_VERDICT_META } from '../ui/Verdict';
+import { C2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { ra2Search } from '@/lib/pilot/match';
-import { VerdictReasons } from '../trust/VerdictReasons';
+import { ra2Search, ra2ParseQuery } from '@/lib/pilot/match';
 import { LayerMenu, layerExtras } from '../layers/LayerToggles';
 import { FacilityCard } from '../layers/FacilityCard';
+import { Button, GUTTER, IconButton, List, SPACE, SearchField, SegmentedControl, SnapSheet, TYPE } from '../ds';
+import { ExploreFilters } from '../explore/ExploreFilters';
+import { PlaceRow } from '../explore/PlaceRow';
+import { applyFilters, countsLine, verdictCounts } from '../explore/filters';
+
+const PEEK = 132;
+const SHEET_ROWS = 50;
 
 // ─────────────────────────────────────────────────────────────
-// MAP — verdict-coded pins, one card at a time
+// MAP (phones) — the map with a draggable list sheet over it
+// (Google/Apple Maps). The list stays the primary, accessible view:
+// the sheet's handle is a button, and List/Map switches to the full list.
 // ─────────────────────────────────────────────────────────────
 function V2MapView({ app }) {
-  const query = app.query || { cats: [], tags: [], label: 'All places' };
-  const results = ra2Search(app.venues, query, app.user?.needs || []);
-  const [selId, setSelId] = React.useState(results[0]?.id || null);
-  // Access layers (F3): a facility pin replaces the place card while selected.
+  const query = app.query || { cats: [], tags: [], label: 'All places', raw: '' };
+  const searched = ra2Search(app.venues, query, app.user?.needs || []);
+  const results = applyFilters(searched, app.filters);
+  const counts = verdictCounts(searched);
+  const [selId, setSelId] = React.useState(null);
+  const [snap, setSnap] = React.useState('half');
+  // Access layers (F3): a facility pin replaces the place list while selected.
   const [extraId, setExtraId] = React.useState(null);
   const extras = layerExtras(app.layers);
   const extra = extraId && extras.some(x => x.id === extraId) ? app.layers.facilityById(extraId) : null;
-  const sel = extra ? null : (results.find(r => r.id === selId) || results[0]);
+  const sel = extra ? null : results.find(r => r.id === selId) || null;
   const h = useV2Heading('map');
   const pinColor = { works: C2.blue, check: C2.amber, barrier: C2.red, unknown: '#475569' };
   const pinIcon = { works: '✓', check: '!', barrier: '✗', unknown: '?' };
-  // Remap data coords into the band clear of the floating search chrome above
-  // and the selected card below, so no pin ever renders under either.
-  const pinX = x => `${(0.06 + x * 0.88) * 100}%`;
-  const pinY = y => `${(0.2 + y * 0.5) * 100}%`;
+  const labels = Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]));
   const legendKinds = [...new Set(results.map(r => r.verdict.kind))];
+
+  const initialText = query.raw || (query.cats.length || query.tags.length ? query.label : '');
+  const [text, setText] = React.useState(initialText);
+  const [shownFor, setShownFor] = React.useState(initialText);
+  if (shownFor !== initialText) { setShownFor(initialText); setText(initialText); }
+
+  const sheetBody = React.useRef(null);
+  function selectPin(id) {
+    setExtraId(null);
+    setSelId(id);
+    if (snap === 'peek') setSnap('half');
+    // The selected place shows at the top of the sheet: scroll the sheet there.
+    requestAnimationFrame(() => sheetBody.current?.parentElement?.scrollTo({ top: 0 }));
+  }
+  function selectExtra(id) { setExtraId(id); setSnap('peek'); }
+
+  const others = sel ? results.filter(r => r.id !== sel.id) : results;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+  const sheetPx = snap === 'peek' ? PEEK : snap === 'half' ? Math.round(vh * 0.5) : vh;
 
   return (
     <V2Shell scroll={false} tabs app={app} active="home">
-      <h1 ref={h} tabIndex={-1} className="ra-sr-only">Map of results — {query.label}</h1>
+      <h1 ref={h} tabIndex={-1} className="ra-sr-only">Map of places — {query.label}</h1>
       <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <PilotMap results={results} selectedId={extra ? null : selId} onSelect={id => { setExtraId(null); setSelId(id); }} origin={app.origin}
-          extras={extras} selectedExtraId={extra?.id || null} onSelectExtra={setExtraId} alertIds={app.layers.alertIds}
-          colors={pinColor} icons={pinIcon} labels={Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]))}
+        <PilotMap results={results} selectedId={extra ? null : selId} onSelect={selectPin} origin={app.origin}
+          extras={extras} selectedExtraId={extra?.id || null} onSelectExtra={selectExtra} alertIds={app.layers.alertIds}
+          colors={pinColor} icons={pinIcon} labels={labels} topPad={190} bottomPad={Math.min(sheetPx, vh * 0.5) + 30}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
-          locateStyle={{ right: 18, bottom: sel || extra ? 268 : 24 }}/>
+          locateStyle={snap === 'full' ? { display: 'none' } : { right: 18, bottom: snap === 'peek' ? PEEK + 14 : 'calc(50% + 14px)' }}/>
 
-        <LayerMenu shown={app.layers.shown} onChange={app.layers.setShown}
-          style={{ top: 'calc(var(--ra-shell-top) + 66px)', right: 18 }}/>
-        {extra && <FacilityCard app={app} f={extra}/>}
-
-        {/* top: search pill + list toggle */}
-        <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 18, right: 18, display: 'flex', gap: 8, zIndex: 3 }}>
-          <button onClick={() => app.goto('results')} style={{
-            flex: 1, minWidth: 0, minHeight: 54, borderRadius: 999, border: `1.5px solid ${C2.line}`,
-            background: C2.paper, padding: '0 18px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 10,
-            fontFamily: F2, fontSize: 15.5, fontWeight: 600, color: C2.char, textAlign: 'left',
-            boxSizing: 'border-box',
-          }} aria-label={`Back to list. Current search: ${query.label}`}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
-              <path d="M15 5l-7 7 7 7" stroke={C2.char} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{query.label}</span>
-            <V2Mic size={18} color={C2.teal}/>
-          </button>
-          <button onClick={() => app.goto('results')} aria-label="Show as list" style={{
-            minHeight: 54, minWidth: 54, borderRadius: 999, border: `1.5px solid ${C2.line}`,
-            background: C2.paper, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-              <path d="M4 6h16M4 12h16M4 18h16" stroke={C2.char} strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
+        {/* top: the same search + filters as the list */}
+        <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 0, right: 0, zIndex: 6, padding: `0 ${GUTTER - 4}px`, pointerEvents: 'none' }}>
+          <div style={{ pointerEvents: 'auto' }}>
+            <SearchField id="map-search" label="Search places" value={text} onChange={setText} floating
+              dirty={text.trim() !== initialText.trim() && !!text.trim()}
+              placeholder="Search places"
+              onSubmit={t => { app.setQuery(ra2ParseQuery(t)); }}
+              onVoice={() => app.goto('voice')}
+              back={{ label: 'Back to home', onClick: () => app.goto('home') }}/>
+          </div>
+          <div style={{ pointerEvents: 'auto', marginTop: SPACE.xs }}>
+            <ExploreFilters app={app} counts={counts} bleed={false}/>
+          </div>
         </div>
 
-        {/* legend */}
-        <MapLegend compact kinds={legendKinds} colors={pinColor} icons={pinIcon}
-          labels={Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]))}
-          style={{ top: 'calc(var(--ra-shell-top) + 66px)', left: 18 }}/>
+        {/* Legend left, layers right; they wrap instead of overlapping at large text sizes. */}
+        <div style={{
+          position: 'absolute', top: 'calc(var(--ra-shell-top) + 128px)', left: 18, right: 18, zIndex: 5,
+          display: 'flex', flexWrap: 'wrap-reverse', justifyContent: 'space-between', alignItems: 'flex-start', gap: SPACE.xs, pointerEvents: 'none',
+        }}>
+          <MapLegend compact kinds={legendKinds} colors={pinColor} icons={pinIcon} labels={labels}
+            style={{ position: 'relative', pointerEvents: 'auto' }}/>
+          <LayerMenu shown={app.layers.shown} onChange={app.layers.setShown}
+            style={{ position: 'relative', pointerEvents: 'auto', marginLeft: 'auto' }}/>
+        </div>
 
-        {/* selected card */}
-        {sel && (
-          <div style={{
-            position: 'absolute', bottom: 16, left: 18, right: 18, zIndex: 3,
-            background: C2.paper, borderRadius: 20, border: `1.5px solid ${C2.line}`,
-            padding: 18, boxShadow: '0 12px 32px rgba(26,26,26,0.10)', boxSizing: 'border-box',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontFamily: F2, fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: C2.char, marginBottom: 3 }}>{sel.name}</div>
-                <div style={{ fontFamily: F2, fontSize: 14, color: C2.slate }}>{sel.kind} · {sel.area} · {sel.mins} min walk</div>
-              </div>
-              <V2Verdict kind={sel.verdict.kind}/>
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <VerdictReasons venue={sel} verdict={sel.verdict} needs={app.user?.needs || []} max={2} fontSize={14.5}/>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => app.goto('venue', sel.id)} style={{
-                flex: 1, minHeight: 50, borderRadius: 12, border: 0, background: C2.teal, color: C2.paper,
-                fontFamily: F2, fontSize: 15.5, fontWeight: 700, cursor: 'pointer',
-              }}>See details</button>
-              <button onClick={() => app.toggleSave(sel.id)}
-                aria-label={app.world.saved.includes(sel.id) ? `Remove ${sel.name} from saved` : `Save ${sel.name}`}
-                aria-pressed={app.world.saved.includes(sel.id)}
-                style={{
-                  minHeight: 50, minWidth: 50, borderRadius: 12, border: `1.5px solid ${C2.line}`,
-                  background: app.world.saved.includes(sel.id) ? C2.tealSoft : C2.paper,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill={app.world.saved.includes(sel.id) ? C2.teal : 'none'} aria-hidden="true" focusable="false">
-                  <path d="M6 4h12v17l-6-4-6 4V4Z" stroke={app.world.saved.includes(sel.id) ? C2.teal : C2.char} strokeWidth="2" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            </div>
+        {extra && (
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: PEEK, height: 0, zIndex: 21 }}>
+            <FacilityCard app={app} f={extra}/>
           </div>
         )}
+
+        <SnapSheet label="Places list" snap={snap} onSnapChange={setSnap} peekHeight={PEEK} topGap={8}
+          header={(
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
+              <div style={{ minWidth: 0, flex: '1 1 140px' }}>
+                <h2 style={{ ...TYPE.title3, margin: 0 }}>{results.length} {results.length === 1 ? 'place' : 'places'}</h2>
+                <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {searched.length ? countsLine(counts) : 'Nothing matched'}
+                </p>
+              </div>
+              <SegmentedControl label="Show results as" value="map" onChange={v => v === 'list' && app.goto('results', null, { replace: true })}
+                options={[{ value: 'list', label: 'List', icon: 'list' }, { value: 'map', label: 'Map', icon: 'map' }]}/>
+            </div>
+          )}>
+          <div ref={sheetBody}>
+            {sel && (
+              <div style={{ borderBottom: `6px solid ${C2.stone}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${SPACE.sm}px ${GUTTER - 8}px 0 ${GUTTER}px` }}>
+                  <p style={{ ...TYPE.overline, color: C2.slate, margin: 0 }}>Selected on the map</p>
+                  <IconButton icon="close" variant="ghost" size="sm" label={`Clear selection: ${sel.name}`} onClick={() => setSelId(null)}/>
+                </div>
+                <PlaceRow app={app} place={sel} reasons={3} selected/>
+                <div style={{ display: 'flex', gap: SPACE.xs, padding: `0 ${GUTTER}px ${SPACE.md}px` }}>
+                  <Button style={{ flex: 1 }} onClick={() => app.goto('venue', sel.id)} iconRight="forward">See details</Button>
+                  <IconButton icon="bookmark" pressed={app.world.saved.includes(sel.id)} size="lg"
+                    label={app.world.saved.includes(sel.id) ? `Remove ${sel.name} from saved` : `Save ${sel.name}`}
+                    onClick={() => app.toggleSave(sel.id)} style={{ width: 52, height: 52 }}/>
+                </div>
+              </div>
+            )}
+            {others.length > 0 && (
+              <List label={`Places: ${query.label}`}>
+                {others.slice(0, SHEET_ROWS).map(r => <PlaceRow key={r.id} app={app} place={r} reasons={1}/>)}
+              </List>
+            )}
+            {others.length > SHEET_ROWS && (
+              <div style={{ padding: `${SPACE.md}px ${GUTTER}px` }}>
+                <Button full variant="ghost" onClick={() => app.goto('results', null, { replace: true })}>
+                  See all {results.length} in the list
+                </Button>
+              </div>
+            )}
+            {!results.length && (
+              <div style={{ padding: `${SPACE.lg}px ${GUTTER}px` }}>
+                <p style={{ ...TYPE.callout, margin: '0 0 12px' }}>No places match. Try removing a filter above.</p>
+                {(app.filters.works || app.filters.hideBarriers) && (
+                  <Button variant="ghost" onClick={() => app.setFilters({ works: false, hideBarriers: false })}>Clear filters</Button>
+                )}
+              </div>
+            )}
+            <div style={{ height: SPACE.lg }}/>
+          </div>
+        </SnapSheet>
       </div>
     </V2Shell>
   );

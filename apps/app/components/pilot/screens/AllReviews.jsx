@@ -3,12 +3,11 @@
 import React from 'react';
 import { RA2_NEEDS } from '@/lib/pilot-data';
 import { useVenueReviews } from './useVenueReviews';
-import { V2BigBtn, V2Back } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
 import { V2Verdict } from '../ui/Verdict';
-import { C2, F2, V2_H1 } from '../ui/palette';
+import { C2, F2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { PhotoGrid, PhotoViewer, SourceBadge } from '../ds';
+import { Button, ChipGroup, EmptyState, FilterChip, GUTTER, PhotoGrid, PhotoViewer, SPACE, ScreenHeader, SkeletonList, SourceBadge } from '../ds';
 import { useVenueSays, VenueReply } from './VenueSays';
 
 // ─────────────────────────────────────────────────────────────
@@ -28,32 +27,18 @@ function V2AllReviews({ app }) {
 
   return (
     <V2Shell tabs app={app} active="home">
-      <div style={{ padding: '10px 22px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <V2Back app={app} to="venue" id={v.id} label={`Back to ${v.name}`}/>
-        <div>
-          <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 19, letterSpacing: '-0.015em' }}>{v.name} reviews</h1>
-          <p style={{ fontSize: 13.5, color: C2.slate, margin: 0, fontFamily: F2 }}>
-            {loaded ? `${all.length} ${all.length === 1 ? 'review' : 'reviews'} from the pilot` : error ? 'Couldn’t load reviews' : 'Loading reviews…'}
-          </p>
-        </div>
+      <ScreenHeader compact headingRef={h} title={`${v.name} reviews`}
+        back={{ label: `Back to ${v.name}`, onClick: () => app.goto('venue', v.id) }}
+        subtitle={loaded ? `${all.length} ${all.length === 1 ? 'review' : 'reviews'} from the pilot` : error ? 'Couldn’t load reviews' : 'Loading reviews…'}/>
+
+      <div style={{ padding: `${SPACE.md}px ${GUTTER}px 0` }}>
+        <ChipGroup label="Filter reviews by lived experience" bleed>
+          {filters.map(f => <FilterChip key={f} selected={filter === f} onChange={() => setFilter(f)}>{f}</FilterChip>)}
+        </ChipGroup>
       </div>
 
-      <div style={{ padding: '18px 22px 0', display: 'flex', gap: 7, flexWrap: 'wrap' }} role="group" aria-label="Filter reviews by lived experience">
-        {filters.map(f => {
-          const on = filter === f;
-          return (
-            <button key={f} onClick={() => setFilter(f)} aria-pressed={on} style={{
-              minHeight: 44, padding: '0 16px', borderRadius: 999, cursor: 'pointer',
-              border: on ? `1.5px solid ${C2.teal}` : `1.5px solid ${C2.line}`,
-              background: on ? C2.teal : C2.paper,
-              color: on ? C2.paper : C2.char,
-              fontFamily: F2, fontSize: 14.5, fontWeight: 600,
-            }}>{f}</button>
-          );
-        })}
-      </div>
-
-      <div style={{ padding: '18px 22px 24px' }}>
+      <div style={{ padding: `${SPACE.md}px ${GUTTER}px ${SPACE.xl}px` }}>
+        {!loaded && !error && <SkeletonList variant="card" count={2} label="Loading reviews…"/>}
         {shown.map((r, i) => (
           <article key={r.id || i} style={{
             border: `1.5px solid ${C2.hair}`, borderRadius: 18, padding: 18, marginBottom: 12,
@@ -81,11 +66,11 @@ function V2AllReviews({ app }) {
           </article>
         ))}
         {loaded && !shown.length && (
-          <p style={{ padding: 24, textAlign: 'center', color: C2.slate, fontSize: 15, border: `1.5px dashed ${C2.line}`, borderRadius: 16, fontFamily: F2 }}>
-            No reviews from this lived experience yet — yours could be the first.
-          </p>
+          <EmptyState compact icon="users" title={`No reviews from “${filter}” yet`}
+            body="Yours could be the first."
+            secondary={filter !== 'All' ? { label: 'Show all reviews', onClick: () => setFilter('All') } : null}/>
         )}
-        <V2BigBtn kind="primary" onClick={() => app.goto('review', v.id)}>Share your experience</V2BigBtn>
+        <Button full size="lg" icon="edit" onClick={() => app.goto('review', v.id)} style={{ marginTop: SPACE.sm }}>Share your experience</Button>
         <PhotoViewer photos={viewer?.photos || []} index={viewer ? viewer.index : null}
           onIndex={i => setViewer(x => ({ ...x, index: i }))} onClose={closeViewer}/>
       </div>
