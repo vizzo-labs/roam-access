@@ -1,0 +1,50 @@
+// es — 'photos' namespace. Machine-translated unless the key is listed in
+// ./_meta.ts → reviewed. Keep the same keys and {placeholders} as en/photos.ts.
+import type { Translation } from '../../types';
+import type en from '../en/photos';
+
+const photos: Translation<typeof en> = {
+  'photos.kind.entrance': "Entrada",
+  'photos.kind.toilet': "Baño",
+  'photos.kind.step': "Escalón o rampa",
+  'photos.kind.seating': "Asientos",
+  'photos.kind.other': "Otra cosa",
+  'photos.gallery.title': "Fotos de las reseñas",
+  'photos.gallery.description': { one: "{count} foto tomada por una persona del piloto, con descripción.", other: "{count} fotos tomadas por personas del piloto, cada una con descripción." },
+  'photos.add.title': "Añadir fotos",
+  'photos.add.description': "La entrada, un escalón, el baño o los asientos son lo que más ayuda. Hasta {max}. Quitamos la ubicación de tus fotos. Evita fotografiar caras.",
+  'photos.add.first': "Añadir una foto",
+  'photos.add.another': "Añadir otra foto",
+  'photos.add.full': "{max} fotos añadidas — el máximo para una reseña",
+  'photos.card': "Foto {n}",
+  'photos.preparing': "Preparando tu foto…",
+  'photos.uploading': "Subiendo…",
+  'photos.retry': "Reintentar",
+  'photos.retryAria': "Volver a subir la foto {n}",
+  'photos.remove': "Quitar",
+  'photos.removeAria': "Quitar la foto {n}",
+  'photos.uploadFailed': "No se pudo subir esta foto.",
+  'photos.unreadable': "Ese archivo no es una foto que podamos leer.",
+  'photos.whatShows': "¿Qué muestra?",
+  'photos.describe': "Descríbela para quien no puede verla",
+  'photos.required': "(obligatorio)",
+  'photos.describeSuggested': "Sugerida a partir de tu foto — comprueba que es correcta y confírmala o edítala.",
+  'photos.describeLoading': "Mirando tu foto para sugerir una descripción…",
+  'photos.describeExample': "p. ej. «Dos escalones hasta la puerta principal de {name}, sin pasamanos»",
+  'photos.confirm': "Esta descripción es correcta",
+  'photos.suggestUnavailable': "Ahora no hay sugerencias — escribe tu propia descripción.",
+  'photos.suggestLimit': "Has usado las sugerencias de fotos de hoy — escribe tu propia descripción.",
+  'photos.suggests': "Tu foto sugiere {answer}",
+  'photos.useAnswer': "Usar esta respuesta",
+  'photos.useAnswerAria': "Usar la sugerencia de la foto: {answer} para «{question}»",
+  'photos.say.preparing': "Preparando la foto…",
+  'photos.say.added': "Foto añadida. Ahora descríbela.",
+  'photos.say.uploadFailed': "No se pudo subir esa foto.",
+  'photos.say.unreadable': "No se pudo leer esa foto.",
+  'photos.say.removed': "Foto quitada.",
+  'photos.say.ready': "Sugerencias listas a partir de tu foto: una descripción para revisar. No se usa nada hasta que lo confirmes.",
+  'photos.say.readyAnswers': { one: "Sugerencias listas a partir de tu foto: una descripción para revisar y la respuesta a {count} pregunta de abajo. No se usa nada hasta que lo confirmes.", other: "Sugerencias listas a partir de tu foto: una descripción para revisar y respuestas a {count} preguntas de abajo. No se usa nada hasta que lo confirmes." },
+  'photos.by': "De una reseña · {who} · {when}",
+};
+
+export default photos;

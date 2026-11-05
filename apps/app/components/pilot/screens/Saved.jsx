@@ -7,6 +7,8 @@ import { useV2Heading } from '../ui/useHeading';
 import { ra2Verdict } from '@/lib/pilot/match';
 import { Banner, Card, EmptyState, GUTTER, List, SPACE, ScreenHeader } from '../ds';
 import { PlaceRow } from '../explore/PlaceRow';
+import { useT } from '../i18n';
+import { kindLabel } from '@/lib/i18n/data';
 
 const INSTALL_TIP_KEY = 'ra2-install-tip-dismissed';
 
@@ -14,6 +16,7 @@ const INSTALL_TIP_KEY = 'ra2-install-tip-dismissed';
 // SAVED — plan your day out
 // ─────────────────────────────────────────────────────────────
 function V2SavedView({ app }) {
+  const t = useT();
   const h = useV2Heading('saved');
   const needs = app.user?.needs || [];
   const places = app.world.saved.map(id => app.venueById(id)).filter(Boolean).map(v => ({ ...v, verdict: ra2Verdict(v, needs) }));
@@ -26,30 +29,30 @@ function V2SavedView({ app }) {
 
   return (
     <V2Shell tabs app={app} active="saved">
-      <ScreenHeader headingRef={h} title="Saved"
-        subtitle={places.length ? 'Your places, with what people in the pilot say now.' : null}/>
+      <ScreenHeader headingRef={h} title={t('explore.saved.title')}
+        subtitle={places.length ? t('explore.saved.subtitle') : null}/>
       <div style={{ padding: `${SPACE.lg}px ${GUTTER}px ${SPACE.xl}px` }}>
         {showTip && (
-          <Banner tone="teal" icon="plus" title="Keep your places one tap away" onDismiss={dismissTip} dismissLabel="Dismiss install tip"
-            action={{ label: 'Install the app', onClick: app.install }} style={{ marginBottom: SPACE.md }}>
-            Add Roam Access to your home screen.
+          <Banner tone="teal" icon="plus" title={t('explore.saved.tipTitle')} onDismiss={dismissTip} dismissLabel={t('explore.saved.tipDismiss')}
+            action={{ label: t('explore.saved.tipInstall'), onClick: app.install }} style={{ marginBottom: SPACE.md }}>
+            {t('explore.saved.tipBody')}
           </Banner>
         )}
         {places.length > 0 ? (
           <Card padding={0}>
-            <List label="Saved places">
-              {places.map(p => <PlaceRow key={p.id} app={app} place={p} reasons={1} padX={SPACE.md} subtitle={`${p.kind} · ${p.area} · ${p.mins} min walk`}/>)}
+            <List label={t('explore.saved.list')}>
+              {places.map(p => <PlaceRow key={p.id} app={app} place={p} reasons={1} padX={SPACE.md} subtitle={`${kindLabel(t, p.kind)} · ${p.area} · ${t('common.minWalk', { mins: p.mins })}`}/>)}
             </List>
           </Card>
         ) : (
           <Card variant="filled" style={{ marginTop: SPACE.xs }}>
-            <EmptyState icon="bookmark" title="Nothing saved yet"
-              body="Save places that work for you and they’ll wait here, with the latest from people in the pilot."
-              action={{ label: 'Explore places', icon: 'search', onClick: () => app.goto('home') }}/>
+            <EmptyState icon="bookmark" title={t('explore.saved.emptyTitle')}
+              body={t('explore.saved.emptyBody')}
+              action={{ label: t('explore.saved.explore'), icon: 'search', onClick: () => app.goto('home') }}/>
           </Card>
         )}
         <p style={{ fontSize: 13, color: C2.slate, margin: `${SPACE.md}px 0 0`, textAlign: 'center' }}>
-          Saved places are stored with your account, on every device.
+          {t('explore.saved.footer')}
         </p>
       </div>
     </V2Shell>

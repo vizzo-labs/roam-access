@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { RA2_TILES } from '@/lib/pilot-data';
+import { useT } from '../i18n';
+import { kindLabel, tileLabel } from '@/lib/i18n/data';
 import { V2Logo } from '../ui/Logo';
 import { V2Mic } from '../ui/Mic';
 import { V2Shell } from '../ui/Shell';
@@ -13,6 +15,7 @@ import { ra2Verdict, ra2ParseQuery } from '@/lib/pilot/match';
 import { AccessLayersLinks } from '../layers/AccessLayersLinks';
 import { Card, GUTTER, Icon, List, RADIUS, SPACE, SearchField, SectionHeader, TYPE } from '../ds';
 import { PlaceRow } from '../explore/PlaceRow';
+import { EnglishSearchNote } from '../explore/EnglishSearchNote';
 
 const ALL = { cats: [], tags: [], label: 'All places', raw: '' };
 
@@ -20,6 +23,7 @@ const ALL = { cats: [], tags: [], label: 'All places', raw: '' };
 // HOME — one question, voice first, search always there
 // ─────────────────────────────────────────────────────────────
 function V2Home({ app }) {
+  const t = useT();
   const h = useV2Heading('home');
   const [typed, setTyped] = React.useState('');
 
@@ -38,7 +42,7 @@ function V2Home({ app }) {
       {!app.wide && (
         <div style={{ padding: `10px ${GUTTER}px 0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <V2Logo size={26}/>
-          <button onClick={() => app.goto('me')} aria-label="Open your profile" className="ds-press" style={{
+          <button onClick={() => app.goto('me')} aria-label={t('explore.home.openProfile')} className="ds-press" style={{
             width: 48, height: 48, borderRadius: RADIUS.pill, background: C2.teal, color: C2.paper,
             border: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 700, fontSize: 16, cursor: 'pointer', fontFamily: F2,
@@ -48,8 +52,8 @@ function V2Home({ app }) {
 
       <div style={{ padding: `${SPACE.xl}px ${GUTTER}px 0` }}>
         <h1 ref={h} tabIndex={-1} style={{ ...TYPE.display, margin: `0 0 ${SPACE.xl}px`, color: C2.char }}>
-          {name ? <>Hi {name}.<br/></> : <>Hi.<br/></>}
-          Where do you want to go today<span style={{ color: C2.rust }}>?</span>
+          {name ? t('explore.home.hiName', { name }) : t('explore.home.hi')}<br/>
+          {t('explore.home.question')}<span style={{ color: C2.rust }}>{t('explore.home.questionMark')}</span>
         </h1>
 
         {/* Voice — the primary action */}
@@ -64,15 +68,16 @@ function V2Home({ app }) {
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}><V2Mic size={30}/></span>
           <span>
-            <span style={{ display: 'block', fontSize: 19, fontWeight: 700, marginBottom: 3 }}>Tap and speak</span>
-            <span style={{ display: 'block', fontSize: 14.5, opacity: 0.92, lineHeight: 1.35 }}>“Find a quiet cafe with step-free entry”</span>
+            <span style={{ display: 'block', fontSize: 19, fontWeight: 700, marginBottom: 3 }}>{t('explore.home.tapSpeak')}</span>
+            <span lang="en-AU" style={{ display: 'block', fontSize: 14.5, opacity: 0.92, lineHeight: 1.35 }}>{t('explore.home.tapSpeakExample')}</span>
           </span>
         </button>
 
         {/* Typing is always one tap away — no extra step */}
-        <SearchField id="home-search" label="Search for places" value={typed} onChange={setTyped}
-          placeholder="Or type what you’re looking for" style={{ marginTop: 10 }}
-          onSubmit={t => app.runSearch(ra2ParseQuery(t))}/>
+        <SearchField id="home-search" label={t('explore.home.searchLabel')} value={typed} onChange={setTyped}
+          placeholder={t('explore.home.searchPlaceholder')} style={{ marginTop: 10 }}
+          onSubmit={text => app.runSearch(ra2ParseQuery(text))}/>
+        <EnglishSearchNote/>
       </div>
 
       {/* 1-tap review prompt — the community loop */}
@@ -81,9 +86,9 @@ function V2Home({ app }) {
           <Card variant="tint" onClick={() => app.goto('review', visited.id)} padding={18} style={{ border: `2px solid ${C2.teal}` }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ ...TYPE.overline, display: 'block', color: C2.slate, marginBottom: 6 }}>1-tap review</span>
-                <span style={{ ...TYPE.headline, fontSize: 17.5, display: 'block', color: C2.char, marginBottom: 3 }}>How was {visited.name}?</span>
-                <span style={{ ...TYPE.footnote, display: 'block', color: C2.slate }}>One tap helps other people plan their day.</span>
+                <span style={{ ...TYPE.overline, display: 'block', color: C2.slate, marginBottom: 6 }}>{t('explore.home.reviewOverline')}</span>
+                <span style={{ ...TYPE.headline, fontSize: 17.5, display: 'block', color: C2.char, marginBottom: 3 }}>{t('explore.home.howWas', { name: visited.name })}</span>
+                <span style={{ ...TYPE.footnote, display: 'block', color: C2.slate }}>{t('explore.home.reviewHint')}</span>
               </span>
               <span style={{ color: C2.teal }}><Icon name="forward" size={20} strokeWidth={2.4}/></span>
             </span>
@@ -96,14 +101,14 @@ function V2Home({ app }) {
 
       {/* Browse */}
       <section aria-labelledby="browse-h" style={pad}>
-        <SectionHeader id="browse-h" size="sm" title="Browse"
-          action={{ label: 'All places', ariaLabel: 'Show all places', onClick: () => app.runSearch(ALL) }}/>
+        <SectionHeader id="browse-h" size="sm" title={t('explore.home.browse')}
+          action={{ label: t('explore.query.all'), ariaLabel: t('explore.showAllPlaces'), onClick: () => app.runSearch(ALL) }}/>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {RA2_TILES.map(t => (
-            <Card key={t.id} padding={SPACE.md} style={{ minHeight: 104 }}
-              onClick={() => app.runSearch({ cats: t.cats, tags: [], label: t.label, raw: '' })}>
-              <span style={{ display: 'block', marginBottom: SPACE.sm }}><V2TileIcon id={t.id}/></span>
-              <span style={{ ...TYPE.headline, fontSize: 15.5, display: 'block', color: C2.char }}>{t.label}</span>
+          {RA2_TILES.map(tile => (
+            <Card key={tile.id} padding={SPACE.md} style={{ minHeight: 104 }}
+              onClick={() => app.runSearch({ cats: tile.cats, tags: [], label: tile.label, raw: '' })}>
+              <span style={{ display: 'block', marginBottom: SPACE.sm }}><V2TileIcon id={tile.id}/></span>
+              <span style={{ ...TYPE.headline, fontSize: 15.5, display: 'block', color: C2.char }}>{tileLabel(t, tile.id)}</span>
             </Card>
           ))}
         </div>
@@ -116,13 +121,13 @@ function V2Home({ app }) {
       {nearbyList.length > 0 && (
         <section aria-labelledby="nearby-h" style={{ ...pad, paddingBottom: SPACE.xl }}>
           <SectionHeader id="nearby-h" size="sm"
-            title={worksNear.length ? 'Works for you, nearby' : 'Nearby, waiting for a first review'}
-            description={worksNear.length ? `Confirmed by people in the pilot · walking from ${app.origin.name}` : 'Been to one of these? Your review is the first data point.'}/>
+            title={worksNear.length ? t('explore.home.worksNear') : t('explore.home.firstNear')}
+            description={worksNear.length ? t('explore.home.worksNearHint', { origin: app.origin.name }) : t('explore.home.firstNearHint')}/>
           <Card padding={0}>
-            <List label={worksNear.length ? 'Places that work for you nearby' : 'Nearby places without reviews'}>
+            <List label={worksNear.length ? t('explore.home.worksNearList') : t('explore.home.firstNearList')}>
               {nearbyList.map(v => (
                 <PlaceRow key={v.id} app={app} place={v} reasons={worksNear.length ? 1 : 0} padX={SPACE.md}
-                  subtitle={`${v.kind} · ${v.mins} min walk`}/>
+                  subtitle={`${kindLabel(t, v.kind)} · ${t('common.minWalk', { mins: v.mins })}`}/>
               ))}
             </List>
           </Card>

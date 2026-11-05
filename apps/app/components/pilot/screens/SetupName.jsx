@@ -7,30 +7,27 @@ import { C2, F2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { V2Verdict } from '../ui/Verdict';
 import { Card, SPACE, TYPE } from '../ds';
+import { useT } from '../i18n';
 
-const VERDICT_HELP = [
-  ['works', 'People with needs like yours say it worked.'],
-  ['check', 'Something to know first — or it isn’t confirmed yet.'],
-  ['barrier', 'People with needs like yours hit a real barrier.'],
-  ['unknown', 'Nobody has reviewed it for your needs yet.'],
-];
+const VERDICT_HELP = ['works', 'check', 'barrier', 'unknown'];
 
 // ─────────────────────────────────────────────────────────────
 // SETUP · step 3 — name
 // ─────────────────────────────────────────────────────────────
 function V2SetupName({ app }) {
   const h = useV2Heading('setup-name');
+  const t = useT();
   const [name, setName] = React.useState(app.user?.name || '');
 
   function finish() {
     app.setUser({ ...(app.user || {}), name: name.trim(), needs: app.user?.needs || [], done: true });
     app.goto('home');
-    app.toast('You’re set. Thanks for joining the pilot.');
+    app.toast(t('onboarding.name.done'));
   }
 
   const bar = (
     <div style={{ padding: '14px 24px calc(var(--ra-tabs-pad) + 8px)', background: C2.paper, borderTop: `1px solid ${C2.hair}`, flexShrink: 0 }}>
-      <V2BigBtn kind="primary" onClick={finish}>Finish →</V2BigBtn>
+      <V2BigBtn kind="primary" onClick={finish}>{t('onboarding.finish')}</V2BigBtn>
     </div>
   );
 
@@ -42,18 +39,18 @@ function V2SetupName({ app }) {
           <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
           <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
         </div>
-        <p className="ra-sr-only">Step 3 of 3</p>
+        <p className="ra-sr-only">{t('onboarding.step', { step: 3, total: 3 })}</p>
 
         <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 29, lineHeight: 1.12, marginBottom: 10 }}>
-          What should we call you<span style={{ color: C2.rust }}>?</span>
+          {t('onboarding.name.title')}<span style={{ color: C2.rust }}>{t('onboarding.questionMark')}</span>
         </h1>
         <p style={{ fontSize: 16.5, color: C2.char, lineHeight: 1.5, margin: '0 0 22px' }}>
-          Totally optional — pick anything. Your reviews never show your name, only your lived experience.
+          {t('onboarding.name.lead')}
         </p>
 
-        <label htmlFor="setup-name" style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Your name</label>
+        <label htmlFor="setup-name" style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{t('onboarding.name.label')}</label>
         <input id="setup-name" value={name} onChange={e => setName(e.target.value)}
-          autoComplete="nickname" placeholder="e.g. Naomi"
+          autoComplete="nickname" placeholder={t('onboarding.name.placeholder')}
           style={{
             width: '100%', boxSizing: 'border-box', minHeight: 60,
             border: `1.5px solid ${C2.line}`, borderRadius: 16, padding: '0 18px',
@@ -63,15 +60,15 @@ function V2SetupName({ app }) {
         {/* First time only: what the answers will look like, before the first search. */}
         {!app.user?.done && (
           <Card variant="filled" as="section" aria-labelledby="verdicts-h" style={{ marginTop: SPACE.xl }}>
-            <h2 id="verdicts-h" style={{ ...TYPE.headline, margin: '0 0 4px' }}>How you’ll see places</h2>
+            <h2 id="verdicts-h" style={{ ...TYPE.headline, margin: '0 0 4px' }}>{t('onboarding.verdicts.title')}</h2>
             <p style={{ ...TYPE.footnote, color: C2.slate, margin: `0 0 ${SPACE.sm}px` }}>
-              Every place gets one answer for your needs. Only reviews from people in the pilot can say “Works for you”.
+              {t('onboarding.verdicts.lead')}
             </p>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: SPACE.sm }}>
-              {VERDICT_HELP.map(([kind, text]) => (
+              {VERDICT_HELP.map(kind => (
                 <li key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
                   <V2Verdict kind={kind}/>
-                  <span style={{ ...TYPE.footnote, color: C2.char }}>{text}</span>
+                  <span style={{ ...TYPE.footnote, color: C2.char }}>{t(`onboarding.verdicts.${kind}`)}</span>
                 </li>
               ))}
             </ul>

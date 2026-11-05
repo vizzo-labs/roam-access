@@ -9,6 +9,7 @@ import type { EntranceAlt, MicroAnswer, Review, Venue } from './db/schema';
 import { RA2_FEATURES, RA2_NEEDS, FEATURE_IDS, type FeatureId, type NeedId, type VerdictKind } from './pilot-data';
 import { ENTRANCE_ALTS } from './trust/entrance';
 import type { SensoryVM } from './sensory/summary';
+import type { I18nText } from './trust/text';
 import { optionOf, slotLabel } from './sensory/defs';
 
 // Where a fact comes from. Only 'community' can make a place "Works for you";
@@ -26,6 +27,9 @@ export type Fact = {
   kind?: 'feature' | 'absence' | 'entrance' | 'mixed' | 'experience' | 'hint';
   quote?: string;       // the reviewer's own words ("where?" for entrances)
   quick?: number;       // how many of `n` are quick answers ("Help fill the gaps")
+  // The same `t` and `s` as translatable descriptors (#21): screens show
+  // textOf(t, f.i18n.t); the English above stays for server pages.
+  i18n?: { t: I18nText; s: I18nText };
 };
 
 // One line per visible review: whose needs, what it answered, when. No ids,
@@ -56,6 +60,12 @@ export type ConfirmationStat = { last: Date | string; count: number };
 export type ReviewVM = {
   id: string; who: string; filters: string[]; v: VerdictKind; when: string;
   text: string; details: string; mine: boolean;
+  // Structured for translation (#21): the reviewer's first need + how many
+  // more, the date to format client-side, whether `text` is the reviewer's
+  // own words (else `textKey`), and the answers as descriptors.
+  needs: NeedId[]; whoNeed: NeedId | null; whoMore: number; at: string;
+  own: boolean; textKey: string | null;
+  items: { ok: boolean; text: I18nText; quote?: string; slots?: string[] }[];
 };
 
 const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many}`;
@@ -99,6 +109,11 @@ export function featureCounts(reviews: Review[], quick: MicroAnswer[] = []): Map
 // "(quick answer)" when that's all there is, else "(1 by quick answer)".
 const viaQuick = (q: number, all: number) =>
   !q ? '' : q === all ? ` (${q === 1 ? 'quick answer' : 'quick answers'})` : ` (${q} by quick answer)`;
+const viaQuickI18n = (q: number, all: number): I18nText | undefined =>
+  !q ? undefined : q === all ? { key: 'facts.quick.all', params: { count: q } } : { key: 'facts.quick.some', params: { count: q } };
+/** "{what} — {count} reports" (+ quick-answer note) as a descriptor. */
+const countedI18n = (what: string, count: number, q = 0): I18nText =>
+  ({ key: 'facts.s.reports', params: { count }, refs: { what }, suffix: viaQuickI18n(q, count) });
 
 export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: ConfirmationStat, quick: MicroAnswer[] = []): VenueVM {
   const works: Fact[] = [], check: Fact[] = [], barriers: Fact[] = [];
@@ -128,23 +143,34 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     const tags = [f.id];
     if (c.yes > c.no) {
       const q = viaQuick(c.quickYes, c.yes);
-      works.push({ t: f.yes, s: `${f.yesShort} — ${reports(c.yes)}${q}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature', quick: c.quickYes || undefined });
+      works.push({
+        t: f.yes, s: `${f.yesShort} — ${reports(c.yes)}${q}`, tags, src: 'community', n: c.yes, last: iso(c.lastYes!), kind: 'feature', quick: c.quickYes || undefined,
+        i18n: { t: { key: `data.feature.${f.id}.yes` }, s: countedI18n(`data.feature.${f.id}.yesShort`, c.yes, c.quickYes) },
+      });
     } else if (c.no > c.yes) {
       // Confirmed absence: specific, counted, and the first reason shown.
       const q = viaQuick(c.quickNo, c.no);
-      const fact: Fact = { t: f.no, s: `${f.noShort} — ${reports(c.no)}${q}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence', quick: c.quickNo || undefined };
+      const fact: Fact = {
+        t: f.no, s: `${f.noShort} — ${reports(c.no)}${q}`, tags, src: 'community', n: c.no, last: iso(c.lastNo!), kind: 'absence', quick: c.quickNo || undefined,
+        i18n: { t: { key: `data.feature.${f.id}.no` }, s: countedI18n(`data.feature.${f.id}.noShort`, c.no, c.quickNo) },
+      };
       let severity = f.noSeverity;
       if (f.id === 'stepfree' && altYesTotal > (altNone?.k ?? 0)) {
         // A step at the main door, but a step-free way in elsewhere: worth
         // knowing before you go, not a dead end.
         fact.t = 'Steps at the main entrance';
         fact.s = `Step at main entrance, step-free way in ${altYes[0].where} — ${reports(c.no)}${q}`;
+        fact.i18n = {
+          t: { key: 'facts.t.stepsMainEntrance' },
+          s: { key: 'facts.s.stepMainAltEntrance', params: { count: c.no }, refs: { where: `trust.entrance.${altYes[0].id}.where` }, suffix: viaQuickI18n(c.quickNo, c.no) },
+        };
         severity = 'check';
       } else if (f.id === 'stepfree' && altNone) {
         fact.t = 'Steps at the entry, and no other step-free way in';
         fact.n = Math.max(c.no, altNone.k);
         fact.last = newest([c.lastNo, altNone.last])!;
         fact.s = `No step-free way in — ${reports(fact.n)}`;
+        fact.i18n = { t: { key: 'facts.t.noStepFreeAtAll' }, s: { key: 'facts.s.noStepFree', params: { count: fact.n } } };
       }
       bucket[severity].push(fact);
     } else {
@@ -152,6 +178,10 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
         t: `Mixed reports on ${f.label}: ${c.yes} yes, ${c.no} no`, s: `Mixed: ${f.label} — ${c.yes} yes, ${c.no} no`,
         tags, src: 'community', n: c.yes + c.no, last: newest([c.lastYes, c.lastNo])!, kind: 'mixed',
         quick: c.quickYes + c.quickNo || undefined,
+        i18n: {
+          t: { key: 'facts.t.mixed', params: { yes: c.yes, no: c.no }, refs: { label: `data.feature.${f.id}.label` } },
+          s: { key: 'facts.s.mixed', params: { yes: c.yes, no: c.no }, refs: { label: `data.feature.${f.id}.label` } },
+        },
       });
     }
   }
@@ -159,6 +189,10 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     works.push({
       t: `Step-free entrance ${a.where}`, s: `${a.short} — ${reports(a.k)}`,
       tags: ['stepfree'], src: 'community', n: a.k, last: iso(a.last), kind: 'entrance', quote: a.quote,
+      i18n: {
+        t: { key: 'facts.t.altEntrance', refs: { where: `trust.entrance.${a.id}.where` } },
+        s: countedI18n(`trust.entrance.${a.id}.short`, a.k),
+      },
     });
   }
 
@@ -179,7 +213,13 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
       barrier: { t: `${k} ${who} said it didn't work for them`,       s: `Didn't work for ${need.short}` },
     }[kind];
     const last = newest(rs.filter(r => r.verdict === kind).map(r => r.createdAt))!;
-    bucket[kind].push({ ...line, s: `${line.s} — ${n(k, 'person', 'people')}`, tags: need.tags, src: 'community', n: k, last, kind: 'experience' });
+    bucket[kind].push({
+      ...line, s: `${line.s} — ${n(k, 'person', 'people')}`, tags: need.tags, src: 'community', n: k, last, kind: 'experience',
+      i18n: {
+        t: { key: `facts.t.exp.${kind}`, params: { count: k }, refs: { who: { key: `data.need.${need.id}.who`, lower: true }, whoPlural: `data.need.${need.id}.whoPlural` } },
+        s: { key: `facts.s.exp.${kind}`, params: { count: k }, refs: { need: `data.need.${need.id}.short` } },
+      },
+    });
   }
 
   // 3 · OpenStreetMap hints — only where the community hasn't spoken yet.
@@ -192,6 +232,8 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
       t: `Listed as ${label} on OpenStreetMap — not yet confirmed by the community`,
       s: cap(`${value === 'no' ? 'not ' : value === 'limited' ? 'partly ' : ''}${short} (unconfirmed)`),
       tags: [tag], src: 'osm', kind: 'hint',
+      // Always "not yet confirmed" in every language (honesty rule).
+      i18n: { t: { key: `facts.t.osm.${tag}.${value}` }, s: { key: `facts.s.osm.${tag}.${value}` } },
     });
   };
   hint('stepfree', osm.wheelchair, 'wheelchair accessible', 'step-free');
@@ -243,6 +285,21 @@ const DEFAULT_TEXT: Record<VerdictKind, string> = {
 
 export function buildReviewVM(r: Review, viewerId: string, now = Date.now()): ReviewVM {
   const needs = RA2_NEEDS.filter(x => r.needs.includes(x.id));
+  const items: ReviewVM['items'] = [];
+  for (const f of RA2_FEATURES) {
+    const val = r.features?.[f.id];
+    if (val === 'yes' || val === 'no') items.push({ ok: val === 'yes', text: { key: `data.feature.${f.id}.${val === 'yes' ? 'yesShort' : 'noShort'}` } });
+  }
+  if (r.entranceAlt && ENTRANCE_ALTS.some(a => a.id === r.entranceAlt)) {
+    items.push({ ok: r.entranceAlt !== 'none', text: { key: `trust.entrance.${r.entranceAlt}.short` }, quote: r.entranceNote?.trim() ? clip(r.entranceNote, 80) : undefined });
+  }
+  for (const [dim, val] of [['noise', r.sensoryNoise], ['light', r.sensoryLight], ['crowd', r.sensoryCrowd]] as const) {
+    if (optionOf(dim, val)) items.push({ ok: true, text: { key: `review.item.${dim}.${val}` } });
+  }
+  if (r.quietTimes?.length) {
+    // {list} is filled on the client from `slots` (fmt.list of review.item.slot.*).
+    items.push({ ok: true, text: { key: 'review.item.quietTimes' }, slots: r.quietTimes });
+  }
   const feats = RA2_FEATURES
     .filter(f => r.features?.[f.id] === 'yes' || r.features?.[f.id] === 'no')
     .map(f => `${r.features[f.id] === 'yes' ? '✓' : '✗'} ${r.features[f.id] === 'yes' ? f.yesShort : f.noShort}`);
@@ -263,6 +320,9 @@ export function buildReviewVM(r: Review, viewerId: string, now = Date.now()): Re
     text: r.note?.trim() || DEFAULT_TEXT[r.verdict as VerdictKind],
     details: feats.join(' · '),
     mine: r.userId === viewerId,
+    needs: needs.map(x => x.id), whoNeed: needs[0]?.id ?? null, whoMore: Math.max(0, needs.length - 1),
+    at: iso(r.createdAt), own: !!r.note?.trim(), textKey: r.note?.trim() ? null : `review.default.${r.verdict}`,
+    items,
   };
 }
 

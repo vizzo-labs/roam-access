@@ -6,6 +6,8 @@ import { RA2_FEATURES } from '@/lib/pilot-data';
 import { preparePhoto } from './resize';
 import { C2 } from '../ui/palette';
 import { Banner, Button, Card, Icon, SectionHeader, SPACE, TYPE, RADIUS, edge, tone } from '../ds';
+import { UserText, useT } from '../i18n';
+import { featureText } from '@/lib/i18n/data';
 
 // Photos in the review form (#3) + suggestions from them (#16).
 // Each photo: resized and stripped of location data in the browser, uploaded
@@ -18,6 +20,7 @@ let seq = 0;
 
 /** Photo state is owned by the review form; this hook holds the actions. */
 function useReviewPhotos(venueId) {
+  const t = useT();
   const [photos, setPhotos] = React.useState([]);
   const [announce, setAnnounce] = React.useState('');
   const photosRef = React.useRef(photos);
@@ -40,11 +43,11 @@ function useReviewPhotos(venueId) {
         // Pre-fill the description only if the reviewer hasn't written one.
         ...(x.alt.trim() ? {} : { alt: s.alt, altSource: 'ai', altConfirmed: false }),
       }));
-      setAnnounce(`Suggestions ready from your photo: a description to check${n ? `, and answers to ${n} ${n === 1 ? 'question' : 'questions'} below` : ''}. Nothing is used until you confirm it.`);
+      setAnnounce(n ? t('photos.say.readyAnswers', { count: n }) : t('photos.say.ready'));
     } catch {
       patch(key, { suggestStatus: 'unavailable' });
     }
-  }, [patch]);
+  }, [patch, t]);
 
   const upload = React.useCallback(async (key, prepared, kind) => {
     patch(key, { status: 'uploading' });
@@ -58,13 +61,14 @@ function useReviewPhotos(venueId) {
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || 'upload failed');
       patch(key, { status: 'ready', id: d.photo.id });
-      setAnnounce('Photo added. Now describe it.');
+      setAnnounce(t('photos.say.added'));
       suggest(key, d.photo.id);
-    } catch (e) {
-      patch(key, { status: 'failed', error: e.message });
-      setAnnounce('Couldn’t upload that photo.');
+    } catch {
+      // Server errors are English: show our own (translated) message.
+      patch(key, { status: 'failed', error: null });
+      setAnnounce(t('photos.say.uploadFailed'));
     }
-  }, [venueId, patch, suggest]);
+  }, [venueId, patch, suggest, t]);
 
   const add = React.useCallback(async (files) => {
     const room = MAX_PHOTOS_PER_REVIEW - photos.length;
@@ -72,18 +76,18 @@ function useReviewPhotos(venueId) {
     for (const file of list) {
       const key = `p${++seq}`;
       setPhotos(ps => [...ps, { key, status: 'preparing', id: null, preview: null, prepared: null, kind: 'other', alt: '', altSource: null, altConfirmed: false, suggestion: null, suggestStatus: 'idle' }]);
-      setAnnounce('Preparing photo…');
+      setAnnounce(t('photos.say.preparing'));
       try {
         const prepared = await preparePhoto(file);
         const preview = URL.createObjectURL(prepared.thumb);
         patch(key, { preview, prepared });
         await upload(key, prepared, 'other');
       } catch {
-        patch(key, { status: 'failed', error: 'That file isn’t a photo we can read.' });
-        setAnnounce('Couldn’t read that photo.');
+        patch(key, { status: 'failed', error: 'unreadable' });
+        setAnnounce(t('photos.say.unreadable'));
       }
     }
-  }, [photos.length, upload, patch]);
+  }, [photos.length, upload, patch, t]);
 
   const remove = React.useCallback((key) => {
     setPhotos(ps => {
@@ -92,8 +96,8 @@ function useReviewPhotos(venueId) {
       if (p?.preview) URL.revokeObjectURL(p.preview);
       return ps.filter(x => x.key !== key);
     });
-    setAnnounce('Photo removed.');
-  }, []);
+    setAnnounce(t('photos.say.removed'));
+  }, [t]);
 
   const retry = React.useCallback((key) => {
     const p = photos.find(x => x.key === key);
@@ -120,14 +124,15 @@ function useReviewPhotos(venueId) {
 }
 
 function ReviewPhotos({ venueName, state }) {
+  const t = useT();
   const { photos, patch, add, remove, retry, announce } = state;
   const input = React.useRef(null);
   const full = photos.length >= MAX_PHOTOS_PER_REVIEW;
 
   return (
     <section aria-labelledby="rev-photos" style={{ marginTop: 22 }}>
-      <SectionHeader id="rev-photos" size="sm" title={<>Add photos <span style={{ fontWeight: 500, color: C2.slate }}>(optional)</span></>}
-        description={`The entrance, a step, the toilet or seating help most. Up to ${MAX_PHOTOS_PER_REVIEW}. We remove the location from your photos. Please avoid people’s faces.`}/>
+      <SectionHeader id="rev-photos" size="sm" title={<>{t('photos.add.title')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('common.optional')}</span></>}
+        description={t('photos.add.description', { max: MAX_PHOTOS_PER_REVIEW })}/>
 
       <div className="ra-sr-only" role="status" aria-live="polite">{announce}</div>
 
@@ -138,7 +143,7 @@ function ReviewPhotos({ venueName, state }) {
       <input ref={input} type="file" accept="image/*" multiple hidden tabIndex={-1} aria-hidden="true"
         onChange={e => { add(e.target.files); e.target.value = ''; }}/>
       <Button variant="secondary" full icon="camera" disabled={full} onClick={() => input.current?.click()}>
-        {full ? `${MAX_PHOTOS_PER_REVIEW} photos added — the most for one review` : photos.length ? 'Add another photo' : 'Add a photo'}
+        {full ? t('photos.add.full', { max: MAX_PHOTOS_PER_REVIEW }) : photos.length ? t('photos.add.another') : t('photos.add.first')}
       </Button>
     </section>
   );
@@ -147,49 +152,50 @@ function ReviewPhotos({ venueName, state }) {
 const fieldLabel = { ...TYPE.headline, fontSize: 15.5, display: 'block', margin: `${SPACE.md}px 0 6px` };
 
 function PhotoCard({ p, n, venueName, patch, remove, retry }) {
+  const t = useT();
   const altId = `alt-${p.key}`, kindId = `kind-${p.key}`, hintId = `alt-hint-${p.key}`;
-  const statusText = { preparing: 'Preparing your photo…', uploading: 'Uploading…' }[p.status];
+  const statusText = { preparing: t('photos.preparing'), uploading: t('photos.uploading') }[p.status];
   const aiPending = p.altSource === 'ai' && !p.altConfirmed;
 
   return (
-    <Card role="group" aria-label={`Photo ${n}`} style={{ marginBottom: SPACE.sm }}>
+    <Card role="group" aria-label={t('photos.card', { n })} style={{ marginBottom: SPACE.sm }}>
       <div style={{ display: 'flex', gap: SPACE.sm, alignItems: 'flex-start' }}>
         <div style={{ width: 84, height: 84, borderRadius: RADIUS.md - 2, overflow: 'hidden', background: C2.stone, flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {p.preview && <img src={p.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ ...TYPE.headline, margin: '0 0 6px' }}>Photo {n}</p>
+          <p style={{ ...TYPE.headline, margin: '0 0 6px' }}>{t('photos.card', { n })}</p>
           {statusText && <p style={{ ...TYPE.footnote, color: C2.slate, margin: `0 0 ${SPACE.xs}px` }}>{statusText}</p>}
           <div style={{ display: 'flex', gap: SPACE.xs, flexWrap: 'wrap' }}>
-            {p.status === 'failed' && p.prepared && <Button size="sm" variant="ghost" icon="refresh" onClick={() => retry(p.key)} aria-label={`Try uploading photo ${n} again`}>Try again</Button>}
-            <Button size="sm" variant="ghost" icon="close" onClick={() => remove(p.key)} aria-label={`Remove photo ${n}`}>Remove</Button>
+            {p.status === 'failed' && p.prepared && <Button size="sm" variant="ghost" icon="refresh" onClick={() => retry(p.key)} aria-label={t('photos.retryAria', { n })}>{t('photos.retry')}</Button>}
+            <Button size="sm" variant="ghost" icon="close" onClick={() => remove(p.key)} aria-label={t('photos.removeAria', { n })}>{t('photos.remove')}</Button>
           </div>
         </div>
       </div>
 
       {p.status === 'failed' && (
-        <Banner tone="danger" style={{ marginTop: SPACE.sm }}>{p.error || 'Couldn’t upload this photo.'}</Banner>
+        <Banner tone="danger" style={{ marginTop: SPACE.sm }}>{p.error === 'unreadable' ? t('photos.unreadable') : t('photos.uploadFailed')}</Banner>
       )}
 
       {p.status !== 'failed' && (
         <>
-          <label htmlFor={kindId} style={fieldLabel}>What does it show?</label>
+          <label htmlFor={kindId} style={fieldLabel}>{t('photos.whatShows')}</label>
           <select id={kindId} value={p.kind} onChange={e => patch(p.key, { kind: e.target.value })} style={{
             ...TYPE.input, width: '100%', minHeight: 48, borderRadius: RADIUS.md - 2, border: edge(), padding: '0 12px',
             background: C2.paper, color: C2.char,
           }}>
-            {PHOTO_KINDS.map(k => <option key={k.id} value={k.id}>{k.label}</option>)}
+            {PHOTO_KINDS.map(k => <option key={k.id} value={k.id}>{t(`photos.kind.${k.id}`)}</option>)}
           </select>
 
           <label htmlFor={altId} style={{ ...fieldLabel, marginBottom: 2 }}>
-            Describe it for people who can’t see it <span style={{ fontWeight: 500, color: C2.slate }}>(required)</span>
+            {t('photos.describe')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('photos.required')}</span>
           </label>
           <p id={hintId} style={{ ...TYPE.footnote, color: C2.slate, margin: '0 0 6px' }}>
             {aiPending
-              ? 'Suggested from your photo — check it’s right, then confirm or edit it.'
-              : p.suggestStatus === 'loading' ? 'Looking at your photo to suggest a description…'
-              : `e.g. “Two steps up to the front door of ${venueName}, no handrail”`}
+              ? t('photos.describeSuggested')
+              : p.suggestStatus === 'loading' ? t('photos.describeLoading')
+              : t('photos.describeExample', { name: venueName })}
           </p>
           <textarea id={altId} rows={2} maxLength={ALT_MAX} value={p.alt} aria-describedby={hintId} aria-required="true"
             onChange={e => patch(p.key, { alt: e.target.value, altSource: 'user', altConfirmed: true })}
@@ -200,14 +206,14 @@ function PhotoCard({ p, n, venueName, patch, remove, retry }) {
           {aiPending && (
             <Button size="sm" variant="outline" icon="check" style={{ marginTop: SPACE.xs }}
               disabled={p.alt.trim().length < ALT_MIN} onClick={() => patch(p.key, { altConfirmed: true })}>
-              This description is right
+              {t('photos.confirm')}
             </Button>
           )}
           {p.suggestStatus === 'unavailable' && (
-            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>Suggestions aren’t available right now — write your own description.</p>
+            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>{t('photos.suggestUnavailable')}</p>
           )}
           {p.suggestStatus === 'limit' && (
-            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>You’ve used today’s photo suggestions — write your own description.</p>
+            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>{t('photos.suggestLimit')}</p>
           )}
         </>
       )}
@@ -217,19 +223,20 @@ function PhotoCard({ p, n, venueName, patch, remove, retry }) {
 
 // Under a yes/no question: what the photo suggests, and a button to use it.
 function PhotoSuggestion({ featureId, suggestion, onUse }) {
+  const tr = useT();
   if (!suggestion) return null;
   const f = RA2_FEATURES.find(x => x.id === featureId);
-  const word = suggestion.value === 'yes' ? 'Yes' : 'No';
+  const word = suggestion.value === 'yes' ? tr('common.yes') : tr('common.no');
   const t = tone('warn');
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm - 2, flexWrap: 'wrap', margin: `0 0 ${SPACE.sm - 2}px`, padding: `${SPACE.xs}px ${SPACE.sm}px`, borderRadius: RADIUS.md - 2, background: t.bg }}>
       <span style={{ ...TYPE.footnote, flex: 1, minWidth: 160, color: C2.char, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
         <span style={{ color: t.fg, flexShrink: 0 }}><Icon name="camera" size={16}/></span>
-        <span>Your photo suggests <strong>{word}</strong>{suggestion.reason ? ` — ${suggestion.reason}` : ''}</span>
+        <span>{tr('photos.suggests', { answer: word })}{suggestion.reason ? <> — <UserText>{suggestion.reason}</UserText></> : ''}</span>
       </span>
       <Button size="sm" variant="outline" onClick={() => onUse(featureId, suggestion.value)}
-        aria-label={`Use the photo’s suggestion: ${word} for “${f?.question}”`}>
-        Use this answer
+        aria-label={tr('photos.useAnswerAria', { answer: word, question: f ? featureText(tr, f.id, 'question') : '' })}>
+        {tr('photos.useAnswer')}
       </Button>
     </div>
   );

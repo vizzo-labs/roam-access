@@ -7,17 +7,22 @@ import { PilotMap, MapLegend } from './PilotMap';
 import { V2Logo } from './ui/Logo';
 import { LayerToggles, layerExtras } from './layers/LayerToggles';
 import { metres } from './layers/layerUtils';
+import { useT } from './i18n';
 
 export const PIN = {
   colors: { works: '#1E5F8B', check: '#854D0E', barrier: '#9C2D0E', unknown: '#475569' },
   icons: { works: '✓', check: '!', barrier: '✗', unknown: '?' },
-  labels: { works: 'Works for you', check: 'Check first', barrier: 'Has barriers', unknown: 'No info yet' },
 };
+// Verdict words for pins and the legend, in the app's language.
+export const pinLabels = t => ({
+  works: t('data.verdict.works'), check: t('data.verdict.check'),
+  barrier: t('data.verdict.barrier'), unknown: t('data.verdict.unknown'),
+});
 
 const NAV = [
-  { id: 'home', label: 'Explore', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
-  { id: 'saved', label: 'Saved', views: ['saved'] },
-  { id: 'me', label: 'Me', views: ['me', 'setup', 'setup-name', 'card'] },
+  { id: 'home', label: 'app.nav.explore', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
+  { id: 'saved', label: 'app.nav.saved', views: ['saved'] },
+  { id: 'me', label: 'app.nav.me', views: ['me', 'setup', 'setup-name', 'card'] },
 ];
 
 function Header({ children }) {
@@ -29,6 +34,8 @@ function Header({ children }) {
 }
 
 export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId = null, children }) {
+  const t = useT();
+  const labels = pinLabels(t);
   const active = NAV.find(n => n.views.includes(app.view))?.id;
   const initial = (app.user?.name || 'You').charAt(0).toUpperCase();
   const kinds = [...new Set(mapResults.map(r => r.verdict.kind))];
@@ -39,39 +46,39 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
     toilets: app.view === 'toilets' || facility?.layer === 'toilets',
     beach: app.view === 'beach' || facility?.layer === 'beach',
   };
-  const extras = layerExtras(L, { forced }).sort((a, b) => metres(app.origin, a) - metres(app.origin, b));
+  const extras = layerExtras(L, { forced, t }).sort((a, b) => metres(app.origin, a) - metres(app.origin, b));
   const fitExtras = app.view === 'toilets' ? 12 : app.view === 'beach' ? true : false;
   return (
     <div className="web-app">
       <Header>
-        <button className="web-brand" onClick={() => app.goto('home')} aria-label="Roam Access — Explore">
+        <button className="web-brand" onClick={() => app.goto('home')} aria-label={t('app.web.brand')}>
           <V2Logo size={30}/>
         </button>
-        <span className="web-tag">Pilot · Manly &amp; surrounds</span>
+        <span className="web-tag">{t('app.web.tag')}</span>
         {app.user?.done && (
-          <nav className="web-nav" aria-label="Primary">
+          <nav className="web-nav" aria-label={t('app.nav.primary')}>
             {NAV.map(n => (
-              <button key={n.id} onClick={() => app.goto(n.id)} aria-current={active === n.id ? 'page' : undefined}>{n.label}</button>
+              <button key={n.id} onClick={() => app.goto(n.id)} aria-current={active === n.id ? 'page' : undefined}>{t(n.label)}</button>
             ))}
           </nav>
         )}
         <div className="web-actions">
           {app.installable && app.canPromptInstall && (
-            <button className="web-btn outline" onClick={app.install}>Install app</button>
+            <button className="web-btn outline" onClick={app.install}>{t('app.web.install')}</button>
           )}
-          <button className="web-btn outline" onClick={app.openA11y}>Accessibility</button>
-          <button className="web-avatar" onClick={() => app.goto('me')} aria-label="Your profile">{initial}</button>
+          <button className="web-btn outline" onClick={app.openA11y}>{t('app.web.accessibility')}</button>
+          <button className="web-avatar" onClick={() => app.goto('me')} aria-label={t('app.web.profile')}>{initial}</button>
         </div>
       </Header>
       <div className="web-body">
         <div className="web-panel">{children}</div>
-        <section className="web-map" aria-label="Map of places in the pilot area">
+        <section className="web-map" aria-label={t('app.web.mapLabel')}>
           <PilotMap results={mapResults} selectedId={selectedId} hoverId={hoverId} onSelect={id => app.goto('venue', id)}
-            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras}
+            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras}
             onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
             extras={extras} selectedExtraId={facility?.id || null} onSelectExtra={id => app.goto('facility', id)}
             fitExtras={fitExtras} alertIds={L.alertIds}/>
-          <MapLegend compact kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} style={{ top: 16, left: 16 }}/>
+          <MapLegend compact kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={labels} style={{ top: 16, left: 16 }}/>
           <LayerToggles shown={L.shown} forced={forced} onChange={L.setShown} style={{ top: 76, right: 16 }}/>
         </section>
       </div>
@@ -82,24 +89,24 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
 // Signed out on a big screen: the welcome screen in the panel, the pilot
 // area on the map, and a plain statement of what this is.
 export function WebWelcome({ origin, signIn, children }) {
+  const t = useT();
   return (
     <div className="web-app">
       <Header>
         <span className="web-brand" aria-hidden="true"><V2Logo size={30}/></span>
-        <span className="web-tag">Pilot · Manly &amp; surrounds</span>
+        <span className="web-tag">{t('app.web.tag')}</span>
         <div className="web-actions">
-          <button className="web-btn outline" onClick={signIn}>Sign in</button>
+          <button className="web-btn outline" onClick={signIn}>{t('app.web.signIn')}</button>
         </div>
       </Header>
       <div className="web-body">
         <div className="web-panel">{children}</div>
-        <section className="web-map" aria-label="Map of the pilot area: Manly and surrounds">
+        <section className="web-map" aria-label={t('app.web.areaMapLabel')}>
           <PilotMap results={[]} selectedId={null} onSelect={() => {}} origin={origin}
-            colors={PIN.colors} icons={PIN.icons} labels={PIN.labels}/>
+            colors={PIN.colors} icons={PIN.icons} labels={pinLabels(t)}/>
           <div className="web-hero">
-            <strong>Real places. Real access.</strong>
-            Cafes, beaches, ocean pools and more around Manly — rated by people with lived
-            experience of disability, for every kind of need.
+            <strong>{t('app.web.heroTitle')}</strong>
+            {t('app.web.heroBody')}
           </div>
         </section>
       </div>

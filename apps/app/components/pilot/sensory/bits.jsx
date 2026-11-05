@@ -26,6 +26,7 @@ export function SensoryIcon({ name, size = 20, color = 'currentColor' }) {
 // One question with chip answers. Single choice by default (tap the chosen
 // answer again to clear it); `multi` for "choose any" — then onChange gets
 // an updater function (prev => next), as React's setState accepts.
+// options: [{ id, label }] — labels already translated.
 export function ChoiceRow({ id, question, hint, options, value, onChange, multi = false, first = false }) {
   const isOn = o => (multi ? (value || []).includes(o.id) : value === o.id);
   // Multi: pass an updater so quick successive taps all count.
@@ -40,7 +41,7 @@ export function ChoiceRow({ id, question, hint, options, value, onChange, multi 
       {hint && <p id={`${id}-hint`} style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0' }}>{hint}</p>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs, marginTop: SPACE.xs }}>
         {options.map(o => (
-          <FilterChip key={o.id} selected={isOn(o)} onChange={sel => toggle(o, sel)}>{o.label}</FilterChip>
+          <FilterChip key={o.id} selected={isOn(o)} onChange={sel => toggle(o, sel)} style={{ whiteSpace: 'normal', textAlign: 'left' }}>{o.label}</FilterChip>
         ))}
       </div>
     </div>
@@ -57,10 +58,13 @@ export function useNow(everyMs = 60000) {
   return now;
 }
 
-export function minsAgo(at, now = Date.now()) {
-  const m = Math.max(0, Math.round((now - +new Date(at)) / 60000));
-  if (m < 2) return 'just now';
-  if (m < 60) return `${m} minutes ago`;
-  const h = Math.round(m / 60);
-  return h === 1 ? '1 hour ago' : `${h} hours ago`;
+// ── Translated labels (pass the `t` from useT()) ─────────────────────────
+/** Answer options for one dimension: [{ id, label }]. */
+export const dimOptions = (t, dim, ids) => ids.map(id => ({ id, label: t(`sensory.${dim}.${id}.label`) }));
+export const optionFact = (t, dim, id) => (id ? t(`sensory.${dim}.${id}.fact`) : null);
+export const slotLabel = (t, id) => t(`sensory.slot.${id}.label`);
+/** "before 10am", "before 10am on weekdays" */
+export function whenText(t, slot, day) {
+  const s = t(`sensory.slot.${slot}.phrase`);
+  return day ? t(`sensory.when.${day}`, { slot: s }) : s;
 }

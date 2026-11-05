@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2 } from '../ui/palette';
 import { IconButton } from './IconButton';
 import { GUTTER, SPACE, TYPE } from './tokens';
@@ -16,6 +17,7 @@ function ScreenHeader({
   back, title, headingRef, subtitle, overline, actions, compact = false,
   size = 'title1', dot = true, padX = GUTTER, style, children,
 }) {
+  const t = useT();
   const h1 = (
     <h1 ref={headingRef} tabIndex={-1} style={{
       ...(compact ? TYPE.title3 : TYPE[size] || TYPE.title1), color: C2.char, margin: 0,
@@ -29,7 +31,7 @@ function ScreenHeader({
     <div style={{ padding: `${hasRow ? 10 : SPACE.md}px ${padX}px 0`, ...style }}>
       {hasRow && (
         <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm, minHeight: 48 }}>
-          {back && <IconButton icon="back" label={back.label || 'Back'} onClick={back.onClick} href={back.href}/>}
+          {back && <IconButton icon="back" label={back.label || t('common.back')} onClick={back.onClick} href={back.href}/>}
           {compact ? <div style={{ flex: 1, minWidth: 0 }}>{h1}</div> : <div style={{ flex: 1 }}/>}
           {actions && <div style={{ display: 'flex', gap: SPACE.xs, flexShrink: 0 }}>{actions}</div>}
         </div>

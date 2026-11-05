@@ -2,8 +2,10 @@
 
 import React from 'react';
 import { C2_BASE, M2 } from './palette';
+import { useT } from '../i18n/I18nProvider';
 
 // Verdict — THE core pattern. One clear answer: icon + colour + words.
+// `label` here is the English fallback; the pill shows data.verdict.* (#21).
 const V2_VERDICT_META = {
   works:   { bg: C2_BASE.blueBg,  fg: C2_BASE.blue,  icon: '✓', label: 'Works for you' },
   check:   { bg: C2_BASE.amberBg, fg: C2_BASE.amber, icon: '!', label: 'Check first' },
@@ -12,7 +14,9 @@ const V2_VERDICT_META = {
 };
 
 function V2Verdict({ kind, big = false, label = null }) {
-  const s = V2_VERDICT_META[kind] || V2_VERDICT_META.check;
+  const t = useT();
+  const k = V2_VERDICT_META[kind] ? kind : 'check';
+  const s = V2_VERDICT_META[k];
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: big ? 10 : 7,
@@ -25,7 +29,7 @@ function V2Verdict({ kind, big = false, label = null }) {
         background: s.fg, color: s.bg, fontFamily: M2, fontWeight: 800,
         fontSize: big ? 13 : 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       }}>{s.icon}</span>
-      {label || s.label}
+      {label || t(`data.verdict.${k}`)}
     </span>
   );
 }

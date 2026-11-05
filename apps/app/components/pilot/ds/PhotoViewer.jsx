@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT, UserText } from '../i18n/I18nProvider';
 import { createPortal } from 'react-dom';
 import { C2 } from '../ui/palette';
 import { useRA2Dialog } from '../ui/useDialog';
@@ -14,12 +15,13 @@ import { RADIUS, SPACE, TYPE, edge } from './tokens';
 //   photos: [{ id, src, thumb, alt, kindLabel, who?, when? }]
 // ─────────────────────────────────────────────────────────────────────────
 function PhotoGrid({ photos, onOpen, size = 88, showKind = true }) {
+  const t = useT();
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexWrap: 'wrap', gap: SPACE.sm - 2 }}>
       {photos.map((p, i) => (
         <li key={p.id} style={{ width: size }}>
           <button type="button" onClick={() => onOpen(i)} className="ds-press"
-            aria-label={`Open photo ${i + 1} of ${photos.length}: ${p.kindLabel}. ${p.alt}`}
+            aria-label={t('ds.photo.open', { n: i + 1, total: photos.length, kind: p.kindLabel, alt: p.alt })}
             style={{
               width: size, height: size, padding: 0, borderRadius: RADIUS.md - 2, overflow: 'hidden', cursor: 'pointer',
               border: edge(), background: C2.stone, display: 'block',
@@ -43,6 +45,7 @@ function PhotoGrid({ photos, onOpen, size = 88, showKind = true }) {
 //   <PhotoViewer photos={photos} index={i} onIndex={setI} onClose={() => setI(null)}/>
 // ─────────────────────────────────────────────────────────────────────────
 function PhotoViewer({ photos, index, onIndex, onClose }) {
+  const t = useT();
   const open = index != null && !!photos[index];
   const ref = useRA2Dialog(open, onClose);
   const n = photos.length;
@@ -68,27 +71,27 @@ function PhotoViewer({ photos, index, onIndex, onClose }) {
           padding: `${SPACE.sm}px ${SPACE.md}px calc(${SPACE.md}px + env(safe-area-inset-bottom))` }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm, marginBottom: SPACE.sm }}>
           <h2 id="ds-photo-title" style={{ ...TYPE.title3, margin: 0 }}>
-            {p.kindLabel}{n > 1 ? <span style={{ fontWeight: 500 }}> · photo {index + 1} of {n}</span> : null}
+            {p.kindLabel}{n > 1 ? <span style={{ fontWeight: 500 }}> · {t('ds.photo.count', { n: index + 1, total: n })}</span> : null}
           </h2>
-          <IconButton icon="close" label="Close photo" variant="onColor" onClick={onClose}/>
+          <IconButton icon="close" label={t('ds.photo.close')} variant="onColor" onClick={onClose}/>
         </div>
         <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: SPACE.sm }}>
-          {n > 1 && <IconButton icon="back" label="Previous photo" variant="onColor" onClick={() => onIndex((index - 1 + n) % n)}/>}
+          {n > 1 && <IconButton icon="back" label={t('ds.photo.prev')} variant="onColor" onClick={() => onIndex((index - 1 + n) % n)}/>}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img key={p.id} src={p.src} alt={p.alt}
             style={{ minWidth: 0, maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: RADIUS.md, background: '#222' }}/>
-          {n > 1 && <IconButton icon="forward" label="Next photo" variant="onColor" onClick={() => onIndex((index + 1) % n)}/>}
+          {n > 1 && <IconButton icon="forward" label={t('ds.photo.next')} variant="onColor" onClick={() => onIndex((index + 1) % n)}/>}
         </div>
         <div style={{ paddingTop: SPACE.sm }}>
-          <p id="ds-photo-desc" style={{ ...TYPE.body, margin: '0 0 6px' }}>{p.alt}</p>
+          <UserText as="p" id="ds-photo-desc" style={{ ...TYPE.body, margin: '0 0 6px' }}>{p.alt}</UserText>
           {(p.who || p.when) && (
             <p style={{ ...TYPE.footnote, margin: 0, color: soft }}>
-              From a review{p.who ? ` · ${p.who}` : ''}{p.when ? ` · ${p.when}` : ''}
+              {t('ds.photo.fromReview')}{p.who ? ` · ${p.who}` : ''}{p.when ? ` · ${p.when}` : ''}
             </p>
           )}
-          <span className="ra-sr-only" aria-live="polite">{`Photo ${index + 1} of ${n}: ${p.kindLabel}`}</span>
+          <span className="ra-sr-only" aria-live="polite">{t('ds.photo.position', { n: index + 1, total: n, kind: p.kindLabel })}</span>
           <p aria-hidden="true" style={{ ...TYPE.caption, fontWeight: 500, margin: `${SPACE.xs}px 0 0`, color: soft }}>
-            {n > 1 ? '← → to move · Esc to close' : 'Esc to close'}
+            {n > 1 ? t('ds.photo.keysMany') : t('ds.photo.keysOne')}
           </p>
         </div>
       </div>

@@ -5,79 +5,91 @@
 
 import React from 'react';
 import { C2 } from '../ui/palette';
-import { Banner, Card, SectionHeader, SPACE, TYPE, divider, plural } from '../ds';
-import { DAY_KINDS, SENSORY_DIMS, SLOTS, optionOf } from '@/lib/sensory/defs';
+import { Banner, Card, SectionHeader, SPACE, TYPE, divider } from '../ds';
+import { CROWD_IDS, LIGHT_IDS, NOISE_IDS } from '@/lib/sensory/defs';
 import { dimSummaries, quietHours, quietNow, slotReadings } from '@/lib/sensory/summary';
+import { ReadAloud, useFormat, useT } from '../i18n';
 import { CheckIn } from './CheckIn';
-import { SensoryIcon, minsAgo, useNow } from './bits';
+import { SensoryIcon, optionFact, slotLabel, useNow, whenText } from './bits';
 
-const USUALLY = {
-  noise: { quiet: 'Usually quiet', some: 'Usually some noise', loud: 'Often loud' },
-  light: { soft: 'Usually soft or natural light', bright: 'Usually bright light', harsh: 'Often harsh or flickering light' },
-  crowd: { few: 'Usually few people', some: 'Usually some people', busy: 'Often crowded' },
-};
-const READING = { quiet: 'Quiet', some: 'Some noise or people', busy: 'Busy or loud', mixed: 'Mixed reports' };
-const slot = id => SLOTS.find(s => s.id === id);
-const dayPhrase = d => (d ? ' ' + DAY_KINDS.find(x => x.id === d).phrase : '');
+const IDS = { noise: NOISE_IDS, light: LIGHT_IDS, crowd: CROWD_IDS };
 
-/** One sentence per dimension: "Usually quiet" + "3 of 4 reports". */
-export function sensoryLines(vm) {
+/** One line per dimension: heading "Noise", text "Usually quiet", meta "3 of 4 reports". */
+export function sensoryLines(vm, t, fmt) {
   return dimSummaries(vm).map(s => {
-    const dim = SENSORY_DIMS.find(d => d.id === s.dim);
     const text = s.id
-      ? (s.n >= 2 ? USUALLY[s.dim][s.id] : optionOf(s.dim, s.id).fact)
-      : `Mixed reports: ${dim.options.filter(o => s.counts[o.id]).map(o => `${o.fact.toLowerCase()} (${s.counts[o.id]})`).join(', ')}`;
-    return { dim: s.dim, heading: dim.heading, text, meta: s.id ? (s.total > 1 ? `${s.n} of ${s.total} reports` : '1 report') : plural(s.total, 'report') };
+      ? t(`sensory.${s.dim}.${s.id}.${s.n >= 2 ? 'usually' : 'fact'}`)
+      : t('sensory.summary.mixed', {
+        list: fmt.list(IDS[s.dim].filter(id => s.counts[id]).map(id =>
+          t('sensory.summary.mixedItem', { what: optionFact(t, s.dim, id).toLocaleLowerCase(t.locale), count: s.counts[id] }))),
+      });
+    const meta = s.id
+      ? (s.total > 1 ? t('sensory.summary.ofReports', { n: s.n, total: s.total }) : t('common.reports', { count: 1 }))
+      : t('common.reports', { count: s.total });
+    return { dim: s.dim, heading: t(`sensory.dim.${s.dim}.heading`), text, meta };
   });
 }
 
-/** "Usually quiet before 10am — 3 reports" */
-export function quietHourText(h) {
-  return `${h.usually ? 'Usually quiet' : 'Quiet'} ${slot(h.slot).phrase}${dayPhrase(h.day)}`;
+/** "Usually quiet before 10am on weekdays" */
+export function quietHourText(h, t) {
+  return t(h.usually ? 'sensory.quiet.usually' : 'sensory.quiet.once', { when: whenText(t, h.slot, h.day) });
 }
 
-function NowBanner({ q, now }) {
+/** The quiet-now banner's title, body and tone (null when there's nothing to say). */
+function nowMessage(q, t, fmt, now) {
   if (!q) return null;
   if (q.kind === 'live') {
-    const what = [optionOf('noise', q.check.noise)?.fact, optionOf('crowd', q.check.crowd)?.fact].filter(Boolean).join(', ').toLowerCase();
-    const t = { quiet: ['success', 'Quiet right now'], some: ['info', 'Some noise or people right now'], busy: ['warn', 'Busy right now'] }[q.reading];
-    return <Banner tone={t[0]} title={t[1]} style={{ marginBottom: SPACE.sm }}>Someone checked in {minsAgo(q.at, now)}{what ? `: ${what}` : ''}.</Banner>;
+    const what = [optionFact(t, 'noise', q.check.noise), optionFact(t, 'crowd', q.check.crowd)]
+      .filter(Boolean).map(x => x.toLocaleLowerCase(t.locale));
+    const ago = fmt.ago(q.at, now);
+    return {
+      tone: { quiet: 'success', some: 'info', busy: 'warn' }[q.reading],
+      title: t(`sensory.now.${q.reading}`),
+      body: what.length ? t('sensory.now.checkedInWhat', { ago, what: fmt.list(what) }) : t('sensory.now.checkedIn', { ago }),
+    };
   }
   if (q.kind === 'usually-quiet') {
-    return (
-      <Banner tone="success" title="Usually quiet at this time" style={{ marginBottom: SPACE.sm }}>
-        {plural(q.hour.n, 'report')} say it’s quiet {slot(q.hour.slot).phrase}{dayPhrase(q.hour.day)}.
-      </Banner>
-    );
+    return { tone: 'success', title: t('sensory.now.usuallyQuiet'),
+      body: t('sensory.now.usuallyQuietBody', { count: q.hour.n, when: whenText(t, q.hour.slot, q.hour.day) }) };
   }
-  return (
-    <Banner tone="warn" title="Usually busy at this time" style={{ marginBottom: SPACE.sm }}>
-      {plural(q.n, 'report')} say it’s busy or loud {slot(q.slot).phrase}.
-    </Banner>
-  );
+  return { tone: 'warn', title: t('sensory.now.usuallyBusy'),
+    body: t('sensory.now.usuallyBusyBody', { count: q.n, when: whenText(t, q.slot) }) };
 }
 
 export function SensorySummary({ app, venue }) {
+  const t = useT();
+  const fmt = useFormat();
   const vm = venue.sensory;
   const now = useNow();
-  const lines = sensoryLines(vm);
+  const lines = sensoryLines(vm, t, fmt);
   const hours = quietHours(vm);
   const day = slotReadings(vm);
-  const q = quietNow(vm, now);
+  const msg = nowMessage(quietNow(vm, now), t, fmt, now);
   const empty = !lines.length && !hours.length;
+
+  // Everything shown, in reading order, for "Read aloud".
+  const spoken = () => [
+    msg && `${msg.title}. ${msg.body}`,
+    ...hours.map(h => `${quietHourText(h, t)}, ${t('common.reports', { count: h.n })}.`),
+    ...lines.map(l => t('sensory.read.lines', { heading: l.heading, text: l.text, meta: l.meta })),
+    t('sensory.summary.from'),
+  ].filter(Boolean).join(' ');
 
   return (
     <Card as="section" aria-labelledby={`sensory-h-${venue.id}`} style={{ marginBottom: SPACE.md }}>
-      <SectionHeader id={`sensory-h-${venue.id}`} title="Noise, light and crowds" size="sm"
-        description={empty ? 'No one has described this yet.' : 'From people in the pilot. This doesn’t change the verdict.'}/>
-      <NowBanner q={q} now={now}/>
+      <SectionHeader id={`sensory-h-${venue.id}`} title={t('sensory.summary.title')} size="sm"
+        description={empty ? t('sensory.summary.empty') : t('sensory.summary.from')}/>
+      {!empty && (
+        <ReadAloud text={spoken} what={t('sensory.readWhat', { name: venue.name })} style={{ marginBottom: SPACE.sm }}/>
+      )}
+      {msg && <Banner tone={msg.tone} title={msg.title} style={{ marginBottom: SPACE.sm }}>{msg.body}</Banner>}
 
       {hours.length > 0 && (
         <ul style={{ listStyle: 'none', margin: `0 0 ${SPACE.sm}px`, padding: 0 }}>
           {hours.map(h => (
             <li key={h.slot} style={{ display: 'flex', gap: SPACE.xs, alignItems: 'flex-start', ...TYPE.body, fontWeight: 700, color: C2.char, margin: '0 0 4px' }}>
               <span style={{ color: C2.green, paddingTop: 2 }}><SensoryIcon name="time"/></span>
-              <span>{quietHourText(h)} <span style={{ fontWeight: 400, color: C2.slate }}>— {plural(h.n, 'report')}</span></span>
+              <span>{quietHourText(h, t)} <span style={{ fontWeight: 400, color: C2.slate }}>— {t('common.reports', { count: h.n })}</span></span>
             </li>
           ))}
         </ul>
@@ -100,12 +112,14 @@ export function SensorySummary({ app, venue }) {
 
       {day.length > 0 && (
         <>
-          <h3 style={{ ...TYPE.headline, fontSize: 15.5, color: C2.char, margin: `${SPACE.sm}px 0 ${SPACE.xxs}px` }}>Through the day</h3>
+          <h3 style={{ ...TYPE.headline, fontSize: 15.5, color: C2.char, margin: `${SPACE.sm}px 0 ${SPACE.xxs}px` }}>{t('sensory.throughDay')}</h3>
           <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'minmax(0, max-content) minmax(0, 1fr)', columnGap: SPACE.md, rowGap: 2 }}>
             {day.map(d => (
               <React.Fragment key={d.slot}>
-                <dt style={{ ...TYPE.footnote, color: C2.slate, fontWeight: 600 }}>{slot(d.slot).label}</dt>
-                <dd style={{ ...TYPE.footnote, color: C2.char, margin: 0 }}>{READING[d.reading]} · {plural(d.total, 'report')}</dd>
+                <dt style={{ ...TYPE.footnote, color: C2.slate, fontWeight: 600 }}>{slotLabel(t, d.slot)}</dt>
+                <dd style={{ ...TYPE.footnote, color: C2.char, margin: 0 }}>
+                  {t('sensory.readingLine', { reading: t(`sensory.reading.${d.reading}`), reports: t('common.reports', { count: d.total }) })}
+                </dd>
               </React.Fragment>
             ))}
           </dl>

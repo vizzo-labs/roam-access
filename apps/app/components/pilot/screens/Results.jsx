@@ -1,18 +1,19 @@
 'use client';
 
 import React from 'react';
-import { RA2_NEEDS } from '@/lib/pilot-data';
 import { V2Shell } from '../ui/Shell';
 import { C2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { ra2Search, ra2ParseQuery } from '@/lib/pilot/match';
+import { ra2Search, ra2ParseQuery, ra2QueryLabel } from '@/lib/pilot/match';
 import { useTrackSearch } from '../track';
 import { BadgeFilter, useBadgeFilter } from '../layers/BadgeFilter';
-import { QuietFilter, useQuietFilter } from '../sensory/QuietFilter';
 import { Button, EmptyState, GUTTER, List, SPACE, SearchField, SegmentedControl, TYPE, scrollIntoViewSafe } from '../ds';
 import { ExploreFilters } from '../explore/ExploreFilters';
 import { PlaceRow } from '../explore/PlaceRow';
-import { applyFilters, countsLine, verdictCounts } from '../explore/filters';
+import { CLEAR_FILTERS, applyFilters, countsLine, filtersOn, verdictCounts } from '../explore/filters';
+import { useT } from '../i18n';
+import { needText } from '@/lib/i18n/data';
+import { EnglishSearchNote } from '../explore/EnglishSearchNote';
 
 const PAGE = 25;
 
@@ -20,21 +21,21 @@ const PAGE = 25;
 // RESULTS — persistent search, filter chips, one verdict per row
 // ─────────────────────────────────────────────────────────────
 function V2Results({ app }) {
+  const t = useT();
   const query = app.query || { cats: [], tags: [], label: 'All places', raw: '' };
   const h = useV2Heading('results-' + query.label);
   const needs = app.user?.needs || [];
   const badgeFilter = useBadgeFilter(app);
-  const quietFilter = useQuietFilter();
-  const matched = badgeFilter.apply(ra2Search(app.venues, query, needs));
-  const searched = quietFilter.apply(matched);
+  const searched = badgeFilter.apply(ra2Search(app.venues, query, needs));
   const all = applyFilters(searched, app.filters);
+  const queryLabel = ra2QueryLabel(query, t);
   const counts = verdictCounts(searched);
   const [limit, setLimit] = React.useState(PAGE);
   const results = all.slice(0, limit);
   useTrackSearch(all);
-  const needShorts = RA2_NEEDS.filter(n => needs.includes(n.id)).map(n => n.short);
+  const needShorts = needs.map(id => needText(t, id, 'short'));
 
-  const initialText = query.raw || (query.cats.length || query.tags.length ? query.label : '');
+  const initialText = query.raw || (query.cats.length || query.tags.length ? queryLabel : '');
   const [text, setText] = React.useState(initialText);
   // A new search resets the box and the page (adjusting state while rendering,
   // not in an effect, so there's no flash of the old text).
@@ -48,20 +49,21 @@ function V2Results({ app }) {
     if (row) scrollIntoViewSafe(row, { block: 'center' });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filtered = app.filters.works || app.filters.hideBarriers;
-  const clearFilters = () => app.setFilters({ works: false, hideBarriers: false });
+  const filtered = filtersOn(app.filters);
+  const clearFilters = () => app.setFilters(CLEAR_FILTERS);
 
   return (
     <V2Shell scroll={false} tabs app={app} active="home">
       {/* fixed top: search + filters never scroll away */}
       <div style={{ paddingTop: 'var(--ra-shell-top)', background: C2.paper, borderBottom: `1px solid ${C2.hair}`, flexShrink: 0 }}>
         <div style={{ padding: `10px ${GUTTER}px ${SPACE.sm}px` }}>
-          <SearchField id="results-search" label="Search places" value={text} onChange={setText}
+          <SearchField id="results-search" label={t('ds.search.label')} value={text} onChange={setText}
             dirty={text.trim() !== initialText.trim() && !!text.trim()}
-            placeholder="Try “quiet cafe with step-free entry”"
+            placeholder={t('explore.search.tryPlaceholder')}
             onSubmit={t => app.runSearch(ra2ParseQuery(t))}
             onVoice={() => app.goto('voice')}
-            back={{ label: 'Back to home', onClick: () => app.goto('home') }}/>
+            back={{ label: t('explore.backHome'), onClick: () => app.goto('home') }}/>
+          <EnglishSearchNote/>
         </div>
         <div style={{ padding: `0 ${GUTTER}px ${SPACE.sm}px` }}>
           <ExploreFilters app={app} counts={counts}/>
@@ -72,35 +74,34 @@ function V2Results({ app }) {
         <div style={{ padding: `${SPACE.lg}px ${GUTTER}px ${SPACE.sm}px` }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
             <h1 ref={h} tabIndex={-1} style={{ ...TYPE.title2, margin: 0, color: C2.char }}>
-              {all.length} {all.length === 1 ? 'place' : 'places'}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
-              <span className="ra-sr-only"> {query.label}</span>
+              {t('common.places', { count: all.length })}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
+              <span className="ra-sr-only"> {queryLabel}</span>
             </h1>
             {!app.wide && (
-              <SegmentedControl label="Show results as" value="list" onChange={v => v === 'map' && app.goto('map', null, { replace: true })}
-                options={[{ value: 'list', label: 'List', icon: 'list' }, { value: 'map', label: 'Map', icon: 'map' }]}/>
+              <SegmentedControl label={t('explore.showAs')} value="list" onChange={v => v === 'map' && app.goto('map', null, { replace: true })}
+                options={[{ value: 'list', label: t('explore.list'), icon: 'list' }, { value: 'map', label: t('explore.map'), icon: 'map' }]}/>
             )}
           </div>
-          {searched.length > 0 && <p style={{ ...TYPE.callout, color: C2.char, margin: '6px 0 0' }}>{countsLine(counts)}</p>}
+          {searched.length > 0 && <p style={{ ...TYPE.callout, color: C2.char, margin: '6px 0 0' }}>{countsLine(counts, t)}</p>}
           <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>
-            {needShorts.length ? `Matched to your needs: ${needShorts.join(' + ')}.` : 'Showing general access — set your needs in Me to personalise.'}
+            {needShorts.length ? t('explore.matchedNeeds', { needs: needShorts.join(' + ') }) : t('explore.generalAccess')}
           </p>
           <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-            <span>Walking times from {app.origin.name}.</span>
-            {!app.origin.mine && <Button variant="plain" size="sm" onClick={app.locateMe} style={{ padding: '0 4px' }}>Use my location</Button>}
+            <span>{t('explore.walkingFrom', { origin: app.origin.name })}</span>
+            {!app.origin.mine && <Button variant="plain" size="sm" onClick={app.locateMe} style={{ padding: '0 4px' }}>{t('explore.useLocation')}</Button>}
           </p>
           {all.length > 1 && (
-            <SegmentedControl label="Sort places" value={app.filters.sort} onChange={v => app.setFilters({ sort: v })}
+            <SegmentedControl label={t('explore.sort.label')} value={app.filters.sort} onChange={v => app.setFilters({ sort: v })}
               style={{ marginTop: SPACE.sm }}
-              options={[{ value: 'match', label: 'Best for me' }, { value: 'near', label: 'Nearest' }]}/>
+              options={[{ value: 'match', label: t('explore.sort.match') }, { value: 'near', label: t('explore.sort.near') }]}/>
           )}
           <div style={{ marginTop: SPACE.md }}>
             <BadgeFilter filter={badgeFilter}/>
-            <QuietFilter filter={quietFilter} list={matched}/>
           </div>
         </div>
 
         {results.length > 0 && (
-          <List label={`Places: ${query.label}`}>
+          <List label={t('explore.placesList', { query: queryLabel })}>
             {results.map(r => (
               <PlaceRow key={r.id} app={app} place={r} selected={r.id === app.lastVenueId}/>
             ))}
@@ -110,20 +111,20 @@ function V2Results({ app }) {
         {all.length > results.length && (
           <div style={{ padding: `${SPACE.md}px ${GUTTER}px` }}>
             <Button full variant="ghost" onClick={() => setLimit(l => l + PAGE)}>
-              Show {Math.min(PAGE, all.length - results.length)} more of {all.length - results.length}
+              {t('explore.showMore', { n: Math.min(PAGE, all.length - results.length), rest: all.length - results.length })}
             </Button>
           </div>
         )}
 
         {!results.length && (filtered && searched.length ? (
-          <EmptyState icon="filter" title="No places match your filters"
-            body={`${searched.length} ${searched.length === 1 ? 'place matches' : 'places match'} “${query.label}” without them.`}
-            action={{ label: `Show all ${searched.length}`, onClick: clearFilters }}/>
+          <EmptyState icon="filter" title={t('explore.empty.filtersTitle')}
+            body={t('explore.empty.filtersBody', { count: searched.length, query: queryLabel })}
+            action={{ label: t('explore.empty.showAll', { count: searched.length }), onClick: clearFilters }}/>
         ) : (
-          <EmptyState icon="search" title={`Nothing matched ${query.raw ? `“${query.raw}”` : query.label}`}
-            body="Try fewer words, like “quiet cafe”, or browse everything nearby."
-            action={{ label: 'Show all places', onClick: () => app.runSearch({ cats: [], tags: [], label: 'All places', raw: '' }) }}
-            secondary={{ label: 'Back to home', onClick: () => app.goto('home') }}/>
+          <EmptyState icon="search" title={t('explore.empty.noneTitle', { query: queryLabel })}
+            body={t('explore.empty.noneBody')}
+            action={{ label: t('explore.showAllPlaces'), onClick: () => app.runSearch({ cats: [], tags: [], label: 'All places', raw: '' }) }}
+            secondary={{ label: t('explore.backHome'), onClick: () => app.goto('home') }}/>
         ))}
         <div style={{ height: SPACE.xl }}/>
       </div>

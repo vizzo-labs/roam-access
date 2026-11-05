@@ -1,0 +1,50 @@
+// zh-Hans — 'photos' namespace. Machine-translated unless the key is listed in
+// ./_meta.ts → reviewed. Keep the same keys and {placeholders} as en/photos.ts.
+import type { Translation } from '../../types';
+import type en from '../en/photos';
+
+const photos: Translation<typeof en> = {
+  'photos.kind.entrance': "入口",
+  'photos.kind.toilet': "卫生间",
+  'photos.kind.step': "台阶或坡道",
+  'photos.kind.seating': "座位",
+  'photos.kind.other': "其他",
+  'photos.gallery.title': "评价者拍的照片",
+  'photos.gallery.description': { one: "{count} 张试点参与者拍的照片，每张都有描述。", other: "{count} 张试点参与者拍的照片，每张都有描述。" },
+  'photos.add.title': "添加照片",
+  'photos.add.description': "入口、台阶、卫生间或座位的照片最有帮助。最多 {max} 张。我们会删除照片中的位置信息。请避免拍到别人的脸。",
+  'photos.add.first': "添加照片",
+  'photos.add.another': "再添加一张",
+  'photos.add.full': "已添加 {max} 张照片 — 每条评价最多这么多",
+  'photos.card': "照片 {n}",
+  'photos.preparing': "正在处理你的照片…",
+  'photos.uploading': "正在上传…",
+  'photos.retry': "重试",
+  'photos.retryAria': "重新上传照片 {n}",
+  'photos.remove': "删除",
+  'photos.removeAria': "删除照片 {n}",
+  'photos.uploadFailed': "无法上传这张照片。",
+  'photos.unreadable': "无法读取这个文件中的照片。",
+  'photos.whatShows': "照片里是什么？",
+  'photos.describe': "为看不见的人描述这张照片",
+  'photos.required': "（必填）",
+  'photos.describeSuggested': "根据你的照片建议的描述 — 请检查是否正确，然后确认或修改。",
+  'photos.describeLoading': "正在查看你的照片，准备建议描述…",
+  'photos.describeExample': "例如：“{name}正门前有两级台阶，没有扶手”",
+  'photos.confirm': "这个描述是对的",
+  'photos.suggestUnavailable': "现在无法提供建议 — 请自己写描述。",
+  'photos.suggestLimit': "今天的照片建议次数已用完 — 请自己写描述。",
+  'photos.suggests': "你的照片显示：{answer}",
+  'photos.useAnswer': "使用这个答案",
+  'photos.useAnswerAria': "使用照片的建议：“{question}”回答{answer}",
+  'photos.say.preparing': "正在处理照片…",
+  'photos.say.added': "照片已添加。现在请描述它。",
+  'photos.say.uploadFailed': "无法上传这张照片。",
+  'photos.say.unreadable': "无法读取这张照片。",
+  'photos.say.removed': "照片已删除。",
+  'photos.say.ready': "照片建议已准备好：有一条描述需要你检查。你确认之前不会使用任何内容。",
+  'photos.say.readyAnswers': { one: "照片建议已准备好：有一条描述需要检查，还有下面 {count} 个问题的答案。你确认之前不会使用任何内容。", other: "照片建议已准备好：有一条描述需要检查，还有下面 {count} 个问题的答案。你确认之前不会使用任何内容。" },
+  'photos.by': "来自一条评价 · {who} · {when}",
+};
+
+export default photos;

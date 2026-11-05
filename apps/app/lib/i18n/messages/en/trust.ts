@@ -1,0 +1,103 @@
+// English (Australia) — sources, confidence and freshness: who says so and how
+// recently; the entrance follow-up; "Report a problem". Keys 'trust.*'.
+const trust = {
+  'trust.source.community': 'Community',
+  'trust.source.osm': 'OpenStreetMap (unconfirmed)',
+  'trust.source.venue': 'Venue says (not checked by the community)',
+
+  'trust.fact.reports': { one: '{count} report from the community', other: '{count} reports from the community' },
+  'trust.fact.quickOnly': { one: '{count} quick answer from the community', other: '{count} quick answers from the community' },
+  'trust.fact.someQuick': { one: '{count} report from the community, {quick} by quick answer', other: '{count} reports from the community, {quick} by quick answer' },
+  'trust.fact.withLatest': '{base} · latest {when}',
+
+  'trust.who.people': { one: '{count} person', other: '{count} people' },
+  'trust.who.need': { one: '{count} {who}', other: '{count} {whoPlural}' },
+  'trust.who.withYourNeeds': { one: '{count} person with your access needs', other: '{count} people with your access needs' },
+  'trust.who.someWithYourNeeds': { one: '{count} person, {same} with your access needs', other: '{count} people, {same} with your access needs' },
+  'trust.who.noneWithYourNeeds': { one: '{count} person (none with your access needs yet)', other: '{count} people (none with your access needs yet)' },
+  'trust.who.and': '{a} and {b}',
+  'trust.quickAnswers': { one: '{count} quick answer', other: '{count} quick answers' },
+
+  'trust.verdict.based': 'Based on {who} · latest {when}',
+  'trust.verdict.plusOsm': ' · plus OpenStreetMap (unconfirmed)',
+  'trust.verdict.osmOnly': 'Only OpenStreetMap (unconfirmed) — nobody in the pilot has checked yet',
+  'trust.verdict.otherReviews': { one: '{count} review here, none about your needs yet', other: '{count} reviews here, none about your needs yet' },
+  'trust.verdict.noReviews': 'No reviews yet',
+
+  'trust.short.peopleWithNeeds': { one: '{count} person with your needs', other: '{count} people with your needs' },
+  'trust.short.peopleSomeNeeds': { one: '{count} person, {same} with your needs', other: '{count} people, {same} with your needs' },
+  'trust.short.plus': '{a} + {b}',
+  'trust.short.line': '{who} · {when}',
+  'trust.short.plusOsm': ' · + OpenStreetMap',
+  'trust.short.noReviews': 'No reviews for your needs yet',
+
+  // fact lists on the venue page
+  'trust.list.barrier': 'Barriers',
+  'trust.list.works': 'What works',
+  'trust.list.check': 'Check before you go',
+  // hidden prefixes for screen readers ("Barrier: Steps at the entry")
+  'trust.mark.barrier': 'Barrier:',
+  'trust.mark.check': 'Check:',
+  'trust.mark.works': 'Works:',
+  'trust.reasons.unknown': 'No info for your needs yet — help us verify it',
+
+  // "Step-free way in through another entrance?"
+  'trust.entrance.question': 'Step-free way in through another entrance?',
+  'trust.entrance.side.label': 'Yes, at the side',
+  'trust.entrance.side.where': 'at the side',
+  'trust.entrance.side.short': 'Step-free side entrance',
+  'trust.entrance.back.label': 'Yes, at the back',
+  'trust.entrance.back.where': 'at the back',
+  'trust.entrance.back.short': 'Step-free back entrance',
+  'trust.entrance.lift.label': 'Yes, via a lift',
+  'trust.entrance.lift.where': 'via a lift',
+  'trust.entrance.lift.short': 'Step-free via a lift',
+  'trust.entrance.other.label': 'Yes, somewhere else',
+  'trust.entrance.other.where': 'through another door',
+  'trust.entrance.other.short': 'Another step-free entrance',
+  'trust.entrance.none.label': 'No other way in',
+  'trust.entrance.none.short': 'No step-free way in',
+  'trust.entrance.where': 'Where?',
+  'trust.entrance.placeholder': 'e.g. Ramp on the laneway side',
+
+  // last confirmed + "Still accurate?"
+  'trust.fresh.last': 'Last confirmed {date}',
+  'trust.fresh.never': 'Not confirmed by anyone yet',
+  'trust.fresh.by': 'Confirmed {ago} by someone in the pilot.',
+  'trust.fresh.stale': 'That’s a while ago — things may have changed.',
+  'trust.fresh.osmOnly': 'Place details come from OpenStreetMap. Been here? Your review would be the first.',
+  'trust.fresh.thanks': 'Thanks — you confirmed it’s still accurate today.',
+  'trust.fresh.question': 'Been lately? Is this still accurate?',
+  'trust.fresh.yes': 'Yes, still accurate',
+  'trust.fresh.changed': 'Something changed',
+  'trust.fresh.reportHint': 'Closed, moved, in the wrong spot or listed twice?',
+  'trust.fresh.report': 'Report a problem',
+  'trust.fresh.saveFailed': 'Couldn’t save that — check your connection and try again.',
+  'trust.fresh.reportSent': 'Thanks — the pilot team will check your report.',
+
+  // "Report a problem"
+  'trust.report.title': 'Report a problem',
+  'trust.report.close': 'Close report a problem',
+  'trust.report.about': 'About {name}. The pilot team checks every report.',
+  'trust.report.whatsWrong': 'What’s wrong?',
+  'trust.report.closed.label': 'It has closed',
+  'trust.report.closed.hint': 'Closed for good, not just today',
+  'trust.report.moved.label': 'It has moved',
+  'trust.report.moved.hint': 'Tell us the new address if you know it',
+  'trust.report.wrong_location.label': 'Wrong spot on the map',
+  'trust.report.wrong_location.hint': 'The pin or address is in the wrong place',
+  'trust.report.duplicate.label': 'It’s listed twice',
+  'trust.report.duplicate.hint': 'Tell us the other listing’s name',
+  'trust.report.info_wrong.label': 'Something here is wrong',
+  'trust.report.info_wrong.hint': 'Access info, name, phone or website',
+  'trust.report.chooseFirst': 'Choose what’s wrong first.',
+  'trust.report.failed': 'Couldn’t send your report — check your connection and try again.',
+  'trust.report.send': 'Send report',
+  'trust.report.accessChanged': 'Access changed since the last review? Sharing your experience updates the verdict straight away.',
+  'trust.report.reviewInstead': 'Share your experience instead',
+  'trust.report.tellMore': 'Tell us more',
+  'trust.report.notePlaceholder': 'e.g. Closed since October; now a bakery',
+  'trust.report.noteHint': 'Please don’t include anyone’s name or health details.',
+};
+
+export default trust;

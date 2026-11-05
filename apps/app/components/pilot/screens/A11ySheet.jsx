@@ -5,18 +5,20 @@ import { V2Mic } from '../ui/Mic';
 import { V2Switch } from '../ui/Switch';
 import { C2, F2 } from '../ui/palette';
 import { useRA2Dialog } from '../ui/useDialog';
+import { LanguagePicker, ReadAloudSettings, useT } from '../i18n';
 
 // ─────────────────────────────────────────────────────────────
 // ACCESSIBILITY SHEET — text size, contrast, motion (all real)
 // ─────────────────────────────────────────────────────────────
 function V2A11ySheet({ open, onClose, prefs, onChange }) {
   const ref = useRA2Dialog(open, onClose);
+  const t = useT();
   const scaleRefs = React.useRef([]);
   const SCALES = [
-    { v: 1, label: 'Default text size' },
-    { v: 1.125, label: 'Large text size, 112%' },
-    { v: 1.25, label: 'Larger text size, 125%' },
-    { v: 1.5, label: 'Largest text size, 150%' },
+    { v: 1, label: t('me.a11y.scale.default') },
+    { v: 1.125, label: t('me.a11y.scale.large') },
+    { v: 1.25, label: t('me.a11y.scale.larger') },
+    { v: 1.5, label: t('me.a11y.scale.largest') },
   ];
   if (!open) return null;
 
@@ -47,8 +49,8 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
           maxHeight: '82%', overflowY: 'auto', boxSizing: 'border-box',
         }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-          <h2 id="a11y-h" style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: F2 }}>Accessibility</h2>
-          <button onClick={onClose} aria-label="Close accessibility settings" style={{
+          <h2 id="a11y-h" style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: F2 }}>{t('me.a11y.title')}</h2>
+          <button onClick={onClose} aria-label={t('me.a11y.close')} style={{
             background: 'transparent', border: 0, cursor: 'pointer', padding: 14, margin: -14, lineHeight: 0,
           }}>
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" focusable="false">
@@ -57,13 +59,13 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
           </button>
         </div>
         <p style={{ fontSize: 13.5, color: C2.slate, margin: '4px 0 6px', fontFamily: F2 }}>
-          Adjust how the app works for you. Saved on this device.
+          {t('me.a11y.lead')}
         </p>
 
         <div style={row}>
           <div>
-            <div id="a11y-scale-label" style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>Text size</div>
-            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>Scales the whole app.</div>
+            <div id="a11y-scale-label" style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.textSize')}</div>
+            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.textSize.hint')}</div>
           </div>
           <div role="radiogroup" aria-labelledby="a11y-scale-label" style={{
             display: 'inline-flex', border: `1px solid ${C2.line}`, borderRadius: 999, padding: 2, gap: 2, flexShrink: 0,
@@ -89,36 +91,46 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
 
         <div style={row}>
           <div>
-            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>Higher contrast</div>
-            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>Darkens borders and secondary text.</div>
+            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.contrast')}</div>
+            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.contrast.hint')}</div>
           </div>
-          <V2Switch checked={prefs.contrast} onChange={() => onChange({ contrast: !prefs.contrast })} label="Higher contrast"/>
+          <V2Switch checked={prefs.contrast} onChange={() => onChange({ contrast: !prefs.contrast })} label={t('me.a11y.contrast')}/>
         </div>
 
         <div style={row}>
           <div>
-            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>Reduce motion</div>
-            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>Disables animation and movement.</div>
+            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.motion')}</div>
+            <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.motion.hint')}</div>
           </div>
-          <V2Switch checked={prefs.motion} onChange={() => onChange({ motion: !prefs.motion })} label="Reduce motion"/>
+          <V2Switch checked={prefs.motion} onChange={() => onChange({ motion: !prefs.motion })} label={t('me.a11y.motion')}/>
+        </div>
+
+        {/* read aloud (#21): on/off and speed — saved on this device */}
+        <div style={{ ...row, display: 'block' }}>
+          <ReadAloudSettings/>
         </div>
 
         <div style={row}>
           <div>
-            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>Voice</div>
+            <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.voice')}</div>
             <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2, maxWidth: 220 }}>
-              Search and reviews work by voice wherever you see the mic.
+              {t('me.a11y.voice.hint')}
             </div>
           </div>
           <V2Mic size={24} color={C2.teal}/>
         </div>
 
+        {/* language (#21) — Reset below leaves it as it is */}
+        <div style={{ ...row, display: 'block' }}>
+          <LanguagePicker idBase="a11y-lang"/>
+        </div>
+
         <div style={{ ...row, alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>Saved on this device</span>
+          <span style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.saved')}</span>
           <button onClick={() => onChange({ scale: 1, contrast: false, motion: false })} style={{
             fontSize: 14, color: C2.teal, fontWeight: 700, background: 'transparent', border: 0,
             padding: '10px 6px', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3, fontFamily: F2,
-          }}>Reset</button>
+          }} aria-label={t('me.a11y.reset.label')}>{t('me.a11y.reset')}</button>
         </div>
       </div>
     </div>

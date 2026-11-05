@@ -1,6 +1,6 @@
 // Match engine and query parsing — pure functions, no React.
 
-import { RA2_NEEDS } from '@/lib/pilot-data';
+import { RA2_NEEDS, RA2_TILES } from '@/lib/pilot-data';
 
 // ── Match engine ──────────────────────────────────────────────────────────
 function ra2NeedTags(needIds) {
@@ -48,6 +48,7 @@ const RA2_TAG_WORDS = {
   seats:    /\b(seats?|seating|rest spots?|sit down|benches|fatigue)\b/,
   simple:   /\b(easy to (understand|navigate)|simple|clear signage)\b/,
 };
+// English names (logs, the English `label` on a query). Screens: ra2QueryLabel.
 const RA2_CAT_LABEL = {
   food: 'cafes & food', parks: 'parks & beaches', arts: 'arts & culture',
   music: 'shows & venues', stay: 'places to stay',
@@ -78,6 +79,26 @@ function ra2ParseQuery(text) {
   return { cats, tags, label, raw: text };
 }
 
+// What a search is called on screen, in the app's language (#21). The parser
+// understands English words; this only names the result. Categories that
+// exactly match browse tiles use the tile names ("Food & drink").
+function ra2QueryLabel(query, t) {
+  const q = query || { cats: [], tags: [], raw: '' };
+  const cats = q.cats || [], tags = q.tags || [];
+  if (!cats.length && !tags.length) {
+    if (!q.raw) return t('explore.query.all');
+    return t('explore.query.quoted', { text: q.raw.length > 42 ? q.raw.slice(0, 42) + '…' : q.raw });
+  }
+  const tiles = RA2_TILES.filter(x => x.cats.every(c => cats.includes(c)));
+  const covered = tiles.length && cats.every(c => tiles.some(x => x.cats.includes(c)));
+  const names = covered ? tiles.map(x => t(`data.tile.${x.id}`)) : cats.map(c => t(`explore.cat.${c}`));
+  const what = names.length ? names.join(t('explore.query.joinCats')) : t('explore.query.places');
+  const base = tags.includes('quiet') ? t('explore.query.quiet', { what }) : what;
+  const extras = tags.filter(x => x !== 'quiet' && x !== 'calm' && RA2_TAG_LABEL[x]).map(x => t(`explore.tag.${x}`));
+  const label = extras.length ? t('explore.query.withExtras', { what: base, extras: extras.join(t('explore.query.joinExtras')) }) : base;
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function ra2Search(venues, query, needIds) {
   const { cats, tags } = query || { cats: [], tags: [] };
   const rank = { works: 3, check: 2, unknown: 1, barrier: 0 };
@@ -92,4 +113,4 @@ function ra2Search(venues, query, needIds) {
     .sort((a, b) => b.score - a.score);
 }
 
-export { ra2NeedTags, ra2Verdict, RA2_CAT_WORDS, RA2_TAG_WORDS, RA2_CAT_LABEL, RA2_TAG_LABEL, RA2_NOISE, ra2ParseQuery, ra2Search };
+export { ra2NeedTags, ra2Verdict, RA2_CAT_WORDS, RA2_TAG_WORDS, RA2_CAT_LABEL, RA2_TAG_LABEL, RA2_NOISE, ra2ParseQuery, ra2QueryLabel, ra2Search };

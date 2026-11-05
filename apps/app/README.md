@@ -137,6 +137,15 @@ times". Columns `reviews.sensory_noise|sensory_light|sensory_crowd|quiet_times`,
 `sensory_reports`. Sensory facts describe the place and **never change a verdict**. Tests:
 `npx tsx lib/sensory/summary.test.ts`.
 
+**Languages and read aloud** (#21, `lib/i18n/`, `components/pilot/i18n/`): English (Australia),
+简体中文, 日本語, 한국어, Español — chosen in Me or Accessibility settings (saved on this device;
+the browser's language on a first visit). `<html lang>` follows it; people's own words keep
+their own `lang`. Non-English strings are machine-translated until reviewed
+(`messages/<locale>/_meta.ts`); `npm run i18n:check` lists gaps. "Read aloud" (Web Speech API)
+reads place summaries and sensory details with a voice for the language. Search still
+understands English words only. Admin, business, council and printable pages are English.
+See [`lib/i18n/README.md`](lib/i18n/README.md).
+
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
 you". OpenStreetMap accessibility tags show up as "Check first — not yet confirmed".
 Quick answers ("Help fill the gaps") are a one-question community review: they count toward

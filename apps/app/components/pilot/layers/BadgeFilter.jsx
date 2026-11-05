@@ -6,6 +6,8 @@ import React from 'react';
 import { BADGES } from '@/lib/layers/defs';
 import { C2 } from '../ui/palette';
 import { ChipGroup, FilterChip, SPACE, TYPE } from '../ds';
+import { useT } from '../i18n';
+import { badgeText } from './layerUtils';
 
 export function useBadgeFilter(app) {
   const [on, setOn] = React.useState([]);
@@ -16,15 +18,16 @@ export function useBadgeFilter(app) {
 }
 
 export function BadgeFilter({ filter }) {
+  const t = useT();
   if (!filter.present.length) return null;
   return (
     <div style={{ margin: `0 0 ${SPACE.md}px` }}>
       <p style={{ ...TYPE.footnote, fontWeight: 700, color: C2.char, margin: '0 0 6px' }}>
-        Partner programs <span style={{ fontWeight: 400, color: C2.slate }}>— the partner’s claim; doesn’t change verdicts</span>
+        {t('layers.badges.filterTitle')} <span style={{ fontWeight: 400, color: C2.slate }}>{t('layers.badges.filterNote')}</span>
       </p>
-      <ChipGroup label="Filter by partner program" wrap>
+      <ChipGroup label={t('layers.badges.filterLabel')} wrap>
         {filter.present.map(b => (
-          <FilterChip key={b.id} selected={filter.on.includes(b.id)} onChange={sel => filter.set(b.id, sel)}>{b.short}</FilterChip>
+          <FilterChip key={b.id} selected={filter.on.includes(b.id)} onChange={sel => filter.set(b.id, sel)}>{badgeText(t, b.id, 'short')}</FilterChip>
         ))}
       </ChipGroup>
     </div>

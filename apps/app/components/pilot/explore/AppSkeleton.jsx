@@ -22,7 +22,7 @@ function AppSkeleton() {
         </div>
       </div>
       <div style={{ marginTop: SPACE.sm }}>
-        <SkeletonList label="Loading places…" count={4}/>
+        <SkeletonList count={4}/>
       </div>
       </div>
     </div>

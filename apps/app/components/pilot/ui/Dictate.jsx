@@ -3,9 +3,12 @@
 import React from 'react';
 import { V2Mic } from './Mic';
 import { C2, F2 } from './palette';
+import { useLocale } from '../i18n/I18nProvider';
 
 // Dictation into a text field. Hidden where the browser has no speech engine.
+// Listens in the app's language: people describe a place in their own words.
 function V2Dictate({ onText }) {
+  const { t, def } = useLocale();
   const [state, setState] = React.useState('idle'); // idle | listening | unsupported
   const recRef = React.useRef(null);
   const onTextRef = React.useRef(onText);
@@ -23,12 +26,12 @@ function V2Dictate({ onText }) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
     recRef.current = rec;
-    rec.lang = 'en-AU';
+    rec.lang = def.speech;
     rec.interimResults = false;
     rec.continuous = false;
     rec.onresult = (e) => {
-      const t = Array.from(e.results).map(r => r[0].transcript).join(' ').trim();
-      if (t) onTextRef.current(t);
+      const text = Array.from(e.results).map(r => r[0].transcript).join(' ').trim();
+      if (text) onTextRef.current(text);
     };
     rec.onend = () => setState('idle');
     rec.onerror = () => setState('idle');
@@ -44,7 +47,7 @@ function V2Dictate({ onText }) {
       fontFamily: F2, fontSize: 16, fontWeight: 700, cursor: 'pointer',
     }}>
       <V2Mic size={20} color={on ? C2.paper : C2.teal}/>
-      {on ? 'Listening… tap to stop' : 'Prefer to talk? Dictate instead'}
+      {on ? t('app.dictate.listening') : t('app.dictate.start')}
     </button>
   );
 }

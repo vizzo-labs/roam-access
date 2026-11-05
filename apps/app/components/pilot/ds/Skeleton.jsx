@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2 } from '../ui/palette';
 import { GUTTER, RADIUS, SPACE } from './tokens';
 
@@ -48,10 +49,11 @@ function SkeletonCard({ media = false, lines = 2 }) {
 }
 
 // Loading region: announces `label` once, shows `count` placeholder rows.
-function SkeletonList({ label = 'Loading places…', count = 5, variant = 'row', padX }) {
+function SkeletonList({ label, count = 5, variant = 'row', padX }) {
+  const t = useT();
   return (
     <div role="status" aria-live="polite">
-      <span className="ra-sr-only">{label}</span>
+      <span className="ra-sr-only">{label || t('ds.loadingPlaces')}</span>
       {variant === 'card'
         ? <div style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sm }}>{Array.from({ length: count }, (_, i) => <SkeletonCard key={i}/>)}</div>
         : Array.from({ length: count }, (_, i) => <SkeletonRow key={i} padX={padX}/>)}

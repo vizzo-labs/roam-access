@@ -4,6 +4,7 @@
 // name — the venue sees "a guest".
 
 import { RA2_NEEDS, type NeedId } from './pilot-data';
+import type { T } from './i18n/core';
 
 export const CARD_LINES: Record<NeedId, string> = {
   mobility:  'I use a wheelchair or mobility aid. I need a step-free way in, room to move, and an accessible toilet if you have one.',
@@ -23,18 +24,39 @@ export function formatVisitDate(iso: string | null | undefined) {
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
-export function cardLines(input: { needs: string[]; note?: string | null; visitOn?: string | null; venueName?: string | null }) {
+/** A visit date ("2026-11-06") in any language; UTC so the day never shifts. */
+export function formatVisitDateIn(iso: string | null | undefined, intl: string) {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(intl, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
+type CardInput = { needs: string[]; note?: string | null; visitOn?: string | null; venueName?: string | null };
+// Without `lang` the card is English (what the venue dashboard shows). With
+// it, the card is written in the tester's language (#21): `t` from useT() and
+// the Intl locale for the date. The English sentences live here (CARD_LINES)
+// and are re-used as the English dictionary entries (messages/en/card.ts).
+type CardLang = { t: T; intl: string };
+
+export function cardLines(input: CardInput, lang?: CardLang) {
   const lines: string[] = [];
-  const when = formatVisitDate(input.visitOn);
-  const where = input.venueName ? ` ${input.venueName}` : '';
-  lines.push(when ? `Hello! I’m planning to visit${where} on ${when}.` : `Hello! I’m planning to visit${where} soon.`);
-  lines.push('Here’s what helps me:');
-  for (const n of RA2_NEEDS) if (input.needs.includes(n.id)) lines.push(`• ${CARD_LINES[n.id]}`);
+  const t = lang?.t;
+  const when = lang ? formatVisitDateIn(input.visitOn, lang.intl) : formatVisitDate(input.visitOn);
+  const name = input.venueName || '';
+  if (t) {
+    lines.push(t(when ? (name ? 'card.text.helloPlaceOn' : 'card.text.helloOn') : (name ? 'card.text.helloPlace' : 'card.text.hello'), { place: name, date: when }));
+    lines.push(t('card.text.helps'));
+  } else {
+    const where = name ? ` ${name}` : '';
+    lines.push(when ? `Hello! I’m planning to visit${where} on ${when}.` : `Hello! I’m planning to visit${where} soon.`);
+    lines.push('Here’s what helps me:');
+  }
+  for (const n of RA2_NEEDS) if (input.needs.includes(n.id)) lines.push(`• ${t ? t(`card.line.${n.id}`) : CARD_LINES[n.id]}`);
   const note = (input.note || '').trim();
   if (note) lines.push(`• ${note}`);
-  lines.push('Thank you!');
+  lines.push(t ? t('card.text.thanks') : 'Thank you!');
   return lines;
 }
 
-export const cardText = (input: Parameters<typeof cardLines>[0]) =>
-  cardLines(input).join('\n') + '\n\n— sent with Roam Access';
+export const cardText = (input: CardInput, lang?: CardLang) =>
+  cardLines(input, lang).join('\n') + '\n\n' + (lang ? lang.t('card.text.footer') : '— sent with Roam Access');

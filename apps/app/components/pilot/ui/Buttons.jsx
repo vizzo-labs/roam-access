@@ -7,6 +7,7 @@
 import React from 'react';
 import { Button } from '../ds/Button';
 import { IconButton } from '../ds/IconButton';
+import { useT } from '../i18n/I18nProvider';
 
 const KIND = { primary: 'primary', rust: 'rust', outline: 'outline', ghost: 'ghost' };
 
@@ -28,8 +29,9 @@ function V2RoundBtn({ children, onClick, ariaLabel, pressed, style = {} }) {
   );
 }
 
-function V2Back({ app, to = 'home', id = null, label = 'Back' }) {
-  return <IconButton icon="back" label={label} onClick={() => app.goto(to, id)}/>;
+function V2Back({ app, to = 'home', id = null, label }) {
+  const t = useT();
+  return <IconButton icon="back" label={label || t('common.back')} onClick={() => app.goto(to, id)}/>;
 }
 
 export { V2BigBtn, V2RoundBtn, V2Back };
