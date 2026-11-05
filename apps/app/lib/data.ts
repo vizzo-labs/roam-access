@@ -3,6 +3,9 @@ import { and, desc, eq, sql } from 'drizzle-orm';
 import { getDb, schema } from './db';
 import { buildReviewVM, buildVenueVM, type VenueVM } from './venues';
 import { FEATURE_IDS, NEED_IDS, type VerdictKind } from './pilot-data';
+import { getConfirmationStats } from './data/trust';
+import type { EntranceAlt } from './db/schema';
+import { ENTRANCE_ALTS, ENTRANCE_NOTE_MAX } from './trust/entrance';
 
 const { venues, reviews, profiles, saved } = schema;
 
@@ -17,21 +20,25 @@ export async function ensureProfile(userId: string) {
 
 export async function getVenueVMs(): Promise<VenueVM[]> {
   const db = getDb();
-  const [vs, rs] = await Promise.all([
+  const [vs, rs, confirm] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
+    getConfirmationStats(),
   ]);
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
-  return vs.map(v => buildVenueVM(v, byVenue.get(v.id) || []));
+  return vs.map(v => buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id)));
 }
 
 export async function getVenueVM(id: string): Promise<VenueVM | null> {
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const rs = await db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false)));
-  return buildVenueVM(v, rs);
+  const [rs, confirm] = await Promise.all([
+    db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
+    getConfirmationStats(id),
+  ]);
+  return buildVenueVM(v, rs, confirm.get(id));
 }
 
 export async function getMyStats(userId: string) {
@@ -98,7 +105,7 @@ export async function getVenueReviews(venueId: string, viewerId: string) {
 
 const VERDICTS: VerdictKind[] = ['works', 'check', 'barrier'];
 
-export async function createReview(userId: string, input: { venueId?: unknown; verdict?: unknown; features?: unknown; note?: unknown }) {
+export async function createReview(userId: string, input: { venueId?: unknown; verdict?: unknown; features?: unknown; note?: unknown; entranceAlt?: unknown; entranceNote?: unknown }) {
   const db = getDb();
   if (typeof input.venueId !== 'string') return { error: 'venueId required' } as const;
   if (!VERDICTS.includes(input.verdict as VerdictKind)) return { error: 'verdict must be works, check or barrier' } as const;
@@ -112,11 +119,14 @@ export async function createReview(userId: string, input: { venueId?: unknown; v
     }
   }
   const note = typeof input.note === 'string' ? input.note.trim().slice(0, 1000) || null : null;
+  const entranceAlt = ENTRANCE_ALTS.some(a => a.id === input.entranceAlt) ? input.entranceAlt as EntranceAlt : null;
+  const entranceNote = entranceAlt && entranceAlt !== 'none' && typeof input.entranceNote === 'string'
+    ? input.entranceNote.trim().slice(0, ENTRANCE_NOTE_MAX) || null : null;
   const profile = await ensureProfile(userId);
 
   await db.insert(reviews).values({
     venueId: v.id, userId, verdict: input.verdict as VerdictKind,
-    needs: profile.needs, features, note,
+    needs: profile.needs, features, note, entranceAlt, entranceNote,
   });
   const [venue, myStats, count] = await Promise.all([
     getVenueVM(v.id),

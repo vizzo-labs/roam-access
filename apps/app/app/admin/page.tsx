@@ -4,6 +4,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { isAdmin } from '@/lib/auth';
 import { getAdminOverview, setReviewHidden } from '@/lib/data';
 import { RA2_FEATURES, RA2_NEEDS } from '@/lib/pilot-data';
+import { IssuesQueue } from './IssuesQueue';
 
 export const metadata = { title: 'Admin · Roam Access pilot' };
 
@@ -64,6 +65,8 @@ async function Admin() {
           </div>
         ))}
       </div>
+
+      <IssuesQueue emails={emails}/>
 
       <h2 style={{ fontSize: 22, margin: '0 0 8px' }}>Testers</h2>
       <p style={{ fontSize: 14, color: C.slate, margin: '0 0 12px' }}>Needs are sensitive information — don’t copy them out of this page.</p>

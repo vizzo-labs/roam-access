@@ -9,6 +9,7 @@ import { V2_VERDICT_META } from '../ui/Verdict';
 import { C2, F2, M2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2NeedTags } from '@/lib/pilot/match';
+import { EntranceQuestion } from '../trust/EntranceQuestion';
 
 // ─────────────────────────────────────────────────────────────
 // REVIEW — one tap required, everything else optional
@@ -19,6 +20,8 @@ function V2ReviewView({ app }) {
   const [choice, setChoice] = React.useState(null);
   const [features, setFeatures] = React.useState({});
   const [note, setNote] = React.useState('');
+  const [entranceAlt, setEntranceAlt] = React.useState(null);
+  const [entranceNote, setEntranceNote] = React.useState('');
   const [sending, setSending] = React.useState(false);
 
   // Questions that touch this tester's own needs come first.
@@ -41,7 +44,10 @@ function V2ReviewView({ app }) {
   async function send() {
     if (!choice || sending) return;
     setSending(true);
-    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note });
+    // The entrance follow-up only counts when the main way in has steps.
+    const entrance = features.stepfree === 'no' && entranceAlt
+      ? { entranceAlt, entranceNote: entranceAlt === 'none' ? '' : entranceNote } : {};
+    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance });
     if (ok) app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
     else setSending(false);
   }
@@ -99,7 +105,8 @@ function V2ReviewView({ app }) {
             Answer only what you noticed. Tap an answer again to clear it.
           </p>
           {questions.map(q => (
-            <div key={q.id} role="group" aria-labelledby={`q-${q.id}`} style={{
+            <React.Fragment key={q.id}>
+            <div role="group" aria-labelledby={`q-${q.id}`} style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0', borderTop: `1px solid ${C2.hair}`,
             }}>
               <span id={`q-${q.id}`} style={{ flex: 1, fontSize: 15.5, lineHeight: 1.35, fontWeight: 600, fontFamily: F2, color: C2.char }}>{q.question}</span>
@@ -115,6 +122,10 @@ function V2ReviewView({ app }) {
                 );
               })}
             </div>
+            {q.id === 'stepfree' && features.stepfree === 'no' && (
+              <EntranceQuestion value={entranceAlt} note={entranceNote} onChange={setEntranceAlt} onNote={setEntranceNote}/>
+            )}
+            </React.Fragment>
           ))}
         </section>
 

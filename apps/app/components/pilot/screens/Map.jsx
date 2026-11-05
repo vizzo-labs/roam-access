@@ -8,6 +8,7 @@ import { V2_VERDICT_META, V2Verdict } from '../ui/Verdict';
 import { C2, F2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Search } from '@/lib/pilot/match';
+import { VerdictReasons } from '../trust/VerdictReasons';
 
 // ─────────────────────────────────────────────────────────────
 // MAP — verdict-coded pins, one card at a time
@@ -33,7 +34,7 @@ function V2MapView({ app }) {
         <PilotMap results={results} selectedId={selId} onSelect={setSelId} origin={app.origin}
           colors={pinColor} icons={pinIcon} labels={Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]))}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
-          locateStyle={{ right: 18, bottom: sel ? 232 : 24 }}/>
+          locateStyle={{ right: 18, bottom: sel ? 268 : 24 }}/>
 
         {/* top: search pill + list toggle */}
         <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 18, right: 18, display: 'flex', gap: 8, zIndex: 3 }}>
@@ -79,8 +80,8 @@ function V2MapView({ app }) {
               </div>
               <V2Verdict kind={sel.verdict.kind}/>
             </div>
-            <div style={{ fontFamily: F2, fontSize: 14.5, color: C2.char, lineHeight: 1.45, marginBottom: 14 }}>
-              {sel.verdict.why}
+            <div style={{ marginBottom: 14 }}>
+              <VerdictReasons venue={sel} verdict={sel.verdict} needs={app.user?.needs || []} max={2} fontSize={14.5}/>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => app.goto('venue', sel.id)} style={{

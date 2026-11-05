@@ -9,6 +9,7 @@ import { V2Verdict } from '../ui/Verdict';
 import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Search } from '@/lib/pilot/match';
+import { VerdictReasons } from '../trust/VerdictReasons';
 
 // ─────────────────────────────────────────────────────────────
 // RESULTS — one verdict per card
@@ -81,7 +82,7 @@ function V2Results({ app }) {
               </span>
               <V2Verdict kind={r.verdict.kind}/>
             </span>
-            <span style={{ display: 'block', fontSize: 15, color: C2.char, lineHeight: 1.5 }}>{r.verdict.why}</span>
+            <VerdictReasons venue={r} verdict={r.verdict} needs={app.user?.needs || []}/>
           </button>
         ))}
 

@@ -60,6 +60,11 @@ function V2Welcome({ app }) {
         <p style={{ fontSize: 12.5, color: C2.slate, textAlign: 'center', margin: '14px 0 0', lineHeight: 1.45 }}>
           Pilot in Manly & surrounds — real places, reviewed by the people taking part.
         </p>
+        <p style={{ textAlign: 'center', margin: '6px 0 0' }}>
+          <a href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: C2.teal, fontFamily: F2, fontSize: 15, fontWeight: 700, textUnderlineOffset: 3 }}>
+            How Roam Access works
+          </a>
+        </p>
       </div>
     </V2Shell>
   );

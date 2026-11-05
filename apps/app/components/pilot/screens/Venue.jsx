@@ -8,6 +8,10 @@ import { V2_VERDICT_META, V2Verdict } from '../ui/Verdict';
 import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Verdict } from '@/lib/pilot/match';
+import { verdictSource } from '@/lib/trust/labels';
+import { FactList } from '../trust/FactList';
+import { Freshness } from '../trust/Freshness';
+import { SourceLine } from '../trust/SourceLine';
 
 // ─────────────────────────────────────────────────────────────
 // VENUE — verdict first, plain language, detail on demand
@@ -26,7 +30,7 @@ function V2VenueView({ app }) {
 
   const nRev = `${v.verified} community ${v.verified === 1 ? 'review' : 'reviews'}`;
   const verdictLead = {
-    works: `${verdict.works.slice(0, 3).map(f => f.s).join(', ')} — from ${nRev}.`,
+    works: `What works for your needs, from ${nRev}.`,
     check: v.verified
       ? `Things to know before you go, from ${nRev}.`
       : 'Not yet confirmed by anyone in the pilot. Check before you go — then tell us how it was.',
@@ -82,55 +86,19 @@ function V2VenueView({ app }) {
           <p style={{ fontSize: 16.5, lineHeight: 1.5, color: C2.char, margin: '12px 0 0', fontFamily: F2 }}>
             {verdictLead}
           </p>
+          <SourceLine src={verdict.kind === 'unknown' ? 'none' : (v.ev?.length ? 'community' : 'osm')}
+            text={verdictSource(v, verdict, app.user?.needs || [])} style={{ marginTop: 10, color: C2.char }}/>
+          <a href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, marginTop: 2, color: C2.teal, fontFamily: F2, fontSize: 15, fontWeight: 700, textUnderlineOffset: 3 }}>
+            How we decide verdicts
+          </a>
         </div>
 
-        {/* barriers — first when they exist */}
-        {verdict.barriers.length > 0 && (
-          <section style={{ borderRadius: 18, border: `1.5px solid ${C2.line}`, overflow: 'hidden', marginBottom: 10 }}>
-            <h2 style={{ padding: '16px 18px 6px', fontSize: 14, fontWeight: 700, color: C2.red, margin: 0, fontFamily: F2, letterSpacing: '0.02em' }}>BARRIERS</h2>
-            {verdict.barriers.map(f => (
-              <div key={f.t} style={{ display: 'flex', gap: 12, padding: '12px 18px', alignItems: 'flex-start', borderTop: `1px solid ${C2.hair}` }}>
-                <span aria-hidden="true" style={{
-                  width: 22, height: 22, borderRadius: 999, background: C2.red, color: C2.redBg, flexShrink: 0,
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, fontFamily: M2,
-                }}>✗</span>
-                <span style={{ fontSize: 16, lineHeight: 1.45, fontFamily: F2 }}>{f.t}</span>
-              </div>
-            ))}
-          </section>
-        )}
+        {/* barriers first when they exist; every fact with its source + recency */}
+        <FactList kind="barrier" facts={verdict.barriers}/>
+        <FactList kind="works" facts={verdict.works}/>
+        <FactList kind="check" facts={verdict.checks} style={{ marginBottom: 16 }}/>
 
-        {/* what works */}
-        {verdict.works.length > 0 && (
-          <section style={{ borderRadius: 18, border: `1.5px solid ${C2.line}`, overflow: 'hidden', marginBottom: 10 }}>
-            <h2 style={{ padding: '16px 18px 6px', fontSize: 14, fontWeight: 700, color: C2.blue, margin: 0, fontFamily: F2, letterSpacing: '0.02em' }}>WHAT WORKS</h2>
-            {verdict.works.map(f => (
-              <div key={f.t} style={{ display: 'flex', gap: 12, padding: '12px 18px', alignItems: 'flex-start', borderTop: `1px solid ${C2.hair}` }}>
-                <span aria-hidden="true" style={{
-                  width: 22, height: 22, borderRadius: 999, background: C2.blue, color: C2.blueBg, flexShrink: 0,
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, fontFamily: M2,
-                }}>✓</span>
-                <span style={{ fontSize: 16, lineHeight: 1.45, fontFamily: F2 }}>{f.t}</span>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {/* check before you go */}
-        {verdict.checks.length > 0 && (
-          <section style={{ borderRadius: 18, border: `1.5px solid ${C2.line}`, overflow: 'hidden', marginBottom: 16 }}>
-            <h2 style={{ padding: '16px 18px 6px', fontSize: 14, fontWeight: 700, color: C2.amber, margin: 0, fontFamily: F2, letterSpacing: '0.02em' }}>CHECK BEFORE YOU GO</h2>
-            {verdict.checks.map(f => (
-              <div key={f.t} style={{ display: 'flex', gap: 12, padding: '12px 18px', alignItems: 'flex-start', borderTop: `1px solid ${C2.hair}` }}>
-                <span aria-hidden="true" style={{
-                  width: 22, height: 22, borderRadius: 999, background: C2.amber, color: C2.amberBg, flexShrink: 0,
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, fontFamily: M2,
-                }}>!</span>
-                <span style={{ fontSize: 16, lineHeight: 1.45, fontFamily: F2 }}>{f.t}</span>
-              </div>
-            ))}
-          </section>
-        )}
+        <Freshness key={v.id} app={app} venue={v}/>
 
         {/* community voice */}
         {firstReview && (
@@ -161,7 +129,8 @@ function V2VenueView({ app }) {
           Place details from{' '}
           <a href={v.osmUrl} target="_blank" rel="noopener noreferrer" style={{ color: C2.teal, fontWeight: 600 }}>
             OpenStreetMap<span className="ra-sr-only"> (opens in a new tab)</span>
-          </a>. Spot something wrong? Say so in your review.
+          </a>.{' '}
+          <a href="/how-it-works" style={{ color: C2.teal, fontWeight: 600 }}>How Roam Access works</a>
         </p>
       </div>
     </V2Shell>
