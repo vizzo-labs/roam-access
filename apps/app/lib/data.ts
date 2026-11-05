@@ -151,7 +151,9 @@ export async function getAdminOverview() {
     db.select({
       userId: profiles.userId, name: profiles.name, needs: profiles.needs,
       onboardedAt: profiles.onboardedAt, createdAt: profiles.createdAt,
-      reviews: sql<number>`(select count(*)::int from ${reviews} where ${reviews.userId} = ${profiles.userId})`,
+      // Qualified by hand: inside a raw subquery Drizzle renders both columns as
+      // bare "user_id", which Postgres resolves to reviews.user_id = reviews.user_id.
+      reviews: sql<number>`(select count(*)::int from ${reviews} r where r.user_id = ${profiles}.user_id)`,
     }).from(profiles).orderBy(desc(profiles.createdAt)),
     db.select({
       id: reviews.id, verdict: reviews.verdict, note: reviews.note, needs: reviews.needs,

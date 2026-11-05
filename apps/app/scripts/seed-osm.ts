@@ -155,7 +155,9 @@ async function main() {
         name: sql`excluded.name`, kind: sql`excluded.kind`, cat: sql`excluded.cat`,
         suburb: sql`excluded.suburb`, address: sql`excluded.address`, lat: sql`excluded.lat`,
         lng: sql`excluded.lng`, phone: sql`excluded.phone`, website: sql`excluded.website`,
-        osmTags: sql`excluded.osm_tags`, active: sql`true`, updatedAt: sql`now()`,
+        osmTags: sql`excluded.osm_tags`, updatedAt: sql`now()`,
+        // `active` is left alone: new rows default to active, and a place an
+        // admin marked inactive (closed, duplicate…) stays hidden on re-import.
       },
     });
   }
