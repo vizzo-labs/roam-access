@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { C2, F2, M2 } from '../ui/palette';
+import { C2, M2 } from '../ui/palette';
+import { TYPE } from '../ds';
 import { SourceLine } from './SourceLine';
 import { verdictSourceShort } from '@/lib/trust/labels';
 
@@ -29,7 +30,7 @@ function VerdictReasons({ venue, verdict, needs = [], max = 3, fontSize = 15 }) 
       {items.length ? items.map(({ f, kind }) => {
         const m = MARK[kind];
         return (
-          <span key={kind + f.t} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 4, fontFamily: F2, fontSize, lineHeight: 1.4, color: C2.char }}>
+          <span key={kind + f.t} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 4, ...TYPE.callout, fontSize, lineHeight: 1.4, color: C2.char }}>
             <span aria-hidden="true" style={{
               width: 18, height: 18, borderRadius: 999, background: m.fg(), color: C2.paper, flexShrink: 0, marginTop: 1,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, fontFamily: M2,
@@ -38,7 +39,7 @@ function VerdictReasons({ venue, verdict, needs = [], max = 3, fontSize = 15 }) 
           </span>
         );
       }) : (
-        <span style={{ display: 'block', fontFamily: F2, fontSize, lineHeight: 1.4, color: C2.char, marginBottom: 4 }}>{verdict.why}</span>
+        <span style={{ ...TYPE.callout, display: 'block', fontSize, lineHeight: 1.4, color: C2.char, marginBottom: 4 }}>{verdict.why}</span>
       )}
       {verdict.kind !== 'unknown' && (
         <SourceLine as="span" compact src={venue.ev?.length ? 'community' : 'osm'}

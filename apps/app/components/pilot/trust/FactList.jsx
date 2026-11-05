@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { C2, F2, M2 } from '../ui/palette';
+import { C2, M2 } from '../ui/palette';
+import { RADIUS, TYPE } from '../ds';
 import { SourceLine } from './SourceLine';
 import { factSource } from '@/lib/trust/labels';
 
@@ -18,8 +19,8 @@ function FactList({ kind, facts, style = {} }) {
   const k = KIND[kind];
   const id = `facts-${kind}`;
   return (
-    <section aria-labelledby={id} style={{ borderRadius: 18, border: `1.5px solid ${C2.line}`, overflow: 'hidden', marginBottom: 10, ...style }}>
-      <h2 id={id} style={{ padding: '16px 18px 6px', fontSize: 14, fontWeight: 700, color: k.fg(), margin: 0, fontFamily: F2, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{k.title}</h2>
+    <section aria-labelledby={id} style={{ borderRadius: RADIUS.lg, border: `1.5px solid ${C2.line}`, overflow: 'hidden', marginBottom: 10, ...style }}>
+      <h2 id={id} style={{ ...TYPE.caption, fontSize: 14, fontWeight: 700, padding: '16px 18px 6px', color: k.fg(), margin: 0, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{k.title}</h2>
       <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {facts.map(f => (
           <li key={f.t} style={{ display: 'flex', gap: 12, padding: '12px 18px', alignItems: 'flex-start', borderTop: `1px solid ${C2.hair}` }}>
@@ -28,9 +29,9 @@ function FactList({ kind, facts, style = {} }) {
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, fontFamily: M2,
             }}>{k.icon}</span>
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: 16, lineHeight: 1.45, fontFamily: F2, color: C2.char }}>{f.t}</span>
+              <span style={{ ...TYPE.body, display: 'block', color: C2.char }}>{f.t}</span>
               {f.quote && (
-                <span style={{ display: 'block', fontSize: 15, lineHeight: 1.45, fontFamily: F2, color: C2.char, margin: '2px 0 0' }}>
+                <span style={{ ...TYPE.callout, display: 'block', color: C2.char, margin: '2px 0 0' }}>
                   “{f.quote}”
                 </span>
               )}
