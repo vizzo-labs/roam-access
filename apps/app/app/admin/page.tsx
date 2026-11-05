@@ -5,6 +5,7 @@ import { isAdmin } from '@/lib/auth';
 import { getAdminOverview, setReviewHidden } from '@/lib/data';
 import { RA2_FEATURES, RA2_NEEDS } from '@/lib/pilot-data';
 import { IssuesQueue } from './IssuesQueue';
+import { AdminPhotos } from './photos';
 
 export const metadata = { title: 'Admin · Roam Access pilot' };
 
@@ -117,6 +118,7 @@ async function Admin() {
           </tbody>
         </table>
       </div>
+      <AdminPhotos/>
     </>
   );
 }

@@ -124,16 +124,16 @@ export async function createReview(userId: string, input: { venueId?: unknown; v
     ? input.entranceNote.trim().slice(0, ENTRANCE_NOTE_MAX) || null : null;
   const profile = await ensureProfile(userId);
 
-  await db.insert(reviews).values({
+  const [created] = await db.insert(reviews).values({
     venueId: v.id, userId, verdict: input.verdict as VerdictKind,
     needs: profile.needs, features, note, entranceAlt, entranceNote,
-  });
+  }).returning({ id: reviews.id });
   const [venue, myStats, count] = await Promise.all([
     getVenueVM(v.id),
     getMyStats(userId),
     db.select({ n: sql<number>`count(*)::int` }).from(reviews).where(and(eq(reviews.venueId, v.id), eq(reviews.hidden, false))),
   ]);
-  return { venue, myStats, venueReviews: count[0]?.n ?? 0 } as const;
+  return { reviewId: created.id, venue, myStats, venueReviews: count[0]?.n ?? 0 } as const;
 }
 
 export async function setSaved(userId: string, venueId: string, on: boolean) {

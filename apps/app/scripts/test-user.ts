@@ -69,7 +69,15 @@ async function main() {
     const { client, target } = await connectPg();
     try {
       if (target !== 'dev') throw new Error('refusing to delete rows outside the dev database');
-      // Reviews and saved places cascade from the profile.
+      // Photo images live in the dev Blob store: delete them first (rows cascade).
+      const photos = await client.query('SELECT pathname, thumb_pathname FROM review_photos WHERE user_id = $1', [user.id]).catch(() => ({ rows: [] }));
+      const paths = photos.rows.flatMap((p: { pathname: string; thumb_pathname: string }) => [p.pathname, p.thumb_pathname]);
+      if (paths.length) {
+        const { del } = await import('@vercel/blob');
+        await del(paths);
+        console.log(`deleted ${paths.length} photo file(s) from the dev Blob store`);
+      }
+      // Reviews, saved places and photo rows cascade from the profile.
       const r = await client.query('DELETE FROM profiles WHERE user_id = $1', [user.id]);
       console.log(`deleted ${r.rowCount} profile row(s) (+ cascaded reviews/saved) from the dev DB`);
     } finally {

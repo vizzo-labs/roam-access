@@ -3,7 +3,7 @@
 import { sql } from 'drizzle-orm';
 import {
   pgTable, text, bigint, doublePrecision, jsonb, boolean, timestamp, uuid,
-  primaryKey, uniqueIndex, index, check,
+  integer, date, primaryKey, uniqueIndex, index, check,
 } from 'drizzle-orm/pg-core';
 
 // Real places in the pilot area, seeded from OpenStreetMap (ODbL). Access
@@ -106,6 +106,42 @@ export const venueIssues = pgTable('venue_issues', {
   check('venue_issues_resolution_chk', sql`${t.resolution} is null or ${t.resolution} in ('fixed', 'no_change', 'venue_inactive')`),
 ]);
 
+// F2 · Photos on reviews (migrations/202611061443_review_photos_ai_usage.sql).
+// The image is in a private Vercel Blob store; review_id is NULL while the
+// review form is still open (draft). Alt text is required to attach.
+export const reviewPhotos = pgTable('review_photos', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
+  reviewId: uuid('review_id').references(() => reviews.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull().default('other'),
+  alt: text('alt').notNull().default(''),
+  pathname: text('pathname').notNull(),
+  thumbPathname: text('thumb_pathname').notNull(),
+  width: integer('width').notNull().default(0),
+  height: integer('height').notNull().default(0),
+  bytes: integer('bytes').notNull().default(0),
+  hidden: boolean('hidden').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  index('review_photos_review_idx').on(t.reviewId),
+  index('review_photos_venue_idx').on(t.venueId),
+  index('review_photos_user_idx').on(t.userId),
+  check('review_photos_kind_chk', sql`${t.kind} in ('entrance', 'toilet', 'step', 'seating', 'other')`),
+]);
+
+// F2 · Per-user daily AI counters (rate limits). Counts only, nothing else.
+export const aiUsage = pgTable('ai_usage', {
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  day: date('day').notNull(),
+  kind: text('kind').notNull(),
+  count: integer('count').notNull().default(0),
+}, t => [
+  primaryKey({ name: 'ai_usage_pk', columns: [t.userId, t.day, t.kind] }),
+  check('ai_usage_kind_chk', sql`${t.kind} in ('ask', 'photo')`),
+]);
+
 export type Venue = typeof venues.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
+export type ReviewPhoto = typeof reviewPhotos.$inferSelect;
