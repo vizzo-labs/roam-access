@@ -55,17 +55,56 @@ export const reviews = pgTable('reviews', {
   note: text('note'),
   hidden: boolean('hidden').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  // "Step-free way in through another entrance?" (migration 202611061445).
+  entranceAlt: text('entrance_alt').$type<EntranceAlt>(),
+  entranceNote: text('entrance_note'),
 }, t => [
   index('reviews_venue_idx').on(t.venueId),
   index('reviews_user_idx').on(t.userId),
   check('reviews_verdict_chk', sql`${t.verdict} in ('works', 'check', 'barrier')`),
+  check('reviews_entrance_alt_chk', sql`${t.entranceAlt} is null or ${t.entranceAlt} in ('side', 'back', 'lift', 'other', 'none')`),
 ]);
+
+export type EntranceAlt = 'side' | 'back' | 'lift' | 'other' | 'none';
 
 export const saved = pgTable('saved', {
   userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
   venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, t => [primaryKey({ columns: [t.userId, t.venueId] })]);
+
+// "Still accurate? Yes" — one row per tester per place (migration 202611061445).
+export const venueConfirmations = pgTable('venue_confirmations', {
+  venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  confirmedAt: timestamp('confirmed_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  primaryKey({ name: 'venue_confirmations_pk', columns: [t.venueId, t.userId] }),
+  index('venue_confirmations_user_idx').on(t.userId),
+]);
+
+export type IssueKind = 'closed' | 'moved' | 'wrong_location' | 'duplicate' | 'info_wrong';
+export type IssueResolution = 'fixed' | 'no_change' | 'venue_inactive';
+
+// "Report a problem" — the admin queue (migration 202611061445).
+export const venueIssues = pgTable('venue_issues', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  kind: text('kind').$type<IssueKind>().notNull(),
+  note: text('note'),
+  status: text('status').$type<'open' | 'resolved'>().notNull().default('open'),
+  resolution: text('resolution').$type<IssueResolution>(),
+  resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  index('venue_issues_status_idx').on(t.status, t.createdAt),
+  index('venue_issues_venue_idx').on(t.venueId),
+  index('venue_issues_user_idx').on(t.userId),
+  check('venue_issues_kind_chk', sql`${t.kind} in ('closed', 'moved', 'wrong_location', 'duplicate', 'info_wrong')`),
+  check('venue_issues_status_chk', sql`${t.status} in ('open', 'resolved')`),
+  check('venue_issues_resolution_chk', sql`${t.resolution} is null or ${t.resolution} in ('fixed', 'no_change', 'venue_inactive')`),
+]);
 
 export type Venue = typeof venues.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
