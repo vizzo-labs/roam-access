@@ -26,7 +26,7 @@ export async function statementAction(form: FormData) {
   if (!userId) redirect('/sign-in');
   const venueId = s(form, 'venueId');
   const r = await saveReply(userId, venueId, null, form.get('body'));
-  redirect(`/business/${encodeURIComponent(venueId)}?${'error' in r ? 'err=1' : r.removed ? 'ok=statement-removed' : 'ok=statement'}`);
+  redirect(`/business/${encodeURIComponent(venueId)}?${'error' in r ? 'err=1' : r.removed ? 'ok=statement-removed' : r.hidden ? 'ok=still-hidden' : 'ok=statement'}`);
 }
 
 export async function replyAction(form: FormData) {
@@ -34,7 +34,7 @@ export async function replyAction(form: FormData) {
   if (!userId) redirect('/sign-in');
   const venueId = s(form, 'venueId');
   const r = await saveReply(userId, venueId, s(form, 'reviewId'), form.get('remove') ? '' : form.get('body'));
-  redirect(`/business/${encodeURIComponent(venueId)}?${'error' in r ? 'err=1' : r.removed ? 'ok=reply-removed' : 'ok=reply'}`);
+  redirect(`/business/${encodeURIComponent(venueId)}?${'error' in r ? 'err=1' : r.removed ? 'ok=reply-removed' : r.hidden ? 'ok=still-hidden' : 'ok=reply'}`);
 }
 
 export async function cardAction(form: FormData) {

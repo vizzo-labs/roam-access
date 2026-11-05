@@ -115,6 +115,9 @@ scripts/
 - Tables: `venue_claims`, `venue_replies`, `needs_cards`, `user_roles`, `venue_views`
   (`lib/db/schema-venues.ts`). All user rows cascade from `profiles`, so “Delete my account”
   removes them; `venue_views` holds counts only, never a user id.
+  View counts are de-duplicated (one per person per place per day) and burst-limited via
+  `venue_view_keys`, whose keys are HMACs (`VIEWS_HASH_SECRET`, else `CLERK_SECRET_KEY`), purged
+  after two days. When an admin hides a “Venue says” post, the venue's dashboard says so, with the reason.
 
 **Access layers** (`lib/layers/`, `lib/data/layers.ts`, `components/pilot/layers/`): public
 toilets and beach access items (`facilities`), partner badges (`venue_badges`) and temporary

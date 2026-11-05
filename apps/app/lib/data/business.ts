@@ -129,10 +129,11 @@ export async function saveReply(userId: string, venueId: string, reviewId: strin
     await db.delete(venueReplies).where(where);
     return { ok: true, removed: true } as const;
   }
-  const [existing] = await db.select({ id: venueReplies.id }).from(venueReplies).where(where);
+  // Editing a post the pilot team hid keeps it hidden (no moderation bypass).
+  const [existing] = await db.select({ id: venueReplies.id, hidden: venueReplies.hidden }).from(venueReplies).where(where);
   if (existing) await db.update(venueReplies).set({ body, userId, updatedAt: new Date() }).where(eq(venueReplies.id, existing.id));
   else await db.insert(venueReplies).values({ venueId, reviewId, userId, body });
-  return { ok: true, removed: false } as const;
+  return { ok: true, removed: false, hidden: !!existing?.hidden } as const;
 }
 
 export async function isClaimed(venueId: string) {
@@ -195,7 +196,7 @@ export async function getVenueDashboard(venueId: string) {
     db.select({ kind: venueViews.kind, need: venueViews.need, n: sql<number>`sum(${venueViews.count})::int` })
       .from(venueViews).where(and(eq(venueViews.venueId, venueId), gte(venueViews.day, since)))
       .groupBy(venueViews.kind, venueViews.need),
-    getVenueSays(venueId),
+    getOwnPosts(venueId),
     listCardsForVenue(venueId),
   ]);
   const count = (kind: string, need: string) => views.find(v => v.kind === kind && v.need === need)?.n ?? 0;
@@ -223,6 +224,7 @@ export async function getVenueDashboard(venueId: string) {
     facts: { works: vm?.works ?? [], check: vm?.check ?? [], barriers: vm?.barriers ?? [] },
     reviews: rs.map(r => ({ ...buildReviewVM(r, '', now), reply: says.replies[r.id] ?? null })),
     statement: says.statement,
+    hiddenCount: says.hiddenCount,
     cards,
   };
 }
@@ -231,11 +233,28 @@ export async function getVenueDashboard(venueId: string) {
 export async function listRecentReplies() {
   return getDb().select({
     id: venueReplies.id, venueId: venueReplies.venueId, reviewId: venueReplies.reviewId, body: venueReplies.body,
-    hidden: venueReplies.hidden, updatedAt: venueReplies.updatedAt, venueName: venues.name,
+    hidden: venueReplies.hidden, hiddenNote: venueReplies.hiddenNote, updatedAt: venueReplies.updatedAt, venueName: venues.name,
   }).from(venueReplies).innerJoin(venues, eq(venues.id, venueReplies.venueId))
     .orderBy(desc(venueReplies.updatedAt)).limit(100);
 }
 
-export async function setReplyHidden(id: string, hidden: boolean) {
-  await getDb().update(venueReplies).set({ hidden }).where(eq(venueReplies.id, id));
+export async function setReplyHidden(id: string, hidden: boolean, note?: string | null) {
+  await getDb().update(venueReplies).set(hidden
+    ? { hidden, hiddenAt: new Date(), hiddenNote: clean(note, 300) || null }
+    : { hidden, hiddenAt: null, hiddenNote: null },
+  ).where(eq(venueReplies.id, id));
+}
+
+export type OwnPost = { body: string; when: string; hidden: boolean; hiddenAt: Date | null; hiddenNote: string | null };
+
+/** The venue's own statement + replies for its dashboard — including hidden
+ *  ones, so the venue can see that (and why) the pilot team hid them. */
+export async function getOwnPosts(venueId: string) {
+  const rows = await getDb().select().from(venueReplies).where(eq(venueReplies.venueId, venueId));
+  const now = Date.now();
+  const toPost = (r: typeof rows[number]): OwnPost => ({ body: r.body, when: ago(+r.updatedAt, now), hidden: r.hidden, hiddenAt: r.hiddenAt, hiddenNote: r.hiddenNote });
+  const s = rows.find(r => !r.reviewId);
+  const replies: Record<string, OwnPost> = {};
+  for (const r of rows) if (r.reviewId) replies[r.reviewId] = toPost(r);
+  return { statement: s ? toPost(s) : null, replies, hiddenCount: rows.filter(r => r.hidden).length };
 }
