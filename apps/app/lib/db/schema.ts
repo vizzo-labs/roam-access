@@ -3,7 +3,7 @@
 import { sql } from 'drizzle-orm';
 import {
   pgTable, text, bigint, doublePrecision, jsonb, boolean, timestamp, uuid,
-  integer, date, primaryKey, uniqueIndex, index, check,
+  integer, date, primaryKey, uniqueIndex, index, check, foreignKey,
 } from 'drizzle-orm/pg-core';
 
 // Real places in the pilot area, seeded from OpenStreetMap (ODbL). Access
@@ -141,6 +141,71 @@ export const aiUsage = pgTable('ai_usage', {
   check('ai_usage_kind_chk', sql`${t.kind} in ('ask', 'photo')`),
 ]);
 
+// ── F3 access layers (migrations/202611060142_access_layers.sql) ─────────
+// Toilets (National Public Toilet Map, CC BY 3.0 AU) and beach access items.
+// Listings from their source — never community-confirmed, never a verdict.
+export const facilities = pgTable('facilities', {
+  id: text('id').primaryKey(),
+  layer: text('layer').notNull(),
+  kind: text('kind').notNull(),
+  name: text('name').notNull(),
+  suburb: text('suburb'),
+  address: text('address'),
+  lat: doublePrecision('lat').notNull(),
+  lng: doublePrecision('lng').notNull(),
+  details: jsonb('details').$type<Record<string, unknown>>().notNull().default({}),
+  description: text('description'),
+  bookingUrl: text('booking_url'),
+  bookingPhone: text('booking_phone'),
+  source: text('source').notNull(),
+  sourceUrl: text('source_url'),
+  sourceLicence: text('source_licence'),
+  sort: integer('sort').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  index('facilities_layer_idx').on(t.layer),
+  check('facilities_layer_chk', sql`${t.layer} in ('toilets', 'beach')`),
+]);
+
+// Partner programs (the partner's claim, with a source). Never a verdict.
+export const venueBadges = pgTable('venue_badges', {
+  venueId: text('venue_id').notNull(),
+  badge: text('badge').notNull(),
+  sourceUrl: text('source_url').notNull(),
+  note: text('note'),
+  addedBy: text('added_by'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  primaryKey({ name: 'venue_badges_pk', columns: [t.venueId, t.badge] }),
+  foreignKey({ name: 'venue_badges_venue_id_venues_id_fk', columns: [t.venueId], foreignColumns: [venues.id] }).onDelete('cascade'),
+  check('venue_badges_badge_chk', sql`${t.badge} in ('companion_card', 'sunflower', 'aspect_autism_friendly', 'atic', 'changing_places')`),
+]);
+
+// Temporary barrier reports that expire. `createdBy` is never shown.
+export const tempBarriers = pgTable('temp_barriers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  targetType: text('target_type').notNull(),
+  targetId: text('target_id').notNull(),
+  type: text('type').notNull(),
+  note: text('note'),
+  createdBy: text('created_by').notNull(),
+  confirmedBy: text('confirmed_by').array().notNull().default(sql`'{}'::text[]`),
+  confirmations: integer('confirmations').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  lastConfirmedAt: timestamp('last_confirmed_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+  hidden: boolean('hidden').notNull().default(false),
+}, t => [
+  index('temp_barriers_target_idx').on(t.targetType, t.targetId),
+  index('temp_barriers_expires_idx').on(t.expiresAt),
+  foreignKey({ name: 'temp_barriers_created_by_profiles_user_id_fk', columns: [t.createdBy], foreignColumns: [profiles.userId] }).onDelete('cascade'),
+  check('temp_barriers_target_type_chk', sql`${t.targetType} in ('venue', 'facility')`),
+]);
+
 export type Venue = typeof venues.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
@@ -195,3 +260,6 @@ export type MappingEvent = typeof mappingEvents.$inferSelect;
 
 // F5 · venues & councils (venue_claims, venue_replies, needs_cards, user_roles, venue_views)
 export * from './schema-venues';
+export type Facility = typeof facilities.$inferSelect;
+export type VenueBadge = typeof venueBadges.$inferSelect;
+export type TempBarrier = typeof tempBarriers.$inferSelect;
