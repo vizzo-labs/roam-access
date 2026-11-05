@@ -4,6 +4,7 @@ import type { Translation } from '../../types';
 import type en from '../en/app';
 
 const app: Translation<typeof en> = {
+  'app.skipLink': 'メインコンテンツへスキップ',
   'app.view.setup': "必要なことを設定",
   'app.view.setup-name': "お名前",
   'app.view.home': "ホーム",

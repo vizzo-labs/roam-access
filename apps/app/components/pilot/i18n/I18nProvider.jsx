@@ -115,7 +115,10 @@ export function I18nProvider({ children }) {
     if (active !== locale) return;
     document.documentElement.lang = def.html;
     document.documentElement.dir = def.dir;
-  }, [def, active, locale]);
+    // The skip link is server-rendered (app/(app)/layout.tsx): name it in the UI language.
+    const skip = document.querySelector('.ra-skip');
+    if (skip) skip.textContent = value.t('app.skipLink');
+  }, [def, active, locale, value]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
