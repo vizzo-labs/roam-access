@@ -17,7 +17,7 @@ const TEAL = '#0A4F4F', PAPER = '#FAF9F6';
 const DETAIL_ZOOM = 15;
 
 export function PilotMap({
-  results, selectedId, onSelect, origin, colors, icons, labels,
+  results, selectedId, hoverId = null, onSelect, origin, colors, icons, labels,
   topPad = 150, bottomPad = 210, fit = true,
   onLocate, onLocateError, autoLocate = false, locateStyle = { right: 16, top: 16 },
   // Access layers (F3): facility pins (toilets, beach items) drawn as square
@@ -30,6 +30,8 @@ export function PilotMap({
   const byIdRef = useRef(new Map());
   const selRef = useRef(selectedId);
   selRef.current = selectedId;
+  // Desktop: the row under the pointer/focus in the panel lifts its pin.
+  const hoverRef = useRef(hoverId);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const onLocateRef = useRef(onLocate);
@@ -41,7 +43,7 @@ export function PilotMap({
   const onSelectExtraRef = useRef(onSelectExtra);
   const alertRef = useRef(alertIds);
   // Latest props for the marker callbacks; runs before the effects below.
-  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; });
+  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId; });
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [following, setFollowing] = useState(false);
@@ -53,7 +55,7 @@ export function PilotMap({
     // A narrowed search (≤ 80 places) shows every result as a full pin; the
     // whole area or a huge list keeps the quiet dots until street level.
     const fewResults = fit && markers.current.size <= 80;
-    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels);
+    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current);
   };
 
   // Create the map once.
@@ -178,6 +180,8 @@ export function PilotMap({
     }
   }, [ready, selectedExtraId, extraKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => { if (ready) repaint.current(); }, [ready, hoverId]);
+
   // Selection: the big pin; bring it into view if it's off-screen.
   useEffect(() => {
     if (!ready || !ctx.current) return;
@@ -298,18 +302,19 @@ function pinButton(r, labels, onClick) {
 // Places with a verdict: a coloured pin at every zoom. Places with no info
 // yet: a quiet dot in the overview, a white pin at street level. Selected:
 // the big pin. Only re-draws a pin whose look actually changed.
-function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels) {
+function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId = null) {
   markers.forEach((m, id) => {
     const on = id === selectedId;
+    const lift = !on && id === hoverId; // highlighted from the list, not selected
     const unknown = m.kind === 'unknown';
     const alert = !!alertIds?.has(id);
     // A live report always gets a full pin, so its ⚠ mark is visible.
-    const quiet = unknown && !on && !detail && !alert;
-    const state = `${on}|${quiet}|${alert}`;
+    const quiet = unknown && !on && !lift && !detail && !alert;
+    const state = `${on}|${lift}|${quiet}|${alert}`;
     if (m.baseLabel == null) m.baseLabel = m.el.getAttribute('aria-label');
     m.el.setAttribute('aria-label', m.baseLabel + (alert ? ', temporary problem reported' : ''));
     m.el.setAttribute('aria-pressed', String(on));
-    m.el.style.zIndex = on ? '5' : quiet ? '1' : unknown ? '2' : '3';
+    m.el.style.zIndex = on ? '5' : lift ? '4' : quiet ? '1' : unknown ? '2' : '3';
     if (m.state === state) return;
     m.state = state;
     if (quiet) {
@@ -319,7 +324,7 @@ function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels)
       m.mk.setOffset([0, 10]); // a dot sits on the place, not above it
       return;
     }
-    const w = on ? 46 : 34;
+    const w = on ? 46 : lift ? 42 : 34;
     m.el.style.width = w + 'px';
     m.el.style.height = Math.round(w * 1.25) + 'px';
     m.el.style.alignItems = 'flex-end';

@@ -33,6 +33,8 @@ import { V2Toilets } from './screens/Toilets';
 import { V2Beach } from './screens/Beach';
 import { V2Facility } from './screens/Facility';
 import { useAccessLayers } from './layers/useAccessLayers';
+import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
+import { AppSkeleton } from './explore/AppSkeleton';
 
 const PREFS_KEY = 'ra2-a11y';
 
@@ -196,7 +198,7 @@ function PilotApp() {
       </div>
     );
   }
-  if (!data) return <div className="ra-loading" role="status">Loading places…</div>;
+  if (!data) return <AppSkeleton/>;
   return <PilotScreens initial={data} userId={userId}/>;
 }
 
@@ -224,6 +226,9 @@ function PilotScreens({ initial, userId }) {
 
   const [route, setRoute] = useState(() => parseHash(venueIds));
   const [query, setQuery] = useState(null);
+  const [filters, setFiltersState] = useState(DEFAULT_FILTERS);
+  const [hoverId, setHoverId] = useState(null);
+  const [lastVenueId, setLastVenueId] = useState(null);
   const [prefs, setPrefs] = useState(initialPrefs);
   const [a11yOpen, setA11yOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -273,6 +278,7 @@ function PilotScreens({ initial, userId }) {
     document.documentElement.dataset.raDark = DARK_VIEWS.includes(view) ? '1' : '';
     document.title = `${VIEW_TITLES[view] || 'Home'} · Roam Access pilot`;
     setA11yOpen(false);
+    setHoverId(null); // rows unmount without a mouseleave
   }, [view, selectedId]);
 
   useEffect(() => {
@@ -288,6 +294,7 @@ function PilotScreens({ initial, userId }) {
   const goto = useCallback((nextView, id, opts) => {
     window.RA2_NAVIGATED = true;
     if (nextView === 'venue') {
+      setLastVenueId(id);
       const from = parseHash(idsRef.current).view;
       if (['home', 'results', 'map', 'saved', 'toilets', 'beach'].includes(from)) venueOriginRef.current = from;
     }
@@ -309,15 +316,22 @@ function PilotScreens({ initial, userId }) {
     const needIds = me.needs;
     let list = [], fit = true;
     if (view === 'saved') list = savedIds.map(id => byId.get(id)).filter(Boolean);
-    else if (query && ['results', 'venue', 'reviews', 'review', 'thanks', 'voice'].includes(view)) list = ra2Search(withMins, query, needIds);
+    else if (query && ['results', 'venue', 'reviews', 'review', 'thanks', 'voice'].includes(view)) list = applyFilters(ra2Search(withMins, query, needIds), filters);
     if (!list.length) { list = withMins; fit = false; }
     const sel = VENUE_VIEWS.includes(view) && selectedId && byId.get(selectedId);
     if (sel && !list.some(v => v.id === sel.id)) list = [...list, sel];
     return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit };
-  }, [wide, view, query, savedIds, withMins, byId, selectedId, me.needs]);
+  }, [wide, view, query, filters, savedIds, withMins, byId, selectedId, me.needs]);
 
   const app = {
     view, selectedId, user, query, origin, wide,
+    // Explore: filters shared by list + maps; setQuery narrows without navigating.
+    filters,
+    setFilters: (partial) => setFiltersState(f => ({ ...f, ...partial })),
+    setQuery,
+    // Desktop: hovering/focusing a row highlights its pin (no-op on phones).
+    hover: wide ? setHoverId : null,
+    lastVenueId,
     installable: !install.standalone,
     canPromptInstall: install.canPrompt,
     install: async () => {
@@ -489,7 +503,7 @@ function PilotScreens({ initial, userId }) {
   );
   if (!wide) return content;
   return (
-    <WebLayout app={app} mapResults={mapView.list} mapFit={mapView.fit} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
+    <WebLayout app={app} mapResults={mapView.list} mapFit={mapView.fit} hoverId={hoverId} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
       {content}
     </WebLayout>
   );

@@ -28,7 +28,7 @@ function Header({ children }) {
   );
 }
 
-export function WebLayout({ app, mapResults, mapFit = true, selectedId, children }) {
+export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId = null, children }) {
   const active = NAV.find(n => n.views.includes(app.view))?.id;
   const initial = (app.user?.name || 'You').charAt(0).toUpperCase();
   const kinds = [...new Set(mapResults.map(r => r.verdict.kind))];
@@ -66,12 +66,12 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, children
       <div className="web-body">
         <div className="web-panel">{children}</div>
         <section className="web-map" aria-label="Map of places in the pilot area">
-          <PilotMap results={mapResults} selectedId={selectedId} onSelect={id => app.goto('venue', id)}
+          <PilotMap results={mapResults} selectedId={selectedId} hoverId={hoverId} onSelect={id => app.goto('venue', id)}
             origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras}
             onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
             extras={extras} selectedExtraId={facility?.id || null} onSelectExtra={id => app.goto('facility', id)}
             fitExtras={fitExtras} alertIds={L.alertIds}/>
-          <MapLegend kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} style={{ top: 16, left: 16 }}/>
+          <MapLegend compact kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} style={{ top: 16, left: 16 }}/>
           <LayerToggles shown={L.shown} forced={forced} onChange={L.setShown} style={{ top: 76, right: 16 }}/>
         </section>
       </div>
