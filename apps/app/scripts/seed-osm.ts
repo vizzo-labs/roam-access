@@ -2,12 +2,16 @@
 // contributors, ODbL). Idempotent: re-running updates names/tags in place and
 // never changes a venue's id, so reviews stay attached.
 //
-//   npx dotenv -e .env.local -- npx tsx scripts/seed-osm.ts [--dry]
+//   npm run db:seed [-- --dry]
+//
+// Writes to the database chosen by lib/db/url.ts: the DEV database unless
+// VERCEL_ENV=production. Never point this at production by hand.
 
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { sql } from 'drizzle-orm';
 import { venues } from '../lib/db/schema';
+import { pickDatabaseUrl, describeDatabaseUrl } from '../lib/db/url';
 
 // Manly, Fairlight, Queenscliff, Balgowlah and the walk to Shelly Beach.
 const BBOX = { south: -33.8150, west: 151.2580, north: -33.7800, east: 151.3020 };
@@ -84,15 +88,31 @@ function classify(tags: Record<string, string>) {
   return null;
 }
 
+// The public Overpass servers are often at capacity: back off, then try a mirror.
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+
+async function fetchOverpass(): Promise<{ elements: El[] }> {
+  let last = '';
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const endpoint = OVERPASS[attempt % OVERPASS.length];
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'roam-access-pilot-seed/0.1 (+https://roamaccess.com.au)' },
+      body: 'data=' + encodeURIComponent(overpassQuery()),
+      signal: AbortSignal.timeout(120_000),
+    }).catch(e => ({ ok: false, status: 0, text: async () => String(e) }) as const);
+    if (res.ok) return (await (res as Response).json()) as { elements: El[] };
+    last = `Overpass ${res.status} at ${endpoint}: ${(await res.text()).slice(0, 200)}`;
+    const wait = 2000 * 2 ** attempt;
+    console.warn(`${last.split('\n')[0]} — retrying in ${wait / 1000}s`);
+    await new Promise(r => setTimeout(r, wait));
+  }
+  throw new Error(last);
+}
+
 async function main() {
   const dry = process.argv.includes('--dry');
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'roam-access-pilot-seed/0.1 (+https://roamaccess.com.au)' },
-    body: 'data=' + encodeURIComponent(overpassQuery()),
-  });
-  if (!res.ok) throw new Error(`Overpass ${res.status}: ${(await res.text()).slice(0, 300)}`);
-  const data = (await res.json()) as { elements: El[] };
+  const data = await fetchOverpass();
 
   const rows = [];
   const seenIds = new Set<string>();
@@ -125,7 +145,9 @@ async function main() {
   console.log('wheelchair-tagged:', rows.filter(r => r.osmTags.wheelchair).length);
   if (dry) { console.log(rows.slice(0, 8)); return; }
 
-  const db = drizzle(neon(process.env.DATABASE_URL!));
+  const { url, target } = pickDatabaseUrl();
+  console.log(`Seeding the ${target} database (${describeDatabaseUrl(url)})`);
+  const db = drizzle(neon(url));
   for (let i = 0; i < rows.length; i += 100) {
     await db.insert(venues).values(rows.slice(i, i + 100)).onConflictDoUpdate({
       target: [venues.osmType, venues.osmId],

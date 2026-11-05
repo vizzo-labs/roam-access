@@ -1,3 +1,5 @@
+// Typed mirror of the SQL in migrations/ — the SQL is the source of truth.
+// When you add a migration, mirror it here. Never `drizzle-kit push`.
 import { sql } from 'drizzle-orm';
 import {
   pgTable, text, bigint, doublePrecision, jsonb, boolean, timestamp, uuid,

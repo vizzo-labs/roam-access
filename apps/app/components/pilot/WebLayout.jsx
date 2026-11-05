@@ -4,7 +4,7 @@
 // and the map stay in sync (pin → venue in the panel; venue → pin selected).
 
 import { PilotMap, MapLegend } from './PilotMap';
-import { V2Logo } from './legacy';
+import { V2Logo } from './ui/Logo';
 
 export const PIN = {
   colors: { works: '#1E5F8B', check: '#854D0E', barrier: '#9C2D0E', unknown: '#475569' },

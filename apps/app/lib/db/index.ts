@@ -2,10 +2,11 @@ import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schema';
+import { pickDatabaseUrl } from './url';
 
 function createDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL is not set — run `vercel env pull`.');
+  // Production deployments use DATABASE_URL; everything else the dev database.
+  const { url } = pickDatabaseUrl();
   return drizzle(neon(url), { schema });
 }
 
@@ -18,3 +19,4 @@ export function getDb() {
 }
 
 export { schema };
+export { pickDatabaseUrl } from './url';
