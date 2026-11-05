@@ -16,7 +16,22 @@ const OK: Record<string, string> = {
   reply: 'Your reply is live under the review.',
   'reply-removed': 'Your reply has been removed.',
   card: 'Thanks — the guest can see you’ve read their card.',
+  'still-hidden': 'Saved — but the pilot team has hidden this post, so it still doesn’t show in the app.',
 };
+
+const fmtDay = (d: Date | null) => d ? d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Australia/Sydney' }) : '';
+
+// Shown to the venue when the pilot team has hidden one of its posts.
+function HiddenNotice({ post, what }: { post: { hidden: boolean; hiddenAt: Date | null; hiddenNote: string | null } | null; what: string }) {
+  if (!post?.hidden) return null;
+  return (
+    <div className="flash err" role="note" style={{ marginTop: '0.75rem', fontWeight: 400 }}>
+      <strong>Hidden by the pilot team{post.hiddenAt ? ` on ${fmtDay(post.hiddenAt)}` : ''}.</strong> This {what} doesn’t show in the app.
+      {post.hiddenNote ? <> Reason: {post.hiddenNote}</> : null}
+      {' '}Editing it won’t make it visible again — contact the Roam Access pilot team if you think this is a mistake.
+    </div>
+  );
+}
 
 export default function VenueDashboardPage({ params, searchParams }: PageProps<'/business/[venueId]'>) {
   return (
@@ -47,6 +62,11 @@ async function Inner({ params, searchParams }: Pick<PageProps<'/business/[venueI
       <p className="pt-eyebrow">Venue dashboard · free</p>
       <h1>{d.venue.name}<span className="dot">.</span></h1>
       <p className="lead">{d.venue.kind} · {[d.venue.address, d.venue.suburb].filter(Boolean).join(', ')}</p>
+      {d.hiddenCount > 0 && (
+        <p className="flash err" role="note">
+          The pilot team has hidden {d.hiddenCount === 1 ? 'one of your posts' : `${d.hiddenCount} of your posts`}. {d.hiddenCount === 1 ? 'It doesn’t' : 'They don’t'} show in the app — see the notes below.
+        </p>
+      )}
       {readOnly && <p className="flash err" role="note">You’re viewing as an admin. Replies and statements can only be posted by the venue.</p>}
 
       <h2 style={{ marginTop: '1.5rem' }}>Last {d.days} days</h2>
@@ -103,6 +123,7 @@ async function Inner({ params, searchParams }: Pick<PageProps<'/business/[venueI
       ) : <p className="muted">No community facts yet.</p>}
 
       <h2 id="statement">Your access statement</h2>
+      <HiddenNotice post={d.statement} what="statement"/>
       <p className="muted">Tell people what to expect: entrances, toilets, quiet times, seating, staff help. It shows on your page as “Venue says — not checked by the community”.</p>
       {readOnly ? (
         <div className="says">{d.statement?.body || <span className="muted">No statement yet.</span>}</div>
@@ -128,6 +149,7 @@ async function Inner({ params, searchParams }: Pick<PageProps<'/business/[venueI
           <p style={{ margin: '0.6rem 0 0.3rem' }}>{r.text}</p>
           {r.details && <p className="muted small" style={{ margin: 0 }}>{r.details}</p>}
           <p className="muted small" style={{ margin: '0.3rem 0 0' }}>{r.when}</p>
+          <HiddenNotice post={r.reply} what="reply"/>
           {readOnly ? (r.reply && <div className="says"><strong>Venue says:</strong> {r.reply.body}</div>) : (
             <details open={!!r.reply}>
               <summary>{r.reply ? 'Your reply' : 'Reply publicly'}<span className="pt-sr"> to the review by a {r.who}</span></summary>

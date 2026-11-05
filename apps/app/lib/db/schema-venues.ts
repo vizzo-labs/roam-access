@@ -49,6 +49,8 @@ export const venueReplies = pgTable('venue_replies', {
   userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
   body: text('body').notNull(),
   hidden: boolean('hidden').notNull().default(false),
+  hiddenAt: timestamp('hidden_at', { withTimezone: true }),
+  hiddenNote: text('hidden_note'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, t => [
@@ -89,6 +91,15 @@ export const venueViews = pgTable('venue_views', {
   primaryKey({ name: 'venue_views_pk', columns: [t.venueId, t.day, t.kind, t.need] }),
   index('venue_views_day_idx').on(t.day),
 ]);
+
+// Dedupe + burst keys for venue_views (migrations/202611061600_venue_views_dedupe.sql).
+// key = HMAC(secret, …): never a user id in clear; purged after two days.
+export const venueViewKeys = pgTable('venue_view_keys', {
+  key: text('key').primaryKey(),
+  day: date('day').notNull(),
+  hits: integer('hits').notNull().default(1),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [index('venue_view_keys_day_idx').on(t.day)]);
 
 export type VenueClaim = typeof venueClaims.$inferSelect;
 export type VenueReply = typeof venueReplies.$inferSelect;

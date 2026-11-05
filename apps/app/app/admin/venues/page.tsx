@@ -46,7 +46,7 @@ async function revoke(form: FormData) {
 async function toggleReply(form: FormData) {
   'use server';
   if (!(await isAdmin())) throw new Error('Not allowed');
-  await setReplyHidden(String(form.get('id')), form.get('hidden') === 'true');
+  await setReplyHidden(String(form.get('id')), form.get('hidden') === 'true', String(form.get('note') || ''));
   revalidatePath('/admin/venues');
   redirect(`/admin/venues?ok=${form.get('hidden') === 'true' ? 'reply-hidden' : 'reply-shown'}#venue-says`);
 }
@@ -134,7 +134,7 @@ async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'
       {!claims.length && <p className="muted">No claims yet.</p>}
 
       <h2 id="venue-says">“Venue says” — latest</h2>
-      <p className="muted">Statements and replies venues have posted. Hide anything abusive, misleading or that names a reviewer.</p>
+      <p className="muted">Statements and replies venues have posted. Hide anything abusive, misleading or that names a reviewer. The venue sees on its dashboard that it was hidden, with your reason.</p>
       <div className="pt-table-wrap">
         <table>
           <thead><tr><th scope="col">Place</th><th scope="col">Type</th><th scope="col">Text</th><th scope="col">Updated</th><th scope="col"><span className="pt-sr">Action</span></th></tr></thead>
@@ -142,10 +142,14 @@ async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'
             {replies.map(r => (
               <tr key={r.id} style={r.hidden ? { opacity: 0.6 } : undefined}>
                 <td>{r.venueName}</td><td>{r.reviewId ? 'Reply to a review' : 'Access statement'}</td>
-                <td style={{ maxWidth: '28rem', whiteSpace: 'pre-line' }}>{r.body}</td><td>{fmt(r.updatedAt)}</td>
+                <td style={{ maxWidth: '28rem', whiteSpace: 'pre-line' }}>{r.body}{r.hidden && r.hiddenNote ? <span className="muted small"><br/>Hidden: {r.hiddenNote}</span> : null}</td><td>{fmt(r.updatedAt)}</td>
                 <td>
                   <form action={toggleReply}>
                     <input type="hidden" name="id" value={r.id}/><input type="hidden" name="hidden" value={r.hidden ? 'false' : 'true'}/>
+                    {!r.hidden && <>
+                      <label htmlFor={`hide-note-${r.id}`} className="small" style={{ margin: '0 0 0.25rem' }}>Reason (the venue sees it)</label>
+                      <input id={`hide-note-${r.id}`} name="note" type="text" maxLength={300} style={{ minWidth: '12rem', marginBottom: '0.4rem' }}/>
+                    </>}
                     <button className="btn ghost" type="submit">{r.hidden ? 'Show' : 'Hide'}<span className="pt-sr"> {r.reviewId ? 'reply' : 'statement'} from {r.venueName}</span></button>
                   </form>
                 </td>
