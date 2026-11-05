@@ -30,10 +30,14 @@ function V2VenueView({ app }) {
 
   React.useEffect(() => { app.markVisited(v.id); }, [v.id]); // eslint-disable-line
 
-  const nRev = `${v.verified} community ${v.verified === 1 ? 'review' : 'reviews'}`;
+  const quick = v.quick || 0;
+  const nRev = [
+    v.verified || !quick ? `${v.verified} community ${v.verified === 1 ? 'review' : 'reviews'}` : null,
+    quick ? `${quick} quick ${quick === 1 ? 'answer' : 'answers'}` : null,
+  ].filter(Boolean).join(' and ');
   const verdictLead = {
     works: `What works for your needs, from ${nRev}.`,
-    check: v.verified
+    check: v.verified || quick
       ? `Things to know before you go, from ${nRev}.`
       : 'Not yet confirmed by anyone in the pilot. Check before you go — then tell us how it was.',
     barrier: `People in the pilot have flagged real barriers here, from ${nRev}.`,
@@ -137,6 +141,11 @@ function V2VenueView({ app }) {
             OpenStreetMap<span className="ra-sr-only"> (opens in a new tab)</span>
           </a>.{' '}
           <a href="/how-it-works" style={{ color: C2.teal, fontWeight: 600 }}>How Roam Access works</a>
+        </p>
+        <p style={{ fontSize: 13.5, textAlign: 'center', margin: '8px 0 0', lineHeight: 1.5, fontFamily: F2 }}>
+          <a href={`/v/${encodeURIComponent(v.id)}/share`} target="_blank" rel="noopener" style={{ color: C2.teal, fontWeight: 600 }}>
+            Share or print this place’s access summary<span className="ra-sr-only"> (opens in a new tab)</span>
+          </a>
         </p>
       </div>
     </V2Shell>
