@@ -12,6 +12,8 @@ import { verdictSource } from '@/lib/trust/labels';
 import { FactList } from '../trust/FactList';
 import { Freshness } from '../trust/Freshness';
 import { SourceLine } from '../trust/SourceLine';
+import { VenuePhotos } from '../photos/VenuePhotos';
+import { AskPlace } from '../ask/AskPlace';
 
 // ─────────────────────────────────────────────────────────────
 // VENUE — verdict first, plain language, detail on demand
@@ -100,6 +102,8 @@ function V2VenueView({ app }) {
 
         <Freshness key={v.id} app={app} venue={v}/>
 
+        <VenuePhotos app={app} venueId={v.id}/>
+
         {/* community voice */}
         {firstReview && (
           <div style={{ background: C2.stone, borderRadius: 18, padding: 18, marginBottom: 16 }}>
@@ -110,6 +114,8 @@ function V2VenueView({ app }) {
             <p style={{ fontSize: 13.5, color: C2.slate, fontWeight: 600, margin: 0, fontFamily: F2 }}>{firstReview.who} · {firstReview.when}</p>
           </div>
         )}
+
+        <AskPlace key={v.id} app={app} venue={v}/>
 
         {written > 0 ? (
           <V2BigBtn kind="ghost" onClick={() => app.goto('reviews', v.id)}>

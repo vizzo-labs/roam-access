@@ -374,9 +374,9 @@ function PilotScreens({ initial, userId }) {
     // A fresh view model from the server (e.g. after "Still accurate? Yes").
     updateVenue: (venue) => setVenues(vs => vs.map(v => (v.id === venue.id ? venue : v))),
 
-    submitReview: async ({ venueId, verdict, features, note, entranceAlt, entranceNote }) => {
+    submitReview: async ({ venueId, verdict, features, note, entranceAlt, entranceNote, photos }) => {
       try {
-        const r = await api('/api/reviews', { method: 'POST', body: JSON.stringify({ venueId, verdict, features, note, entranceAlt, entranceNote }) });
+        const r = await api('/api/reviews', { method: 'POST', body: JSON.stringify({ venueId, verdict, features, note, entranceAlt, entranceNote, photos }) });
         if (r.venue) setVenues(vs => vs.map(v => (v.id === venueId ? r.venue : v)));
         setReviewed(x => (x.includes(venueId) ? x : [...x, venueId]));
         setMyStats(r.myStats);

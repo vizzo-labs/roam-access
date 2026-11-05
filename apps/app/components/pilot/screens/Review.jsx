@@ -10,6 +10,7 @@ import { C2, F2, M2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2NeedTags } from '@/lib/pilot/match';
 import { EntranceQuestion } from '../trust/EntranceQuestion';
+import { ReviewPhotos, useReviewPhotos, PhotoSuggestion } from '../photos/ReviewPhotos';
 
 // ─────────────────────────────────────────────────────────────
 // REVIEW — one tap required, everything else optional
@@ -23,6 +24,10 @@ function V2ReviewView({ app }) {
   const [entranceAlt, setEntranceAlt] = React.useState(null);
   const [entranceNote, setEntranceNote] = React.useState('');
   const [sending, setSending] = React.useState(false);
+  const photos = useReviewPhotos(v.id);
+  const photoBlock = photos.busy
+    ? 'Wait for your photos to finish uploading.'
+    : photos.needsAlt.length ? `Describe ${photos.needsAlt.length === 1 ? 'your photo' : 'each photo'} (or confirm the suggested description) to send.` : null;
 
   // Questions that touch this tester's own needs come first.
   const mine = ra2NeedTags(app.user?.needs || []);
@@ -42,12 +47,12 @@ function V2ReviewView({ app }) {
   });
 
   async function send() {
-    if (!choice || sending) return;
+    if (!choice || sending || photoBlock) return;
     setSending(true);
     // The entrance follow-up only counts when the main way in has steps.
     const entrance = features.stepfree === 'no' && entranceAlt
       ? { entranceAlt, entranceNote: entranceAlt === 'none' ? '' : entranceNote } : {};
-    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance });
+    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, photos: photos.payload });
     if (ok) app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
     else setSending(false);
   }
@@ -97,6 +102,8 @@ function V2ReviewView({ app }) {
           );
         })}
 
+        <ReviewPhotos venueName={v.name} state={photos}/>
+
         <section aria-labelledby="rev-more" style={{ marginTop: 22 }}>
           <h2 id="rev-more" style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', fontFamily: F2 }}>
             Tell us more <span style={{ fontWeight: 500, color: C2.slate }}>(optional)</span>
@@ -125,6 +132,9 @@ function V2ReviewView({ app }) {
             {q.id === 'stepfree' && features.stepfree === 'no' && (
               <EntranceQuestion value={entranceAlt} note={entranceNote} onChange={setEntranceAlt} onNote={setEntranceNote}/>
             )}
+            {features[q.id] === undefined && (
+              <PhotoSuggestion featureId={q.id} suggestion={photos.suggestions[q.id]} onUse={setFeature}/>
+            )}
             </React.Fragment>
           ))}
         </section>
@@ -144,12 +154,12 @@ function V2ReviewView({ app }) {
         </div>
 
         <div style={{ marginTop: 20 }}>
-          <V2BigBtn kind="primary" onClick={send} disabled={!choice || sending} ariaDescribedBy="rev-hint">
+          <V2BigBtn kind="primary" onClick={send} disabled={!choice || sending || !!photoBlock} ariaDescribedBy="rev-hint">
             {sending ? 'Sending…' : 'Send it →'}
           </V2BigBtn>
         </div>
         <p id="rev-hint" style={{ fontSize: 13.5, color: C2.slate, textAlign: 'center', marginTop: 12, lineHeight: 1.4, fontFamily: F2 }}>
-          {choice ? 'Shown with your lived experience — never your name.' : 'Choose one of the three options above to send.'}
+          {!choice ? 'Choose one of the three options above to send.' : photoBlock || 'Shown with your lived experience — never your name.'}
         </p>
       </div>
     </V2Shell>

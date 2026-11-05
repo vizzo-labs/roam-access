@@ -24,6 +24,8 @@ and ships with the landing page on GitHub Pages. This folder is separate and dep
 | Database | Neon Postgres, Sydney (Vercel Marketplace) + Drizzle ORM |
 | Places | OpenStreetMap via Overpass (ODbL — keep the attribution) |
 | Map | MapLibre GL + OpenFreeMap tiles (free, no key) |
+| Review photos | Vercel Blob, **private** stores in `syd1`: `roam-access-photos` (Production), `roam-access-photos-dev` (Preview + Development) |
+| AI | Vercel AI Gateway via AI SDK 7 (`ai`), model `anthropic/claude-haiku-5.5` (zero data retention); needs Node ≥ 22 |
 | Hosting | Vercel project `roam-access`, Root Directory `apps/app` |
 
 ## How it fits together
@@ -38,6 +40,8 @@ app/ds/               design-system preview (open in dev/previews; admin-only in
 app/how-it-works/     public policy page: verdicts, sources, "payment never changes a verdict", privacy
 app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved ·
                       venues/[id]/reviews · venues/[id]/confirm · venues/[id]/issues
+                      photos (POST) · photos/[id] (GET, DELETE) · photos/[id]/suggest
+                      venues/[id]/photos · venues/[id]/ask
 components/pilot/
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
   PilotMap.jsx        real map; pins are buttons, list view stays primary
@@ -62,6 +66,9 @@ lib/
                       source, count and latest date; confirmed absence; other entrances
   trust/              labels.ts (source + confidence wording) · entrance.ts
   data/trust.ts       confirmations, problem reports, the admin queue
+  data/photos.ts      review photos (private Blob) · data/ai-usage.ts daily AI limits
+  photos/             kinds + limits (shared) · jpeg.ts strips metadata server-side
+  ai/                 model.ts (gateway model + ZDR) · photo-suggest.ts · ask.ts
   data.ts             all database access
   db/url.ts           which database: prod only when VERCEL_ENV=production, else dev
   db/schema.ts        typed mirror of migrations/: venues · profiles · reviews · saved
@@ -142,3 +149,19 @@ every merge to `main` deploys production (and migrates the production DB). No ma
   Testers can delete everything from Me → Delete my account. Update `privacy.html` on the
   landing page to cover the pilot before going wide.
 - **Admins**: set `ADMIN_EMAILS` (comma-separated, verified emails) in Vercel env vars.
+
+## Photos & AI (F2)
+
+- **Photos on reviews**: up to 5 per review, each with a required description (alt text).
+  The browser resizes and re-encodes every photo (drops EXIF/GPS); the server strips any
+  metadata again (`lib/photos/jpeg.ts`). Images are in a **private** Blob store and only
+  served by `/api/photos/[id]` to signed-in testers, so hiding a photo or its review (admin)
+  really hides it. Account deletion removes the images too.
+- **Photo suggestions**: after upload, the model suggests a description and yes/no answers
+  (step-free, accessible toilet, seating). Nothing is applied until the reviewer confirms.
+- **Ask about this place**: answered only from that place's reviews and photo descriptions;
+  an answer must cite at least one review or it's shown as "the reviews don't say".
+- Limits per tester per Sydney day (`ai_usage`, counts only): 20 questions, 30 photo
+  suggestions. Questions, photos and answers are never stored or logged.
+- The AI Gateway needs a credit card on the Vercel team; without one the AI features show
+  "not available right now" and everything else keeps working.

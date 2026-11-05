@@ -8,6 +8,7 @@ import { V2Shell } from '../ui/Shell';
 import { V2Verdict } from '../ui/Verdict';
 import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
+import { PhotoGrid, PhotoViewer, SourceBadge } from '../ds';
 
 // ─────────────────────────────────────────────────────────────
 // ALL REVIEWS — filter by lived experience
@@ -20,6 +21,8 @@ function V2AllReviews({ app }) {
   const all = loaded || [];
   const filters = ['All', ...RA2_NEEDS.map(n => n.filter)];
   const shown = filter === 'All' ? all : all.filter(r => r.filters.includes(filter));
+  const [viewer, setViewer] = React.useState(null); // { photos, index }
+  const closeViewer = React.useCallback(() => setViewer(null), []);
 
   return (
     <V2Shell tabs app={app} active="home">
@@ -59,6 +62,14 @@ function V2AllReviews({ app }) {
             </div>
             <p style={{ fontSize: 15.5, lineHeight: 1.5, margin: '0 0 12px', color: C2.char, fontFamily: F2 }}>{r.text}</p>
             {r.details && <p style={{ fontSize: 14, lineHeight: 1.5, margin: '0 0 12px', color: C2.slate, fontFamily: F2 }}>{r.details}</p>}
+            {r.photos?.length > 0 && (
+              <div style={{ margin: '0 0 12px' }}>
+                <div style={{ marginBottom: 8 }}>
+                  <SourceBadge source="photo">{r.photos.length === 1 ? 'With photo' : `With ${r.photos.length} photos`}</SourceBadge>
+                </div>
+                <PhotoGrid photos={r.photos} size={72} onOpen={i => setViewer({ photos: r.photos, index: i })}/>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>
                 {r.when}{r.mine ? ' · yours' : ''}
@@ -72,6 +83,8 @@ function V2AllReviews({ app }) {
           </p>
         )}
         <V2BigBtn kind="primary" onClick={() => app.goto('review', v.id)}>Share your experience</V2BigBtn>
+        <PhotoViewer photos={viewer?.photos || []} index={viewer ? viewer.index : null}
+          onIndex={i => setViewer(x => ({ ...x, index: i }))} onClose={closeViewer}/>
       </div>
     </V2Shell>
   );

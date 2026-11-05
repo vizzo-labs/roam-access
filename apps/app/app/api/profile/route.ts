@@ -1,6 +1,7 @@
 import { clerkClient } from '@clerk/nextjs/server';
 import { badRequest, getUserId, unauthorized } from '@/lib/auth';
 import { deleteProfile, updateProfile } from '@/lib/data';
+import { deleteUserPhotoBlobs } from '@/lib/data/photos';
 
 export async function PUT(req: Request) {
   const userId = await getUserId();
@@ -10,11 +11,12 @@ export async function PUT(req: Request) {
   return Response.json(await updateProfile(userId, body));
 }
 
-// "Delete my account": the tester's needs, reviews and saved places go first,
-// then the Clerk sign-in itself.
+// "Delete my account": the tester's photos (images in Blob), needs, reviews
+// and saved places go first, then the Clerk sign-in itself.
 export async function DELETE() {
   const userId = await getUserId();
   if (!userId) return unauthorized();
+  await deleteUserPhotoBlobs(userId);
   await deleteProfile(userId);
   const client = await clerkClient();
   await client.users.deleteUser(userId);
