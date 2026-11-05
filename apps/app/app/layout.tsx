@@ -36,7 +36,8 @@ const clerkAppearance = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-AU" dir="ltr">
+    // lang follows the chosen language on the client (#21) — set before paint.
+    <html lang="en-AU" dir="ltr" suppressHydrationWarning>
       <body>
         <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up" afterSignOutUrl="/" appearance={clerkAppearance}>
           {children}

@@ -1,0 +1,46 @@
+// English (Australia) — shared words used across many screens. Keys 'common.*'.
+// Plain, first-person, short sentences; en-AU spelling. See lib/i18n/README.md.
+const common = {
+  'common.back': 'Back',
+  'common.close': 'Close',
+  'common.cancel': 'Cancel',
+  'common.send': 'Send',
+  'common.sending': 'Sending…',
+  'common.save': 'Save',
+  'common.saving': 'Saving…',
+  'common.done': 'Done',
+  'common.next': 'Next',
+  'common.edit': 'Edit',
+  'common.retry': 'Try again',
+  'common.loading': 'Loading…',
+  'common.optional': '(optional)',
+  'common.yes': 'Yes',
+  'common.no': 'No',
+  'common.opensNewTab': '(opens in a new tab)',
+  'common.justNow': 'just now',
+  'common.reports': { one: '{count} report', other: '{count} reports' },
+  'common.people': { one: '{count} person', other: '{count} people' },
+  'common.reviews': { one: '{count} review', other: '{count} reviews' },
+  'common.places': { one: '{count} place', other: '{count} places' },
+  'common.photos': { one: '{count} photo', other: '{count} photos' },
+  'common.minWalk': '{mins} min walk',
+  'common.offline': 'You’re offline',
+  'common.checkConnection': 'Check your connection and try again.',
+
+  'common.language.title': 'Language',
+  'common.language.hint': 'Saved on this device. Reviews stay in the language people wrote them in.',
+  'common.language.machine': 'This language was translated by machine. A person will check it soon — tell us if something reads wrong.',
+
+  'common.readAloud.start': 'Read aloud',
+  'common.readAloud.stop': 'Stop',
+  'common.readAloud.named': 'Read aloud: {what}',
+  'common.readAloud.stopNamed': 'Stop reading aloud: {what}',
+  'common.readAloud.setting': 'Read-aloud buttons',
+  'common.readAloud.settingHint': 'Show “Read aloud” on place summaries. It never starts by itself.',
+  'common.readAloud.unsupported': 'This browser can’t read aloud.',
+  'common.readAloud.speed': 'Reading speed',
+  'common.readAloud.slower': 'Slower',
+  'common.readAloud.normal': 'Normal',
+};
+
+export default common;

@@ -1,0 +1,5 @@
+/* Read aloud: a gentle pulse on the speaker while it talks. Only applied
+   when motion is allowed (ReadAloud checks useReducedMotion), and cut to
+   nothing by the global reduced-motion rules anyway. */
+@keyframes ra-speak { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.ra-speaking svg { animation: ra-speak 1.2s ease-in-out infinite; }

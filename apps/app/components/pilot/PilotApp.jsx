@@ -33,6 +33,7 @@ import { V2Toilets } from './screens/Toilets';
 import { V2Beach } from './screens/Beach';
 import { V2Facility } from './screens/Facility';
 import { useAccessLayers } from './layers/useAccessLayers';
+import { I18nProvider } from './i18n';
 import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
 import { AppSkeleton } from './explore/AppSkeleton';
 
@@ -157,7 +158,12 @@ function CantConnect({ offline }) {
   );
 }
 
+// Every screen is inside the language provider (#21).
 export function PilotRoot() {
+  return <I18nProvider><PilotRootInner/></I18nProvider>;
+}
+
+function PilotRootInner() {
   const { isLoaded, isSignedIn } = useAuth();
   const { online, slow } = useConnection(isLoaded);
   if (!isLoaded && (!online || slow)) return <CantConnect offline={!online}/>;
