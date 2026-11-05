@@ -1,0 +1,177 @@
+/* Ported from the static pilot (app/index.html). Layout classes live here
+   because inline styles can't carry media queries. */
+/* ── Fonts — self-hosted; no visitor data leaves this origin ─────────── */
+    @font-face {
+      font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap;
+      src: url('/fonts/inter-latin-var.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap;
+      src: url('/fonts/jetbrains-mono-latin-var.woff2') format('woff2');
+    }
+
+    :root {
+      --ra-scale: 1;
+      --ra-paper: #FAF9F6;
+      --ra-char: #1A1A1A;
+      --ra-teal: #0A4F4F;
+      --ra-rust: #9C2D0E;
+      --ra-hair: #E5E2DA;
+      --ra-line: #8A8680;
+      --ra-canvas: #F2EFE7;
+    }
+    :root[data-ra-contrast="high"] { --ra-hair: #4A4742; --ra-line: #5A5651; }
+
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      color: var(--ra-char); background: var(--ra-canvas);
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+
+    /* ── Text size: zoom scales type + spacing together, reaching every
+         px-valued inline style without rewriting them ─────────────────── */
+    #root { zoom: var(--ra-scale); }
+
+    /* ── Motion: honoured from the OS, forceable from the in-app panel ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+      }
+    }
+    [data-ra-motion="reduce"] *, [data-ra-motion="reduce"] *::before, [data-ra-motion="reduce"] *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+    }
+
+    /* ── Focus: replaced, never removed ─────────────────────────────────── */
+    :focus-visible { outline: 3px solid var(--ra-char); outline-offset: 2px; border-radius: 6px; }
+    [data-ra-oncolor] :focus-visible,
+    [data-ra-oncolor]:focus-visible { outline-color: var(--ra-paper); }
+    @media (prefers-contrast: more) { :focus-visible { outline-width: 4px; } }
+
+    ::placeholder { color: #5A5651; opacity: 1; }
+    :root[data-ra-contrast="high"] ::placeholder { color: #3A3733; }
+
+    .ra-sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+    .ra-skip {
+      position: absolute; left: 8px; top: -80px; z-index: 500;
+      background: var(--ra-char); color: var(--ra-paper);
+      padding: 12px 18px; border-radius: 10px;
+      font-size: 16px; font-weight: 600; text-decoration: none;
+      transition: top .12s ease;
+    }
+    .ra-skip:focus { top: 8px; }
+
+    /* ── Screen scaffold (used by every app screen) ─────────────────────── */
+    .v2-screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .v2-scroll {
+      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      padding-top: var(--ra-shell-top);
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .v2-fixed { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+
+    /* ── Voice animation ────────────────────────────────────────────────── */
+    @keyframes ra-bar { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+    .ra-bar { animation: ra-bar 1.05s ease-in-out infinite; transform-origin: center; }
+    @keyframes ra-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(156,45,14,.5); } 60% { box-shadow: 0 0 0 18px rgba(156,45,14,0); } }
+    .ra-pulse { animation: ra-pulse 1.6s ease-out infinite; }
+    [data-ra-motion="reduce"] .ra-bar, [data-ra-motion="reduce"] .ra-pulse { animation: none; }
+
+    /* ── The app fills the viewport (phones, tablets and desktop) ───────
+       iOS Safari rules this layout:
+       — never size the app with `position: fixed; inset: 0`: fixed elements
+         are laid out against the LAYOUT viewport (toolbar collapsed), so the
+         bottom bar renders under the toolbar.
+       — 100dvh tracks the VISIBLE viewport; normal flow avoids the
+         fixed-position scroll quirks.
+       — overflow:hidden must sit on BOTH html and body with
+         overscroll-behavior:none, or swipes rubber-band the document. */
+    html.ra-phone {
+      --ra-shell-top: calc(env(safe-area-inset-top, 0px) + 14px);
+      --ra-tabs-pad: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    }
+    html.ra-phone, html.ra-phone body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    html.ra-phone .app-shell {
+      position: relative; width: 100%; height: 100%; height: 100dvh;
+      background: var(--ra-paper); overflow: hidden;
+    }
+
+    /* ── Web app (≥ 960px): header + side panel + big map ─────────────── */
+    html.ra-wide { --ra-shell-top: 18px; --ra-tabs-pad: 18px; }
+    html.ra-wide #root { zoom: 1; }
+    html.ra-wide .web-panel, html.ra-wide .web-head { zoom: var(--ra-scale); }
+    .web-app { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--ra-canvas); }
+    .web-head {
+      flex-shrink: 0; height: 68px; box-sizing: border-box; padding: 0 20px 0 24px;
+      display: flex; align-items: center; gap: 18px;
+      background: var(--ra-paper); border-bottom: 1px solid var(--ra-hair);
+    }
+    .web-brand { display: inline-flex; align-items: center; background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: 10px; }
+    .web-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5A5651; }
+    .web-nav { display: flex; gap: 4px; margin-left: 12px; }
+    .web-nav button, .web-btn {
+      min-height: 44px; padding: 0 16px; border-radius: 999px; border: 0; background: transparent;
+      font: 600 15.5px/1 Inter, system-ui, sans-serif; color: var(--ra-char); cursor: pointer;
+    }
+    .web-nav button:hover, .web-btn:hover { background: #EDEAE2; }
+    .web-nav button[aria-current="page"] { background: #F0F5F5; color: var(--ra-teal); box-shadow: inset 0 0 0 2px var(--ra-teal); }
+    .web-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .web-btn.outline { box-shadow: inset 0 0 0 1.5px var(--ra-line); }
+    .web-btn.primary { background: var(--ra-teal); color: var(--ra-paper); }
+    .web-btn.primary:hover { background: #073838; }
+    .web-avatar {
+      width: 44px; height: 44px; border-radius: 999px; border: 0; cursor: pointer;
+      background: var(--ra-teal); color: var(--ra-paper); font: 700 15px Inter, system-ui, sans-serif;
+    }
+    .web-body { flex: 1; min-height: 0; display: flex; }
+    .web-panel {
+      position: relative; width: 460px; flex-shrink: 0; background: var(--ra-paper);
+      border-right: 1px solid var(--ra-hair); box-shadow: 4px 0 24px rgba(26,26,26,.06); z-index: 2;
+    }
+    .web-map { position: relative; flex: 1; min-width: 0; }
+    .web-legend {
+      position: absolute; top: 16px; left: 16px; z-index: 2;
+      background: var(--ra-paper); border: 1px solid var(--ra-line); border-radius: 12px;
+      padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+      font: 600 12.5px Inter, system-ui, sans-serif; color: var(--ra-char);
+    }
+    .web-legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .web-legend i { width: 11px; height: 11px; border-radius: 999px; display: inline-block; }
+    .web-hero {
+      position: absolute; right: 24px; bottom: 24px; z-index: 2; max-width: 360px;
+      background: var(--ra-teal); color: var(--ra-paper); border-radius: 20px; padding: 22px 24px;
+      font: 500 16px/1.5 Inter, system-ui, sans-serif; box-shadow: 0 12px 32px rgba(26,26,26,.18);
+    }
+    .web-hero strong { display: block; font-size: 22px; letter-spacing: -0.02em; margin-bottom: 6px; }
+
+    .noscript-note { max-width: 620px; margin: 80px auto; padding: 0 24px; font-size: 17px; line-height: 1.6; }
+
+/* ── Pilot additions ─────────────────────────────────────────────────── */
+html.ra-phone #root { position: absolute; inset: 0; }
+.ra-auth-brand { display: inline-flex; margin: 8px 0 18px; border-radius: 10px; }
+.ra-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5A5651; }
+.ra-auth-scroll { position: absolute; inset: 0; overflow-y: auto; padding: calc(var(--ra-shell-top) + 8px) 0 32px;
+  display: flex; flex-direction: column; align-items: center; background: var(--ra-paper); }
+.maplibregl-ctrl-attrib { font-size: 11px; }
+.maplibregl-canvas:focus-visible { outline: 3px solid var(--ra-char); outline-offset: -3px; }
+
+/* Map: our own 48px "my location" button drives MapLibre's geolocate
+   control, so its small built-in button is hidden. */
+.maplibregl-ctrl-top-right .maplibregl-ctrl-geolocate { display: none; }
+.maplibregl-ctrl-top-right .maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) { display: none; }
+@keyframes ra-spin { to { transform: rotate(360deg); } }
+.ra-locating { animation: ra-spin 1.2s linear infinite; }
+[data-ra-motion="reduce"] .ra-locating { animation: none; }
+.maplibregl-user-location-dot, .maplibregl-user-location-accuracy-circle { z-index: 4; }

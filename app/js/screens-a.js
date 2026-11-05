@@ -12,7 +12,7 @@ function V2Welcome({
       padding: '22px 26px 0'
     }
   }, /*#__PURE__*/React.createElement(V2Logo, {
-    size: 20
+    size: 30
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '48px 26px 0'
@@ -427,7 +427,7 @@ function V2Home({
       justifyContent: 'space-between'
     }
   }, /*#__PURE__*/React.createElement(V2Logo, {
-    size: 16
+    size: 26
   }), /*#__PURE__*/React.createElement("button", {
     onClick: () => app.goto('me'),
     "aria-label": "Open your profile",
@@ -856,6 +856,7 @@ function V2Voice({
       startDemo();
     } else {
       let latest = '';
+      let silence = null;
       rec = new SR();
       rec.lang = 'en-AU';
       rec.interimResults = true;
@@ -874,7 +875,10 @@ function V2Voice({
         }
         latest = text.trim();
         setTranscript(latest);
-        if (final && latest) later(() => finalize(latest), 500);
+        // Some engines (iOS Safari) never send a final result or onend; a
+        // short silence after the last words finalizes instead.
+        if (silence) clearTimeout(silence);
+        if (final && latest) later(() => finalize(latest), 500);else if (latest) silence = later(() => finalize(latest), 2000);
       };
       rec.onerror = () => {
         if (!latest) startDemo();
@@ -892,6 +896,10 @@ function V2Voice({
       later(() => {
         if (!latest) startDemo();
       }, 7000);
+      // Hard cap: whatever was heard by now is the query.
+      later(() => {
+        if (latest) finalize(latest);
+      }, 15000);
     }
     return () => {
       done = true;

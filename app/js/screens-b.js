@@ -886,7 +886,9 @@ function V2ReviewView({
   function send() {
     if (!choice) return;
     app.addReview(v.id, choice);
-    app.goto('thanks', v.id);
+    app.goto('thanks', v.id, {
+      replace: true
+    }); // Back must not reopen a sent form
   }
   return /*#__PURE__*/React.createElement(V2Shell, null, /*#__PURE__*/React.createElement("div", {
     style: {

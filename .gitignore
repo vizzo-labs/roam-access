@@ -7,3 +7,5 @@ Thumbs.db
 
 # Build tooling (app/js is committed — the site deploys with no build step)
 node_modules/
+.vercel
+.env*

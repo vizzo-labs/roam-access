@@ -1,0 +1,7 @@
+# Deploys run from the repo root with Root Directory = apps/app.
+node_modules
+.next
+dist
+.env*
+.vercel
+.DS_Store

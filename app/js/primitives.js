@@ -90,7 +90,7 @@ const RA2_CAT_WORDS = {
   parks: /\b(parks?|outdoors?|walks?|gardens?|wildlife|zoo|beach|nature)\b/,
   arts: /\b(museums?|galler(y|ies)|arts?|exhibits?|shopping|shops?|arcade)\b/,
   music: /\b(music|gigs?|concerts?|shows?|events?|theatres?|venues?|plays?)\b/,
-  stay: /\b(hotels?|stay|accommodation|rooms?)\b/
+  stay: /\b(hotels?|stay|accommodation)\b/
 };
 const RA2_TAG_WORDS = {
   stepfree: /\b(step[- ]?free|wheelchairs?|ramps?|no steps?|roll in|accessible entry|mobility)\b/,
@@ -118,8 +118,12 @@ const RA2_TAG_LABEL = {
   simple: 'easy to navigate',
   calm: 'calm'
 };
+
+// Phrases whose words would otherwise read as categories: "show me…" is not
+// a show, "a quiet room" is not a hotel, "park the car" is not a park.
+const RA2_NOISE = /\b(show me|can you show|(where|somewhere|place|can i|to) park( my| the)?( car)?|parking|(can'?t|cannot|not) walk( far| much)?)\b/g;
 function ra2ParseQuery(text) {
-  const t = (text || '').toLowerCase();
+  const t = (text || '').toLowerCase().replace(RA2_NOISE, ' ');
   const cats = Object.keys(RA2_CAT_WORDS).filter(c => RA2_CAT_WORDS[c].test(t));
   const tags = Object.keys(RA2_TAG_WORDS).filter(k => RA2_TAG_WORDS[k].test(t));
   let label;

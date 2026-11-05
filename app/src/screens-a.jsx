@@ -8,7 +8,7 @@ function V2Welcome({ app }) {
   return (
     <V2Shell>
       <div style={{ padding: '22px 26px 0' }}>
-        <V2Logo size={20}/>
+        <V2Logo size={30}/>
       </div>
       <div style={{ padding: '48px 26px 0' }}>
         <p style={{ fontFamily: M2, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: C2.slate, margin: '0 0 18px' }}>
@@ -204,7 +204,7 @@ function V2Home({ app }) {
   return (
     <V2Shell tabs app={app} active="home">
       <div style={{ padding: '10px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <V2Logo size={16}/>
+        <V2Logo size={26}/>
         <button onClick={() => app.goto('me')} aria-label="Open your profile" style={{
           width: 44, height: 44, borderRadius: 999, background: C2.teal, color: C2.paper,
           border: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -397,6 +397,7 @@ function V2Voice({ app }) {
       startDemo();
     } else {
       let latest = '';
+      let silence = null;
       rec = new SR();
       rec.lang = 'en-AU';
       rec.interimResults = true;
@@ -413,7 +414,11 @@ function V2Voice({ app }) {
         }
         latest = text.trim();
         setTranscript(latest);
+        // Some engines (iOS Safari) never send a final result or onend; a
+        // short silence after the last words finalizes instead.
+        if (silence) clearTimeout(silence);
         if (final && latest) later(() => finalize(latest), 500);
+        else if (latest) silence = later(() => finalize(latest), 2000);
       };
       rec.onerror = () => { if (!latest) startDemo(); };
       rec.onend = () => {
@@ -424,6 +429,8 @@ function V2Voice({ app }) {
       try { rec.start(); } catch (e) { startDemo(); }
       // Safety net: mic silent, permission hung, anything — 7s then demo.
       later(() => { if (!latest) startDemo(); }, 7000);
+      // Hard cap: whatever was heard by now is the query.
+      later(() => { if (latest) finalize(latest); }, 15000);
     }
 
     return () => {
