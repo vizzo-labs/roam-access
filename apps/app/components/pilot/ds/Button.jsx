@@ -64,7 +64,7 @@ const Button = React.forwardRef(function Button({
         ...variantStyle(variant), ...off, ...style,
       }} {...rest}>
       {icon && <Icon name={icon} size={s.icon}/>}
-      <span>{children}</span>
+      {children}
       {iconRight && <Icon name={iconRight} size={s.icon}/>}
     </Pressable>
   );

@@ -18,3 +18,5 @@ export { ActionRow } from './ActionRow';
 export { SegmentedControl, Tabs, TabPanel } from './Tabs';
 export { Sheet, SnapSheet, SNAPS } from './Sheet';
 export { PhotoGrid, PhotoViewer } from './PhotoViewer';
+export { ScreenHeader } from './ScreenHeader';
+export { SearchField } from './SearchField';

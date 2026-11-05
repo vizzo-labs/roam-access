@@ -67,8 +67,14 @@ import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE,
 | Venue quick actions | `ActionRow actions=[Directions, Call, Website, Save, Share]` | Keep this order. Leave out an action that doesn't apply; don't disable it. |
 | Switching mode or panels | `SegmentedControl` (List · Map; a radiogroup) and `Tabs` + `TabPanel` | Roving tabindex with arrow keys and Home/End. |
 | A modal panel | `Sheet open onClose title footer` | A bottom sheet on phones and a dialog from 960px; focus is trapped and restored; Escape, the scrim and drag-down close it. |
+| The top of a screen | `ScreenHeader back={{ label: 'Back to …', onClick }} headingRef={h} title subtitle actions` | Back is always top-left; it renders the screen's one `<h1>` (pass the `useV2Heading` ref). Use `compact` to put a short title on the Back row. |
+| Search | `SearchField value onChange onSubmit onVoice back` | A real `role="search"` form: Clear button, mic, and a Search button once the text changes; Enter submits; the whole pill shows focus. |
+| A place in a list | `explore/PlaceRow app place` (place needs `.verdict`) | Name, kind · area · walk, verdict, reasons. Hovering or focusing it highlights the pin on the desktop map. |
+| Explore filters | `explore/ExploreFilters` + `explore/filters.js` (`applyFilters`, `verdictCounts`, `countsLine`) | Shared by Results, the phone map and the desktop map (`app.filters`, `app.setFilters`, `app.setQuery`). Filters only narrow, or sort by distance when the tester asks; they never change a verdict. |
 | A list over a map | `SnapSheet snap onSnapChange label header` | Peek · half · full. The handle is a button (click, Enter, arrow keys) and each change is announced; tabbing into a collapsed list opens it. |
 | Dates, plurals | `formatDate(d)` → "6 November 2026", `timeAgo(d)`, `plural(n, 'review')` | en-AU, Sydney time. |
+
+The old `ui/Buttons` (`V2BigBtn`, `V2RoundBtn`, `V2Back`) are now thin wrappers over `Button` and `IconButton`. Use the design-system names in new code.
 
 Rules: read `C2.x` at render time; animate only through CSS transitions or `dur()`, or check
 `useReducedMotion()`; check every new colour pair on `/ds` (text ≥ 4.5:1, control

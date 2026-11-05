@@ -62,3 +62,9 @@
 /* /ds preview toolbar: sticky only where there's room for it. */
 .ds-preview-head { position: static; }
 @media (min-width: 900px) { .ds-preview-head { position: sticky; top: 0; } }
+
+/* SearchField: the whole pill shows focus (the input's own ring would sit
+   awkwardly inside it). */
+.ds-search:focus-within { outline: 3px solid var(--ra-char); outline-offset: 2px; }
+.ds-search input:focus-visible { outline: none; }
+.ds-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

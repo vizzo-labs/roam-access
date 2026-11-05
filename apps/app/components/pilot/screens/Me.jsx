@@ -3,9 +3,10 @@
 import React from 'react';
 import { RA2_NEEDS } from '@/lib/pilot-data';
 import { V2Shell } from '../ui/Shell';
-import { C2, F2, M2, V2_H1 } from '../ui/palette';
+import { C2, F2, M2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { MePortals } from './MePortals';
+import { usePortalRows } from './MePortals';
+import { Card, Chip, ChipGroup, GUTTER, Icon, List, ListRow, RADIUS, SPACE, SectionHeader, TYPE } from '../ds';
 
 // ─────────────────────────────────────────────────────────────
 // ME — profile, needs, impact, settings
@@ -25,110 +26,76 @@ function V2Me({ app }) {
     { l: 'Delete my account', m: 'Removes your needs, reviews and saved places', fn: () => app.deleteAccount() },
   ];
 
+  const icons = {
+    'Accessibility settings': 'a11y', 'My needs card': 'user', 'Install the app': 'plus',
+    'Invite someone to the pilot': 'users', 'Sign out': 'back', 'Delete my account': 'close',
+  };
+  const row = r => (
+    <ListRow key={r.l} onClick={r.fn} padX={SPACE.md} title={r.l} subtitle={r.m}
+      leading={<span style={{ color: r.danger ? C2.red : C2.teal }}><Icon name={icons[r.l] || 'forward'} size={22}/></span>}/>
+  );
+  const portals = usePortalRows();
+
   return (
     <V2Shell tabs app={app} active="me">
-      <div style={{ padding: '16px 22px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
+      <div style={{ padding: `${SPACE.md}px ${GUTTER}px ${SPACE.xl}px` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.md, marginBottom: SPACE.lg }}>
           <span aria-hidden="true" style={{
-            width: 64, height: 64, borderRadius: 999, background: C2.teal, color: C2.paper,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, fontFamily: F2,
+            width: 64, height: 64, borderRadius: RADIUS.pill, background: C2.teal, color: C2.paper, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, fontFamily: F2,
           }}>{(name || 'You').charAt(0).toUpperCase()}</span>
-          <div>
-            <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 24, letterSpacing: '-0.02em' }}>
-              {name || 'You'}<span style={{ color: C2.rust }}>.</span>
+          <div style={{ minWidth: 0 }}>
+            <h1 ref={h} tabIndex={-1} style={{ ...TYPE.title1, margin: 0 }}>
+              {name || 'You'}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
             </h1>
-            <p style={{ fontSize: 14, color: C2.slate, margin: 0, fontFamily: F2 }}>Manly pilot · tester</p>
+            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0' }}>Manly pilot · tester</p>
           </div>
         </div>
 
         {/* my needs */}
-        <section style={{ background: C2.stone, borderRadius: 18, padding: 18, marginBottom: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: 0, fontFamily: F2 }}>What I need</h2>
-            <button onClick={() => app.goto('setup')} style={{
-              minHeight: 44, padding: '0 14px', borderRadius: 999, border: 0, background: 'transparent',
-              color: C2.teal, fontFamily: F2, fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
-              textDecoration: 'underline', textUnderlineOffset: 4,
-            }}>Edit</button>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-            {needChips.length ? needChips.map(t => (
-              <span key={t} style={{
-                fontSize: 13.5, fontWeight: 600, padding: '8px 13px', borderRadius: 999,
-                background: C2.paper, color: C2.char, border: `1px solid ${C2.line}`, fontFamily: F2,
-              }}>{t}</span>
-            )) : (
-              <span style={{ fontSize: 14, color: C2.slate, fontFamily: F2 }}>Nothing set — showing general access for now.</span>
-            )}
-          </div>
-        </section>
+        <Card variant="filled" as="section" aria-labelledby="needs-h" style={{ marginBottom: SPACE.sm }}>
+          <SectionHeader id="needs-h" title="What I need" size="sm" style={{ marginBottom: SPACE.xs }}
+            action={{ label: 'Edit', ariaLabel: 'Edit what I need', onClick: () => app.goto('setup') }}/>
+          <ChipGroup label="My needs" wrap>
+            {needChips.length
+              ? needChips.map(t => <Chip key={t} outline>{t}</Chip>)
+              : <span style={{ ...TYPE.footnote, color: C2.slate }}>Nothing set — showing general access for now.</span>}
+          </ChipGroup>
+        </Card>
 
         {/* impact */}
-        <section style={{ background: C2.teal, borderRadius: 18, padding: 18, marginBottom: 18, color: C2.paper }} data-ra-oncolor="">
-          <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: '0 0 12px', fontFamily: F2 }}>Your impact</h2>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {[[String(stats.reviews), stats.reviews === 1 ? 'review' : 'reviews'], [String(stats.places), stats.places === 1 ? 'place reviewed' : 'places reviewed'], [String(app.pilot.testers), app.pilot.testers === 1 ? 'person in the pilot' : 'people in the pilot']].map(([n, l]) => (
-              <div key={l} style={{ flex: 1, background: 'rgba(250,249,246,0.1)', borderRadius: 12, padding: '12px 10px' }}>
-                <div style={{ fontFamily: M2, fontSize: 24, fontWeight: 700, marginBottom: 3 }}>{n}</div>
-                <div style={{ fontSize: 12, opacity: 0.88, lineHeight: 1.3, fontFamily: F2 }}>{l}</div>
+        <Card variant="brand" as="section" aria-labelledby="impact-h" style={{ marginBottom: SPACE.lg }} data-ra-oncolor="">
+          <h2 id="impact-h" style={{ ...TYPE.headline, margin: `0 0 ${SPACE.sm}px` }}>Your impact</h2>
+          <dl style={{ display: 'flex', gap: 10, margin: 0 }}>
+            {[[stats.reviews, stats.reviews === 1 ? 'review' : 'reviews'], [stats.places, stats.places === 1 ? 'place reviewed' : 'places reviewed'], [app.pilot.testers, app.pilot.testers === 1 ? 'person in the pilot' : 'people in the pilot']].map(([n, l]) => (
+              <div key={l} style={{ flex: 1, background: 'rgba(250,249,246,0.12)', borderRadius: RADIUS.md, padding: '12px 10px', display: 'flex', flexDirection: 'column-reverse' }}>
+                <dt style={{ fontSize: 13, lineHeight: 1.3, fontFamily: F2 }}>{l}</dt>
+                <dd style={{ fontFamily: M2, fontSize: 24, fontWeight: 700, margin: '0 0 3px' }}>{n}</dd>
               </div>
             ))}
-          </div>
-        </section>
+          </dl>
+          {stats.reviews === 0 && (
+            <p style={{ ...TYPE.footnote, margin: `${SPACE.sm}px 0 0` }}>Your first review helps everyone with needs like yours.</p>
+          )}
+        </Card>
 
-        {/* settings rows */}
-        {rows.slice(0, -2).map(r => (
-          <button key={r.l} onClick={r.fn} style={{
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-            minHeight: 66, padding: '10px 16px', marginBottom: 8, cursor: 'pointer', textAlign: 'left',
-            borderRadius: 16, fontFamily: F2, boxSizing: 'border-box',
-            border: r.hi ? `2px solid ${C2.teal}` : `1.5px solid ${C2.line}`,
-            background: r.hi ? C2.tealSoft : C2.paper,
-          }}>
-            <span>
-              <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: C2.char, marginBottom: 2 }}>{r.l}</span>
-              <span style={{ display: 'block', fontSize: 13, color: C2.slate }}>{r.m}</span>
-            </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
-              <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        ))}
+        <Card padding={0} style={{ marginBottom: SPACE.md }}>
+          <List label="Settings and tools">
+            {rows.slice(0, -2).map(row)}
+            <ListRow href="/how-it-works" padX={SPACE.md} title="How Roam Access works"
+              subtitle="How verdicts are made · payment never changes one · privacy"
+              leading={<span style={{ color: C2.teal }}><Icon name="info" size={22}/></span>}/>
+            {portals}
+          </List>
+        </Card>
 
-        <a href="/how-it-works" style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-          minHeight: 66, padding: '10px 16px', marginBottom: 8, textAlign: 'left', textDecoration: 'none',
-          borderRadius: 16, fontFamily: F2, boxSizing: 'border-box', border: `1.5px solid ${C2.line}`, background: C2.paper,
-        }}>
-          <span>
-            <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: C2.char, marginBottom: 2 }}>How Roam Access works</span>
-            <span style={{ display: 'block', fontSize: 13, color: C2.slate }}>How verdicts are made · payment never changes one · privacy</span>
-          </span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
-            <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </a>
-        <MePortals/>
+        <Card padding={0}>
+          <List label="Account">
+            {rows.slice(-2).map(r => row({ ...r, danger: r.l === 'Delete my account' }))}
+          </List>
+        </Card>
 
-        {rows.slice(-2).map(r => (
-          <button key={r.l} onClick={r.fn} style={{
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-            minHeight: 66, padding: '10px 16px', marginBottom: 8, cursor: 'pointer', textAlign: 'left',
-            borderRadius: 16, fontFamily: F2, boxSizing: 'border-box',
-            border: r.hi ? `2px solid ${C2.teal}` : `1.5px solid ${C2.line}`,
-            background: r.hi ? C2.tealSoft : C2.paper,
-          }}>
-            <span>
-              <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: C2.char, marginBottom: 2 }}>{r.l}</span>
-              <span style={{ display: 'block', fontSize: 13, color: C2.slate }}>{r.m}</span>
-            </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
-              <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        ))}
-
-        <p style={{ fontFamily: M2, fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: C2.slate, textAlign: 'center', margin: '16px 0 0' }}>
+        <p style={{ ...TYPE.overline, fontSize: 11, color: C2.slate, textAlign: 'center', margin: `${SPACE.lg}px 0 0` }}>
           Roam Access pilot · Manly · map data © OpenStreetMap contributors
         </p>
       </div>

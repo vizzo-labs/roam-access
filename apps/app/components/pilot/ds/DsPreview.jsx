@@ -15,7 +15,7 @@ import {
   Icon, ICON_NAMES, Button, IconButton, Card, Chip, FilterChip, RemovableChip, ChipGroup,
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
-  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer,
+  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField,
 } from './index';
 
 const SAMPLE = [
@@ -95,6 +95,7 @@ export function DsPreview() {
   const [photoAt, setPhotoAt] = React.useState(null);
   const closePhoto = React.useCallback(() => setPhotoAt(null), []);
   const [toggled, setToggled] = React.useState(false);
+  const [searchText, setSearchText] = React.useState('');
 
   const pairs = [
     ['Body text', C2.char, C2.paper], ['Secondary text', C2.slate, C2.paper], ['Secondary on stone', C2.slate, C2.stone],
@@ -386,6 +387,26 @@ export function DsPreview() {
                 <p style={{ ...TYPE.body, margin: 0 }}>The {id} panel.</p>
               </TabPanel>
             ))}
+          </div>
+        </Section>
+
+        <Section id="header" title="ScreenHeader · SearchField" note="ScreenHeader: Back always top-left (48px, “Back to …”), optional actions top-right, then the screen’s one h1. SearchField: a real search form — Back, Clear, mic, and a Search button once the text changed; Enter submits; the whole pill shows focus.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+            <Card padding={0}>
+              <ScreenHeader title="Sample Café" dot back={{ label: 'Back to results', onClick: () => {} }}
+                actions={<IconButton icon="share" label="Share Sample Café"/>}
+                subtitle="Cafe · 3 min walk" style={{ paddingBottom: 16 }}/>
+            </Card>
+            <Card padding={0}>
+              <ScreenHeader compact title="Sample Café reviews" back={{ label: 'Back to Sample Café', onClick: () => {} }}
+                subtitle="4 reviews from the pilot" style={{ paddingBottom: 16 }}/>
+            </Card>
+          </div>
+          <div style={{ maxWidth: 420, marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <SearchField id="ds-search-1" value={searchText} onChange={setSearchText} onSubmit={() => {}} onVoice={() => {}}
+              placeholder="Try “quiet cafe with step-free entry”"/>
+            <SearchField id="ds-search-2" value="Food & drink" onChange={() => {}} dirty={false} onVoice={() => {}} floating
+              back={{ label: 'Back to home', onClick: () => {} }}/>
           </div>
         </Section>
 
