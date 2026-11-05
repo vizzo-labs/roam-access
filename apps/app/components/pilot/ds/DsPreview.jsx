@@ -15,7 +15,7 @@ import {
   Icon, ICON_NAMES, Button, IconButton, Card, Chip, FilterChip, RemovableChip, ChipGroup,
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
-  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet,
+  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer,
 } from './index';
 
 const SAMPLE = [
@@ -23,6 +23,10 @@ const SAMPLE = [
   { id: 'b', name: 'Harbour Kiosk (sample)', kind: 'Takeaway · 5 min walk', verdict: 'check', note: 'Step-free (unconfirmed)' },
   { id: 'c', name: 'Example Gallery', kind: 'Gallery · 8 min walk', verdict: 'barrier', note: 'Two steps at the door' },
   { id: 'd', name: 'Demo Beach Pool', kind: 'Pool · 12 min walk', verdict: 'unknown', note: 'No reviews yet' },
+];
+const SAMPLE_PHOTOS = [
+  { id: 'p1', src: '/icons/icon-512.png', thumb: '/icons/icon-192.png', kindLabel: 'Entrance', alt: 'Sample: wide level doorway with an automatic door', who: 'Wheelchair or mobility aid user', when: '2 days ago' },
+  { id: 'p2', src: '/icons/maskable-512.png', thumb: '/icons/maskable-192.png', kindLabel: 'Toilet', alt: 'Sample: accessible toilet with grab rails on both sides', who: 'Person with chronic illness', when: '1 week ago' },
 ];
 const daysAgo = n => new Date(Date.now() - n * 86400000);
 
@@ -88,6 +92,8 @@ export function DsPreview() {
   const [snap, setSnap] = React.useState('half');
   const [loading, setLoading] = React.useState(true);
   const [banner, setBanner] = React.useState(true);
+  const [photoAt, setPhotoAt] = React.useState(null);
+  const closePhoto = React.useCallback(() => setPhotoAt(null), []);
   const [toggled, setToggled] = React.useState(false);
 
   const pairs = [
@@ -347,6 +353,12 @@ export function DsPreview() {
             <Banner tone="offline" title="You’re offline">Saved places still show; reviews will load when you’re back.</Banner>
             {banner && <Banner tone="teal" title="New: filter by what works for you" onDismiss={() => setBanner(false)} dismissLabel="Dismiss tip">Tap “Works for me” above the list.</Banner>}
           </div>
+        </Section>
+
+        <Section id="photos" title="PhotoGrid · PhotoViewer" note="Review photos. Each thumbnail is one button named with its position, kind and description. The viewer is a modal dialog: focus in, trapped and restored; Esc closes; ← → move; the description is shown as text too.">
+          <PhotoGrid photos={SAMPLE_PHOTOS} onOpen={setPhotoAt}/>
+          <PhotoViewer photos={SAMPLE_PHOTOS} index={photoAt} onIndex={setPhotoAt} onClose={closePhoto}/>
+          <Row><SourceBadge source="photo">With photo</SourceBadge></Row>
         </Section>
 
         <Section id="actionrow" title="ActionRow" note="Venue quick actions in a fixed order. Leave out what doesn’t apply (no phone → no Call); don’t disable.">

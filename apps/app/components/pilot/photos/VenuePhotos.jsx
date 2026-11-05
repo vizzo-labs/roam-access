@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PhotoThumbs, PhotoViewer } from './PhotoViewer';
-import { C2, F2 } from '../ui/palette';
+import { Card, PhotoGrid, PhotoViewer, SectionHeader, SPACE, plural } from '../ds';
 
 // Venue page gallery: photos from visible reviews only. Hidden by an admin =
 // gone from here (images are private and served through an auth check).
@@ -24,16 +23,12 @@ function VenuePhotos({ app, venueId }) {
   const close = React.useCallback(() => setOpen(null), []);
   if (!photos || !photos.length) return null;
   return (
-    <section aria-labelledby="venue-photos-h" style={{ borderRadius: 18, border: `1.5px solid ${C2.line}`, padding: '16px 18px 18px', marginBottom: 16 }}>
-      <h2 id="venue-photos-h" style={{ fontSize: 14, fontWeight: 700, color: C2.teal, margin: '0 0 4px', fontFamily: F2, letterSpacing: '0.02em' }}>
-        PHOTOS FROM REVIEWERS
-      </h2>
-      <p style={{ fontSize: 14, color: C2.slate, margin: '0 0 12px', fontFamily: F2, lineHeight: 1.45 }}>
-        {photos.length} {photos.length === 1 ? 'photo' : 'photos'} taken by people in the pilot. Each has a description.
-      </p>
-      <PhotoThumbs photos={photos} onOpen={setOpen}/>
+    <Card as="section" aria-labelledby="venue-photos-h" style={{ marginBottom: SPACE.md }}>
+      <SectionHeader id="venue-photos-h" title="Photos from reviewers" size="sm"
+        description={`${plural(photos.length, 'photo')} taken by people in the pilot, each with a description.`}/>
+      <PhotoGrid photos={photos} onOpen={setOpen}/>
       <PhotoViewer photos={photos} index={open} onIndex={setOpen} onClose={close}/>
-    </section>
+    </Card>
   );
 }
 

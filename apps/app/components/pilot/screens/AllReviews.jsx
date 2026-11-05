@@ -8,7 +8,7 @@ import { V2Shell } from '../ui/Shell';
 import { V2Verdict } from '../ui/Verdict';
 import { C2, F2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { PhotoThumbs, PhotoViewer, WithPhotoMarker } from '../photos/PhotoViewer';
+import { PhotoGrid, PhotoViewer, SourceBadge } from '../ds';
 
 // ─────────────────────────────────────────────────────────────
 // ALL REVIEWS — filter by lived experience
@@ -64,8 +64,10 @@ function V2AllReviews({ app }) {
             {r.details && <p style={{ fontSize: 14, lineHeight: 1.5, margin: '0 0 12px', color: C2.slate, fontFamily: F2 }}>{r.details}</p>}
             {r.photos?.length > 0 && (
               <div style={{ margin: '0 0 12px' }}>
-                <div style={{ marginBottom: 8 }}><WithPhotoMarker count={r.photos.length}/></div>
-                <PhotoThumbs photos={r.photos} size={72} onOpen={i => setViewer({ photos: r.photos, index: i })}/>
+                <div style={{ marginBottom: 8 }}>
+                  <SourceBadge source="photo">{r.photos.length === 1 ? 'With photo' : `With ${r.photos.length} photos`}</SourceBadge>
+                </div>
+                <PhotoGrid photos={r.photos} size={72} onOpen={i => setViewer({ photos: r.photos, index: i })}/>
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

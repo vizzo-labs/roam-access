@@ -4,8 +4,8 @@ import React from 'react';
 import { ALT_MAX, ALT_MIN, MAX_PHOTOS_PER_REVIEW, PHOTO_KINDS, SUGGESTABLE } from '@/lib/photos/kinds';
 import { RA2_FEATURES } from '@/lib/pilot-data';
 import { preparePhoto } from './resize';
-import { CameraIcon } from './PhotoViewer';
-import { C2, F2, RA2_INPUT_FONT } from '../ui/palette';
+import { C2 } from '../ui/palette';
+import { Banner, Button, Card, Icon, SectionHeader, SPACE, TYPE, RADIUS, edge, tone } from '../ds';
 
 // Photos in the review form (#3) + suggestions from them (#16).
 // Each photo: resized and stripped of location data in the browser, uploaded
@@ -126,13 +126,8 @@ function ReviewPhotos({ venueName, state }) {
 
   return (
     <section aria-labelledby="rev-photos" style={{ marginTop: 22 }}>
-      <h2 id="rev-photos" style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', fontFamily: F2 }}>
-        Add photos <span style={{ fontWeight: 500, color: C2.slate }}>(optional)</span>
-      </h2>
-      <p style={{ fontSize: 14.5, color: C2.slate, margin: '0 0 10px', lineHeight: 1.45, fontFamily: F2 }}>
-        The entrance, a step, the toilet or seating help most. Up to {MAX_PHOTOS_PER_REVIEW}. We remove the location
-        from your photos. Please avoid people’s faces.
-      </p>
+      <SectionHeader id="rev-photos" size="sm" title={<>Add photos <span style={{ fontWeight: 500, color: C2.slate }}>(optional)</span></>}
+        description={`The entrance, a step, the toilet or seating help most. Up to ${MAX_PHOTOS_PER_REVIEW}. We remove the location from your photos. Please avoid people’s faces.`}/>
 
       <div className="ra-sr-only" role="status" aria-live="polite">{announce}</div>
 
@@ -142,64 +137,55 @@ function ReviewPhotos({ venueName, state }) {
 
       <input ref={input} type="file" accept="image/*" multiple hidden tabIndex={-1} aria-hidden="true"
         onChange={e => { add(e.target.files); e.target.value = ''; }}/>
-      <button type="button" disabled={full} onClick={() => input.current?.click()} style={{
-        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-        minHeight: 52, borderRadius: 14, border: full ? `1.5px solid ${C2.line}` : `1.5px dashed ${C2.teal}`,
-        background: full ? C2.stone : C2.tealSoft, color: full ? C2.slate : C2.teal,
-        fontFamily: F2, fontSize: 16, fontWeight: 700, cursor: full ? 'not-allowed' : 'pointer',
-      }}>
-        <CameraIcon size={20} color={full ? C2.slate : C2.teal}/>
+      <Button variant="secondary" full icon="camera" disabled={full} onClick={() => input.current?.click()}>
         {full ? `${MAX_PHOTOS_PER_REVIEW} photos added — the most for one review` : photos.length ? 'Add another photo' : 'Add a photo'}
-      </button>
+      </Button>
     </section>
   );
 }
 
+const fieldLabel = { ...TYPE.headline, fontSize: 15.5, display: 'block', margin: `${SPACE.md}px 0 6px` };
+
 function PhotoCard({ p, n, venueName, patch, remove, retry }) {
   const altId = `alt-${p.key}`, kindId = `kind-${p.key}`, hintId = `alt-hint-${p.key}`;
-  const statusText = {
-    preparing: 'Preparing your photo…',
-    uploading: 'Uploading…',
-    ready: null,
-    failed: p.error || 'Couldn’t upload this photo.',
-  }[p.status];
+  const statusText = { preparing: 'Preparing your photo…', uploading: 'Uploading…' }[p.status];
   const aiPending = p.altSource === 'ai' && !p.altConfirmed;
-  const smallBtn = {
-    minHeight: 44, padding: '0 14px', borderRadius: 999, cursor: 'pointer', fontFamily: F2, fontSize: 15, fontWeight: 700,
-    border: `1.5px solid ${C2.line}`, background: C2.paper, color: C2.char,
-  };
 
   return (
-    <div role="group" aria-label={`Photo ${n}`} style={{ border: `1.5px solid ${C2.line}`, borderRadius: 16, padding: 14, marginBottom: 12 }}>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        <div style={{ width: 84, height: 84, borderRadius: 12, overflow: 'hidden', background: C2.stone, flexShrink: 0 }}>
+    <Card role="group" aria-label={`Photo ${n}`} style={{ marginBottom: SPACE.sm }}>
+      <div style={{ display: 'flex', gap: SPACE.sm, alignItems: 'flex-start' }}>
+        <div style={{ width: 84, height: 84, borderRadius: RADIUS.md - 2, overflow: 'hidden', background: C2.stone, flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {p.preview && <img src={p.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: '0 0 6px', fontWeight: 700, fontSize: 15.5, fontFamily: F2 }}>Photo {n}</p>
-          {statusText && <p style={{ margin: '0 0 8px', fontSize: 14.5, color: p.status === 'failed' ? C2.red : C2.slate, fontFamily: F2 }}>{statusText}</p>}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {p.status === 'failed' && p.prepared && <button type="button" style={smallBtn} onClick={() => retry(p.key)}>Try again</button>}
-            <button type="button" style={smallBtn} onClick={() => remove(p.key)} aria-label={`Remove photo ${n}`}>Remove</button>
+          <p style={{ ...TYPE.headline, margin: '0 0 6px' }}>Photo {n}</p>
+          {statusText && <p style={{ ...TYPE.footnote, color: C2.slate, margin: `0 0 ${SPACE.xs}px` }}>{statusText}</p>}
+          <div style={{ display: 'flex', gap: SPACE.xs, flexWrap: 'wrap' }}>
+            {p.status === 'failed' && p.prepared && <Button size="sm" variant="ghost" icon="refresh" onClick={() => retry(p.key)} aria-label={`Try uploading photo ${n} again`}>Try again</Button>}
+            <Button size="sm" variant="ghost" icon="close" onClick={() => remove(p.key)} aria-label={`Remove photo ${n}`}>Remove</Button>
           </div>
         </div>
       </div>
 
+      {p.status === 'failed' && (
+        <Banner tone="danger" style={{ marginTop: SPACE.sm }}>{p.error || 'Couldn’t upload this photo.'}</Banner>
+      )}
+
       {p.status !== 'failed' && (
         <>
-          <label htmlFor={kindId} style={{ display: 'block', fontSize: 15.5, fontWeight: 700, margin: '14px 0 6px', fontFamily: F2 }}>What does it show?</label>
+          <label htmlFor={kindId} style={fieldLabel}>What does it show?</label>
           <select id={kindId} value={p.kind} onChange={e => patch(p.key, { kind: e.target.value })} style={{
-            width: '100%', minHeight: 48, borderRadius: 12, border: `1.5px solid ${C2.line}`, padding: '0 12px',
-            fontSize: RA2_INPUT_FONT, fontFamily: F2, background: C2.paper, color: C2.char,
+            ...TYPE.input, width: '100%', minHeight: 48, borderRadius: RADIUS.md - 2, border: edge(), padding: '0 12px',
+            background: C2.paper, color: C2.char,
           }}>
             {PHOTO_KINDS.map(k => <option key={k.id} value={k.id}>{k.label}</option>)}
           </select>
 
-          <label htmlFor={altId} style={{ display: 'block', fontSize: 15.5, fontWeight: 700, margin: '14px 0 2px', fontFamily: F2 }}>
+          <label htmlFor={altId} style={{ ...fieldLabel, marginBottom: 2 }}>
             Describe it for people who can’t see it <span style={{ fontWeight: 500, color: C2.slate }}>(required)</span>
           </label>
-          <p id={hintId} style={{ fontSize: 14, color: C2.slate, margin: '0 0 6px', lineHeight: 1.4, fontFamily: F2 }}>
+          <p id={hintId} style={{ ...TYPE.footnote, color: C2.slate, margin: '0 0 6px' }}>
             {aiPending
               ? 'Suggested from your photo — check it’s right, then confirm or edit it.'
               : p.suggestStatus === 'loading' ? 'Looking at your photo to suggest a description…'
@@ -208,26 +194,24 @@ function PhotoCard({ p, n, venueName, patch, remove, retry }) {
           <textarea id={altId} rows={2} maxLength={ALT_MAX} value={p.alt} aria-describedby={hintId} aria-required="true"
             onChange={e => patch(p.key, { alt: e.target.value, altSource: 'user', altConfirmed: true })}
             style={{
-              width: '100%', boxSizing: 'border-box', borderRadius: 12, padding: 12, resize: 'vertical',
-              border: aiPending ? `2px solid ${C2.amber}` : `1.5px solid ${C2.line}`,
-              fontSize: RA2_INPUT_FONT, fontFamily: F2, lineHeight: 1.45, color: C2.char, background: C2.paper,
+              ...TYPE.input, width: '100%', boxSizing: 'border-box', borderRadius: RADIUS.md - 2, padding: SPACE.sm, resize: 'vertical',
+              border: aiPending ? `2px solid ${C2.amber}` : edge(), color: C2.char, background: C2.paper,
             }}/>
           {aiPending && (
-            <button type="button" onClick={() => patch(p.key, { altConfirmed: true })}
-              disabled={p.alt.trim().length < ALT_MIN}
-              style={{ ...smallBtn, marginTop: 8, border: `2px solid ${C2.teal}`, color: C2.teal }}>
-              ✓ This description is right
-            </button>
+            <Button size="sm" variant="outline" icon="check" style={{ marginTop: SPACE.xs }}
+              disabled={p.alt.trim().length < ALT_MIN} onClick={() => patch(p.key, { altConfirmed: true })}>
+              This description is right
+            </Button>
           )}
           {p.suggestStatus === 'unavailable' && (
-            <p style={{ fontSize: 13.5, color: C2.slate, margin: '6px 0 0', fontFamily: F2 }}>Suggestions aren’t available right now — write your own description.</p>
+            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>Suggestions aren’t available right now — write your own description.</p>
           )}
           {p.suggestStatus === 'limit' && (
-            <p style={{ fontSize: 13.5, color: C2.slate, margin: '6px 0 0', fontFamily: F2 }}>You’ve used today’s photo suggestions — write your own description.</p>
+            <p style={{ ...TYPE.footnote, color: C2.slate, margin: '6px 0 0' }}>You’ve used today’s photo suggestions — write your own description.</p>
           )}
         </>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -236,17 +220,17 @@ function PhotoSuggestion({ featureId, suggestion, onUse }) {
   if (!suggestion) return null;
   const f = RA2_FEATURES.find(x => x.id === featureId);
   const word = suggestion.value === 'yes' ? 'Yes' : 'No';
+  const t = tone('warn');
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '0 0 10px', padding: '8px 12px', borderRadius: 12, background: C2.amberBg }}>
-      <span style={{ flex: 1, minWidth: 160, fontSize: 14, color: C2.char, fontFamily: F2, lineHeight: 1.4 }}>
-        <CameraIcon size={15} color={C2.amber}/> Your photo suggests <strong>{word}</strong>
-        {suggestion.reason ? ` — ${suggestion.reason}` : ''}
+    <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm - 2, flexWrap: 'wrap', margin: `0 0 ${SPACE.sm - 2}px`, padding: `${SPACE.xs}px ${SPACE.sm}px`, borderRadius: RADIUS.md - 2, background: t.bg }}>
+      <span style={{ ...TYPE.footnote, flex: 1, minWidth: 160, color: C2.char, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+        <span style={{ color: t.fg, flexShrink: 0 }}><Icon name="camera" size={16}/></span>
+        <span>Your photo suggests <strong>{word}</strong>{suggestion.reason ? ` — ${suggestion.reason}` : ''}</span>
       </span>
-      <button type="button" onClick={() => onUse(featureId, suggestion.value)}
-        aria-label={`Use the photo’s suggestion: ${word} for “${f?.question}”`}
-        style={{ minHeight: 44, padding: '0 14px', borderRadius: 999, border: `2px solid ${C2.amber}`, background: C2.paper, color: C2.amber, fontWeight: 700, fontSize: 14.5, fontFamily: F2, cursor: 'pointer' }}>
+      <Button size="sm" variant="outline" onClick={() => onUse(featureId, suggestion.value)}
+        aria-label={`Use the photo’s suggestion: ${word} for “${f?.question}”`}>
         Use this answer
-      </button>
+      </Button>
     </div>
   );
 }

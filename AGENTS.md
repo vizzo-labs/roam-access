@@ -60,6 +60,7 @@ import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE,
 | Status and provenance | `Badge`, `SourceBadge source="community" \| "osm" \| "venue" \| "partner" \| "photo"`, `Freshness date=…` | `SourceBadge` only shows where a fact came from and **never** decides a verdict. OSM is always "unconfirmed". |
 | Verdicts | the existing `ui/Verdict` (`V2Verdict`) | Unchanged: icon + colour + words. |
 | Section titles | `SectionHeader title level={2} action={{ label, ariaLabel, onClick }}` | A real heading with at most one action. |
+| Photos | `PhotoGrid photos onOpen` + `PhotoViewer photos index onIndex onClose` | Thumbnails are buttons named with kind + description; the viewer is a modal dialog (focus trapped/restored, ←/→, Esc) that shows the description as text. Mark reviews with `SourceBadge source="photo"`. |
 | Loading | `SkeletonList`, `SkeletonCard`, `Skeleton` | Announces one "Loading…" message; the shimmer stops when motion is reduced. |
 | Nothing to show | `EmptyState icon title body action` | Always give a next step. |
 | Inline messages | `Banner tone="info" \| "success" \| "warn" \| "danger" \| "offline"` | `live="polite"` when it appears after an action; `"assertive"` only for errors that block the user. |
