@@ -400,7 +400,7 @@ function V2ReviewView({ app }) {
   function send() {
     if (!choice) return;
     app.addReview(v.id, choice);
-    app.goto('thanks', v.id);
+    app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
   }
 
   return (

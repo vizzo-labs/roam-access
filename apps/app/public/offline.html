@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>You're offline · Roam Access pilot</title>
+  <style>
+    @font-face { font-family: 'Inter'; font-weight: 100 900; font-display: swap; src: url('/fonts/inter-latin-var.woff2') format('woff2'); }
+    html, body { margin: 0; height: 100%; }
+    body { font-family: Inter, -apple-system, system-ui, sans-serif; background: #FAF9F6; color: #1A1A1A;
+      display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; }
+    main { max-width: 420px; }
+    img { width: 64px; height: 64px; border-radius: 16px; }
+    h1 { font-size: 30px; letter-spacing: -0.02em; line-height: 1.15; margin: 20px 0 10px; }
+    h1 span { color: #9C2D0E; }
+    p { font-size: 17px; line-height: 1.55; color: #5A5651; margin: 0 0 24px; }
+    button { width: 100%; min-height: 56px; border-radius: 16px; border: 0; background: #0A4F4F; color: #FAF9F6;
+      font: 700 17px Inter, system-ui, sans-serif; cursor: pointer; }
+    :focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icons/icon-192.png" alt=""/>
+    <h1>You're offline<span>.</span></h1>
+    <p>Roam Access needs a connection to load places and reviews. Your reviews and saved places are safe — they're stored with your account.</p>
+    <button type="button" onclick="location.reload()">Try again</button>
+  </main>
+</body>
+</html>
