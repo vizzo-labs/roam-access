@@ -1,7 +1,8 @@
 // Which database to talk to. ONE rule for the app, the build and every script:
 //
 //   VERCEL_ENV === 'production'  → DATABASE_URL      (production Neon)
-//   anything else                → DEV_DATABASE_URL  (dev Neon: local, previews)
+//   anything else ('preview', unset locally) → DEV_DATABASE_URL (dev Neon)
+//   (Preview deployments have BOTH URLs set — they must still use dev.)
 //
 // If DEV_DATABASE_URL is missing outside production we fall back to
 // DATABASE_URL with a loud warning — that is production data.

@@ -77,7 +77,7 @@ dates as `6 November 2026`; plain, first-person, short sentences ("I use a wheel
 - The dev DB is already migrated and seeded (232 Manly venues, no users). You rarely need
   `npm run db:seed`; the public Overpass API often refuses automated requests anyway.
 - **Never run migrations, seeds or writes against production yourself.** The production
-  build applies migrations; the orchestrator deploys.
+  build (automatic on merge to `main`) applies migrations.
 
 ### Migrations (instead of `drizzle-kit push`)
 
@@ -103,8 +103,9 @@ another branch added. It is removed. Instead:
 - Commands (from `apps/app`): `npm run db:status` (pending/applied), `npm run db:migrate`
   (apply to the dev DB), `npm run db:describe` (`\d`-style dump), `npm run db:seed`
   (OpenStreetMap places into the dev DB).
-- `npm run build` runs `db:migrate` first (`prebuild`): Vercel production builds migrate
-  production; previews and local builds migrate the dev DB. `SKIP_MIGRATIONS=1` skips it.
+- `npm run build` runs `db:migrate` first (`prebuild`): Vercel production builds (every
+  merge to `main`) migrate production; Preview builds (`VERCEL_ENV=preview`, every PR) and
+  local builds migrate the dev DB. `SKIP_MIGRATIONS=1` skips it.
 - Migrations are tracked in the `_migrations` table (name, checksum, applied_at).
 
 ## Testing protocol
@@ -137,9 +138,19 @@ Every PR, from `apps/app`:
 - PR against `main`; the body says what changed, how you tested it (viewports, test user,
   screenshots) and any migration, and ends with:
   `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+- Every PR gets a **Vercel Preview deployment** (behind Vercel login; it builds against the
+  dev DB and runs your migration there). Before merging, check it passed
+  (`gh pr checks <n>`) and look at it if your change is visible.
 - Before merging: `git fetch && git rebase origin/main`, re-run build + typecheck + your
-  browser checks, push (`--force-with-lease`), then `gh pr merge --squash --delete-branch`.
+  browser checks, push (`--force-with-lease`), wait for the preview to pass, then
+  `gh pr merge --squash --delete-branch`.
 - If two migrations conflict on rebase, keep both files (they're independent) and re-run
   `npm run db:migrate`.
-- **Do not deploy to production.** The orchestrator (parent thread) deploys after each merge.
+- **Never run `vercel deploy`.** The Vercel project is Git-connected: every merge to `main`
+  deploys production automatically, and that build's `prebuild` **migrates the production
+  DB** — so your migration must be additive and idempotent.
+- After merging, wait for the production deployment to be **Ready**
+  (`npx vercel@latest ls roam-access`, or `gh pr view <n> --json statusCheckRollup`), then
+  smoke-test https://roam-access.vercel.app (signed-out page loads; nothing you touched is
+  broken). If production fails, tell the orchestrator (parent thread) at once.
 - Never commit `.env*` or `.vercel` (both gitignored).

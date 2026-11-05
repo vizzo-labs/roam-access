@@ -115,7 +115,9 @@ npm run test-user -- create my-feature --port 3456   # prints a one-time /sign-i
 npm run test-user -- delete my-feature               # Clerk user + dev-DB rows
 ```
 
-Deploys: the orchestrator deploys production from the repo root (`npx vercel deploy --prod`).
+Deploys: the Vercel project is Git-connected — every PR gets a Preview deployment (dev DB),
+every merge to `main` deploys production (and migrates the production DB). No manual
+`vercel deploy`.
 
 ## Before inviting more testers
 
