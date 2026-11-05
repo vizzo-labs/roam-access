@@ -5,12 +5,15 @@
   "scripts": {
     "predev": "mkdir -p public/maplibre && cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre/",
     "dev": "next dev",
-    "prebuild": "mkdir -p public/maplibre && cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre/",
+    "prebuild": "npm run db:migrate && mkdir -p public/maplibre && cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre/",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "dotenv -e .env.local -- drizzle-kit push",
-    "db:seed": "dotenv -e .env.local -- tsx scripts/seed-osm.ts"
+    "db:migrate": "dotenv -e .env.local -- tsx scripts/migrate.ts",
+    "db:status": "dotenv -e .env.local -- tsx scripts/migrate.ts --status",
+    "db:describe": "dotenv -e .env.local -- tsx scripts/db-describe.ts",
+    "db:seed": "dotenv -e .env.local -- tsx scripts/seed-osm.ts",
+    "test-user": "dotenv -e .env.local -- tsx scripts/test-user.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.24",
@@ -24,12 +27,14 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv-cli": "^11.1.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
+    "pg": "^8.23.1",
     "tsx": "^4.23.15",
     "typescript": "^5"
   }
