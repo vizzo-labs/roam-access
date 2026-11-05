@@ -18,6 +18,8 @@ import { sanitiseJpeg } from '../photos/jpeg';
 
 const { reviewPhotos, reviews, venues } = schema;
 
+export type CoverPhoto = { url: string; alt: string };
+
 export type PhotoVM = {
   id: string; kind: PhotoKind; kindLabel: string; alt: string;
   src: string; thumb: string; width: number; height: number;
@@ -178,6 +180,20 @@ export async function getPhotosByReview(reviewIds: string[], viewerId: string) {
     out.set(id, [...(out.get(id) || []), toVM(r.p, r.needs, viewerId, now)]);
   }
   return out;
+}
+
+/** One cover photo per venue for the map preview card: the newest visible
+ *  entrance photo, else the newest visible photo. Id + alt text only (the
+ *  image itself is served by /api/photos/[id] after the sign-in check). */
+export async function getCoverPhotos(venueId?: string): Promise<Map<string, CoverPhoto>> {
+  const where = venueId ? and(visible, eq(reviewPhotos.venueId, venueId)) : visible;
+  const rows = await getDb().selectDistinctOn([reviewPhotos.venueId], {
+    venueId: reviewPhotos.venueId, id: reviewPhotos.id, alt: reviewPhotos.alt,
+  })
+    .from(reviewPhotos).innerJoin(reviews, eq(reviews.id, reviewPhotos.reviewId))
+    .where(where)
+    .orderBy(reviewPhotos.venueId, sql`(${reviewPhotos.kind} = 'entrance') desc`, desc(reviewPhotos.createdAt));
+  return new Map(rows.map(r => [r.venueId, { url: `/api/photos/${r.id}?size=thumb`, alt: r.alt }]));
 }
 
 /** Who may see this photo: everyone signed in if it and its review are visible;

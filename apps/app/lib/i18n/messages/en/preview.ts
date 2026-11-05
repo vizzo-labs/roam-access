@@ -1,0 +1,33 @@
+// English (Australia) — the place preview card on the map (pin → card).
+// Keys 'preview.*'. Plain, first-person, short sentences; en-AU spelling.
+const preview = {
+  'preview.close': 'Close preview of {name}',
+  'preview.photoAlt': 'Photo of {name}',
+  'preview.noPhoto': 'No photo yet',
+  'preview.addFirst': 'Add the first',
+  'preview.addFirstAria': 'Add the first photo of {name}: write a review',
+  'preview.factsLabel': 'Access facts for your needs',
+  'preview.noInfo': 'Nobody has said yet how this works for your needs.',
+  'preview.feature.stepfree': 'Step-free',
+  'preview.feature.bathroom': 'Accessible loo',
+  'preview.feature.seats': 'Seats',
+  'preview.feature.quiet': 'Quiet',
+  'preview.feature.simple': 'Easy to find your way',
+  'preview.feature.calm': 'Calm',
+  'preview.feature.hearing': 'Hearing support',
+  'preview.feature.vision': 'Low-vision friendly',
+  'preview.state.yes': 'Yes',
+  'preview.state.no': 'No',
+  'preview.state.mixed': 'Mixed reports',
+  'preview.state.alt': 'Another way in',
+  'preview.state.unconfirmed': 'Unconfirmed',
+  'preview.seeDetailsAria': 'See details of {name}',
+  'preview.details': 'Details',
+  'preview.answerOne': 'Answer 1 question',
+  'preview.answerOneAria': 'Answer 1 question about {name}',
+  'preview.notNow': 'Not now',
+  'preview.answerHelps': 'One tap. It shows up as a quick answer.',
+  'preview.thanks': 'Thanks. Your answer is saved.',
+  'preview.moreReports': { one: '{count} more report on the details page', other: '{count} more reports on the details page' },
+};
+export default preview;
