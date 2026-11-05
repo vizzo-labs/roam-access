@@ -29,6 +29,10 @@ import { V2Me } from './screens/Me';
 import { V2A11ySheet } from './screens/A11ySheet';
 import { V2Gaps } from './screens/Gaps';
 import { V2NeedsCard } from './screens/NeedsCard';
+import { V2Toilets } from './screens/Toilets';
+import { V2Beach } from './screens/Beach';
+import { V2Facility } from './screens/Facility';
+import { useAccessLayers } from './layers/useAccessLayers';
 
 const PREFS_KEY = 'ra2-a11y';
 
@@ -39,6 +43,7 @@ const VIEW_TITLES = {
   thanks: 'Thank you', saved: 'Saved places', me: 'Your profile',
   gaps: 'Help fill the gaps',
   card: 'My needs card',
+  toilets: 'Accessible toilets', beach: 'Beach access', facility: 'Access details',
 };
 const ROUTES = Object.keys(VIEW_TITLES);
 const DARK_VIEWS = ['voice', 'thanks'];
@@ -199,6 +204,7 @@ function PilotScreens({ initial, userId }) {
   const { signOut } = useClerk();
   const wide = useWide();
   const install = useInstall();
+  const layers = useAccessLayers();
   const [me, setMe] = useState(initial.me);
   const [venues, setVenues] = useState(initial.venues);
   const [savedIds, setSavedIds] = useState(initial.saved);
@@ -283,7 +289,7 @@ function PilotScreens({ initial, userId }) {
     window.RA2_NAVIGATED = true;
     if (nextView === 'venue') {
       const from = parseHash(idsRef.current).view;
-      if (['home', 'results', 'map', 'saved'].includes(from)) venueOriginRef.current = from;
+      if (['home', 'results', 'map', 'saved', 'toilets', 'beach'].includes(from)) venueOriginRef.current = from;
     }
     const hash = id ? `#/${nextView}/${encodeURIComponent(id)}` : `#/${nextView}`;
     if (opts && opts.replace) {
@@ -328,6 +334,7 @@ function PilotScreens({ initial, userId }) {
     venueById: id => byId.get(id),
     world: { saved: savedIds, reviewed, visitedId },
     myStats, pilot, lastSubmit,
+    layers,
     venueOrigin: venueOriginRef.current,
     goto,
     toast: setToast,
@@ -468,6 +475,7 @@ function PilotScreens({ initial, userId }) {
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
     gaps: V2Gaps,
     card: V2NeedsCard,
+    toilets: V2Toilets, beach: V2Beach, facility: V2Facility,
   };
   const Screen = screens[view] || V2Home;
 

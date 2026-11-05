@@ -9,6 +9,8 @@ import { C2, F2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Search } from '@/lib/pilot/match';
 import { VerdictReasons } from '../trust/VerdictReasons';
+import { LayerMenu, layerExtras } from '../layers/LayerToggles';
+import { FacilityCard } from '../layers/FacilityCard';
 
 // ─────────────────────────────────────────────────────────────
 // MAP — verdict-coded pins, one card at a time
@@ -17,7 +19,11 @@ function V2MapView({ app }) {
   const query = app.query || { cats: [], tags: [], label: 'All places' };
   const results = ra2Search(app.venues, query, app.user?.needs || []);
   const [selId, setSelId] = React.useState(results[0]?.id || null);
-  const sel = results.find(r => r.id === selId) || results[0];
+  // Access layers (F3): a facility pin replaces the place card while selected.
+  const [extraId, setExtraId] = React.useState(null);
+  const extras = layerExtras(app.layers);
+  const extra = extraId && extras.some(x => x.id === extraId) ? app.layers.facilityById(extraId) : null;
+  const sel = extra ? null : (results.find(r => r.id === selId) || results[0]);
   const h = useV2Heading('map');
   const pinColor = { works: C2.blue, check: C2.amber, barrier: C2.red, unknown: '#475569' };
   const pinIcon = { works: '✓', check: '!', barrier: '✗', unknown: '?' };
@@ -31,10 +37,15 @@ function V2MapView({ app }) {
     <V2Shell scroll={false} tabs app={app} active="home">
       <h1 ref={h} tabIndex={-1} className="ra-sr-only">Map of results — {query.label}</h1>
       <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <PilotMap results={results} selectedId={selId} onSelect={setSelId} origin={app.origin}
+        <PilotMap results={results} selectedId={extra ? null : selId} onSelect={id => { setExtraId(null); setSelId(id); }} origin={app.origin}
+          extras={extras} selectedExtraId={extra?.id || null} onSelectExtra={setExtraId} alertIds={app.layers.alertIds}
           colors={pinColor} icons={pinIcon} labels={Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]))}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
-          locateStyle={{ right: 18, bottom: sel ? 268 : 24 }}/>
+          locateStyle={{ right: 18, bottom: sel || extra ? 268 : 24 }}/>
+
+        <LayerMenu shown={app.layers.shown} onChange={app.layers.setShown}
+          style={{ top: 'calc(var(--ra-shell-top) + 66px)', right: 18 }}/>
+        {extra && <FacilityCard app={app} f={extra}/>}
 
         {/* top: search pill + list toggle */}
         <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 18, right: 18, display: 'flex', gap: 8, zIndex: 3 }}>

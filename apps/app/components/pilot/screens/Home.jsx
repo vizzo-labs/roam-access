@@ -11,6 +11,7 @@ import { GapsPrompt } from '../community/GapsPrompt';
 import { C2, F2, M2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Verdict, ra2ParseQuery } from '@/lib/pilot/match';
+import { AccessLayersLinks } from '../layers/AccessLayersLinks';
 
 // ─────────────────────────────────────────────────────────────
 // HOME — one question, voice first
@@ -156,6 +157,9 @@ function V2Home({ app }) {
           ))}
         </div>
       </div>
+
+      {/* Toilets + beach access (F3) */}
+      <AccessLayersLinks app={app}/>
 
       {/* Nearby — what works, or where a first review helps most */}
       {nearbyList.length > 0 && (

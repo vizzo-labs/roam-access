@@ -20,6 +20,9 @@ export function PilotMap({
   results, selectedId, onSelect, origin, colors, icons, labels,
   topPad = 150, bottomPad = 210, fit = true,
   onLocate, onLocateError, autoLocate = false, locateStyle = { right: 16, top: 16 },
+  // Access layers (F3): facility pins (toilets, beach items) drawn as square
+  // markers, and ids of places with a live temporary report (⚠ corner mark).
+  extras = [], selectedExtraId = null, onSelectExtra, fitExtras = false, alertIds = null,
 }) {
   const box = useRef(null);
   const ctx = useRef(null); // { map, lib }
@@ -34,6 +37,11 @@ export function PilotMap({
   const onLocateErrorRef = useRef(onLocateError);
   onLocateErrorRef.current = onLocateError;
   const geoRef = useRef(null);
+  const extraMarkers = useRef(new Map()); // id → { mk, el, state }
+  const onSelectExtraRef = useRef(onSelectExtra);
+  const alertRef = useRef(alertIds);
+  // Latest props for the marker callbacks; runs before the effects below.
+  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; });
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [following, setFollowing] = useState(false);
@@ -45,7 +53,7 @@ export function PilotMap({
     // A narrowed search (≤ 80 places) shows every result as a full pin; the
     // whole area or a huge list keeps the quiet dots until street level.
     const fewResults = fit && markers.current.size <= 80;
-    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM);
+    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels);
   };
 
   // Create the map once.
@@ -96,6 +104,7 @@ export function PilotMap({
       ctx.current = null;
       geoRef.current = null;
       markers.current.clear();
+      extraMarkers.current.clear();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -124,6 +133,50 @@ export function PilotMap({
     }
     repaint.current();
   }, [ready, key]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reports come and go without the result set changing: repaint the marks.
+  const alertKey = alertIds ? [...alertIds].sort().join('|') : '';
+  useEffect(() => { if (ready) repaint.current(); }, [ready, alertKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Facility pins (access layers): rebuilt when the set or a report changes.
+  const extraKey = extras.map(x => `${x.id}:${x.muted ? 1 : 0}:${alertIds?.has(x.id) ? 1 : 0}`).join('|');
+  useEffect(() => {
+    if (!ready || !ctx.current) return;
+    const { map, lib } = ctx.current;
+    extraMarkers.current.forEach(m => m.mk.remove());
+    extraMarkers.current.clear();
+    for (const x of extras) {
+      const el = document.createElement('button');
+      el.type = 'button';
+      const alert = !!alertIds?.has(x.id);
+      el.setAttribute('aria-label', x.label + (alert ? ', temporary problem reported' : ''));
+      Object.assign(el.style, { background: 'transparent', border: '0', padding: '0', cursor: 'pointer', lineHeight: '0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' });
+      el.addEventListener('click', (e) => { e.stopPropagation(); onSelectExtraRef.current?.(x.id); });
+      const mk = new lib.Marker({ element: el, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).addTo(map);
+      extraMarkers.current.set(x.id, { mk, el, x, alert, state: null });
+    }
+    paintExtras(extraMarkers.current, selectedExtraId);
+    // fitExtras: true = frame them all; a number = frame the first N.
+    if (fitExtras && extras.length) {
+      const bounds = new lib.LngLatBounds();
+      (typeof fitExtras === 'number' ? extras.slice(0, fitExtras) : extras).forEach(x => bounds.extend([x.lng, x.lat]));
+      map.fitBounds(bounds, { padding: { top: topPad, bottom: bottomPad, left: 48, right: 48 }, maxZoom: 16, duration: 0 });
+    }
+  }, [ready, extraKey, fitExtras]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!ready || !ctx.current) return;
+    paintExtras(extraMarkers.current, selectedExtraId);
+    const sel = extraMarkers.current.get(selectedExtraId)?.x;
+    if (sel) {
+      const { map } = ctx.current;
+      const p = map.project([sel.lng, sel.lat]);
+      const { clientWidth: w, clientHeight: h } = map.getContainer();
+      if (p.x < 40 || p.x > w - 40 || p.y < topPad - 10 || p.y > h - bottomPad) {
+        map.easeTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.getZoom(), 15), padding: { top: topPad, bottom: bottomPad, left: 0, right: 0 }, duration: 300 });
+      }
+    }
+  }, [ready, selectedExtraId, extraKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Selection: the big pin; bring it into view if it's off-screen.
   useEffect(() => {
@@ -194,6 +247,11 @@ export const PLACE_ICONS = {
   arts:  'M4 10 12 4l8 6M6 10v8M10 10v8M14 10v8M18 10v8M4 18h16',
   music: 'M9 18V6l10-2v12M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm10-2a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z',
   stay:  'M3 6v13M3 14h18M21 19v-5a3 3 0 0 0-3-3h-8v3M6.5 11.5a1.5 1.5 0 1 0 0-.01',
+  // Access layers (F3)
+  toilet: 'M6 3h5v7H6zM4 10h15v1.5A6.5 6.5 0 0 1 12.5 18h-2A6.5 6.5 0 0 1 4 11.5V10ZM9 18l-1 3h7l-1-3',
+  swing: 'M3 3h18M7 3v11M17 3v11M5 14h14v3H5zM9 20h6',
+  ferry: 'M3 14h18l-2.5 5h-13L3 14ZM6 14V9h12v5M10 9V6h4v3M2 22c2.5 0 2.5-1.2 5-1.2s2.5 1.2 5 1.2 2.5-1.2 5-1.2 2.5 1.2 5 1.2',
+  walk:  'M13.5 4.5a1.5 1.5 0 1 0 0-.01M9 21l2.5-6 3 3v3M11.5 15l-1-5.5 4 1.5 2 3M10.5 9.5 7 12v3',
 };
 export const PLACE_ICON_LEGEND = [
   ['cafe', 'Cafe'], ['food', 'Food'], ['bar', 'Bar & pub'], ['park', 'Park'],
@@ -214,13 +272,14 @@ export const iconFor = (r) => KIND_ICON[r.kind] || CAT_ICON[r.cat] || 'food';
 const PIN_PATH = 'M16 39C16 39 3 24.5 3 15.5a13 13 0 0 1 26 0C29 24.5 16 39 16 39Z';
 
 // One map pin as SVG markup. `badge` is the verdict symbol (or null).
-export function pinSvg({ w, fill, stroke, iconColor, icon, badge, badgeColor }) {
+export function pinSvg({ w, fill, stroke, iconColor, icon, badge, badgeColor, alert = false }) {
   const h = Math.round(w * 1.25);
   return `<svg width="${w}" height="${h}" viewBox="0 0 32 40" aria-hidden="true" focusable="false" style="display:block;overflow:visible;filter:drop-shadow(0 1px 2px rgba(26,26,26,.35))">`
     + `<path d="${PIN_PATH}" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`
     + `<g transform="translate(8.5 8) scale(0.625)"><path d="${PLACE_ICONS[icon]}" fill="none" stroke="${iconColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>`
     + (badge ? `<circle cx="27" cy="5" r="6.5" fill="${PAPER}" stroke="${badgeColor}" stroke-width="1.5"/>`
       + `<text x="27" y="8.2" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="800" font-size="9" fill="${badgeColor}">${badge}</text>` : '')
+    + (alert ? ALERT_MARK : '')
     + `</svg>`;
 }
 
@@ -239,12 +298,16 @@ function pinButton(r, labels, onClick) {
 // Places with a verdict: a coloured pin at every zoom. Places with no info
 // yet: a quiet dot in the overview, a white pin at street level. Selected:
 // the big pin. Only re-draws a pin whose look actually changed.
-function paintPins(markers, selectedId, colors, icons, detail) {
+function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels) {
   markers.forEach((m, id) => {
     const on = id === selectedId;
     const unknown = m.kind === 'unknown';
-    const quiet = unknown && !on && !detail;
-    const state = `${on}|${quiet}`;
+    const alert = !!alertIds?.has(id);
+    // A live report always gets a full pin, so its ⚠ mark is visible.
+    const quiet = unknown && !on && !detail && !alert;
+    const state = `${on}|${quiet}|${alert}`;
+    if (m.baseLabel == null) m.baseLabel = m.el.getAttribute('aria-label');
+    m.el.setAttribute('aria-label', m.baseLabel + (alert ? ', temporary problem reported' : ''));
     m.el.setAttribute('aria-pressed', String(on));
     m.el.style.zIndex = on ? '5' : quiet ? '1' : unknown ? '2' : '3';
     if (m.state === state) return;
@@ -262,8 +325,42 @@ function paintPins(markers, selectedId, colors, icons, detail) {
     m.el.style.alignItems = 'flex-end';
     m.mk.setOffset([0, 0]);
     m.el.innerHTML = unknown
-      ? pinSvg({ w, fill: PAPER, stroke: colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: null })
-      : pinSvg({ w, fill: colors[m.kind], stroke: PAPER, iconColor: PAPER, icon: m.icon, badge: icons[m.kind], badgeColor: colors[m.kind] });
+      ? pinSvg({ w, fill: PAPER, stroke: colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: null, alert })
+      : pinSvg({ w, fill: colors[m.kind], stroke: PAPER, iconColor: PAPER, icon: m.icon, badge: icons[m.kind], badgeColor: colors[m.kind], alert });
+  });
+}
+
+// ── Facility pins (access layers) ────────────────────────────────────────
+// A rounded square with a pointer: a different SHAPE from place pins, so a
+// listing never reads as a verdict. Teal = listed; muted (paper) = listed but
+// not accessible (e.g. a toilet without an accessible cubicle).
+const TEAL_FILL = '#0A4F4F', MUTED = '#475569';
+export function facilitySvg({ w, icon, muted = false, alert = false }) {
+  const h = Math.round(w * 1.25);
+  const fill = muted ? PAPER : TEAL_FILL, stroke = muted ? MUTED : PAPER, ic = muted ? MUTED : PAPER;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 32 40" aria-hidden="true" focusable="false" style="display:block;overflow:visible;filter:drop-shadow(0 1px 2px rgba(26,26,26,.35))">`
+    + `<path d="M7 3h18a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4h-5l-4 8-4-8H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`
+    + `<g transform="translate(8.5 8.5) scale(0.625)"><path d="${PLACE_ICONS[icon] || PLACE_ICONS.toilet}" fill="none" stroke="${ic}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>`
+    + (alert ? ALERT_MARK : '')
+    + `</svg>`;
+}
+
+// ⚠ in the top-left corner: a temporary problem was reported today.
+const ALERT_MARK = `<path d="M5 -4 11.5 7.5H-1.5Z" fill="#1A1A1A" stroke="${PAPER}" stroke-width="1.5" stroke-linejoin="round"/>`
+  + `<path d="M5 -0.5v3.5" stroke="${PAPER}" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="5.2" r="0.9" fill="${PAPER}"/>`;
+
+function paintExtras(markers, selectedId) {
+  markers.forEach((m, id) => {
+    const on = id === selectedId;
+    const state = `${on}`;
+    m.el.setAttribute('aria-pressed', String(on));
+    m.el.style.zIndex = on ? '6' : '4';
+    if (m.state === state) return;
+    m.state = state;
+    const w = on ? 44 : 32;
+    m.el.style.width = w + 'px';
+    m.el.style.height = Math.round(w * 1.25) + 'px';
+    m.el.innerHTML = facilitySvg({ w, icon: m.x.icon, muted: m.x.muted, alert: m.alert });
   });
 }
 
