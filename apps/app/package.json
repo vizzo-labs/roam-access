@@ -13,6 +13,7 @@
     "db:status": "dotenv -e .env.local -- tsx scripts/migrate.ts --status",
     "db:describe": "dotenv -e .env.local -- tsx scripts/db-describe.ts",
     "db:seed": "dotenv -e .env.local -- tsx scripts/seed-osm.ts",
+    "layers:import": "dotenv -e .env.local -- tsx scripts/import-toilets.ts",
     "test-user": "dotenv -e .env.local -- tsx scripts/test-user.ts"
   },
   "dependencies": {

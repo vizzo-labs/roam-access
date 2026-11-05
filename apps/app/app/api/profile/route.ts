@@ -2,6 +2,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { badRequest, getUserId, unauthorized } from '@/lib/auth';
 import { deleteProfile, updateProfile } from '@/lib/data';
 import { deleteUserPhotoBlobs } from '@/lib/data/photos';
+import { forgetUserInReports } from '@/lib/data/layers';
 
 export async function PUT(req: Request) {
   const userId = await getUserId();
@@ -17,6 +18,7 @@ export async function DELETE() {
   const userId = await getUserId();
   if (!userId) return unauthorized();
   await deleteUserPhotoBlobs(userId);
+  await forgetUserInReports(userId);
   await deleteProfile(userId);
   const client = await clerkClient();
   await client.users.deleteUser(userId);

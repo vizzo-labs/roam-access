@@ -5,6 +5,8 @@
 
 import { PilotMap, MapLegend } from './PilotMap';
 import { V2Logo } from './ui/Logo';
+import { LayerToggles, layerExtras } from './layers/LayerToggles';
+import { metres } from './layers/layerUtils';
 
 export const PIN = {
   colors: { works: '#1E5F8B', check: '#854D0E', barrier: '#9C2D0E', unknown: '#475569' },
@@ -30,6 +32,15 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, children
   const active = NAV.find(n => n.views.includes(app.view))?.id;
   const initial = (app.user?.name || 'You').charAt(0).toUpperCase();
   const kinds = [...new Set(mapResults.map(r => r.verdict.kind))];
+  // Access layers (F3): the toilets / beach lists always show their layer.
+  const L = app.layers;
+  const facility = app.view === 'facility' ? L.facilityById(app.selectedId) : null;
+  const forced = {
+    toilets: app.view === 'toilets' || facility?.layer === 'toilets',
+    beach: app.view === 'beach' || facility?.layer === 'beach',
+  };
+  const extras = layerExtras(L, { forced }).sort((a, b) => metres(app.origin, a) - metres(app.origin, b));
+  const fitExtras = app.view === 'toilets' ? 12 : app.view === 'beach' ? true : false;
   return (
     <div className="web-app">
       <Header>
@@ -56,9 +67,12 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, children
         <div className="web-panel">{children}</div>
         <section className="web-map" aria-label="Map of places in the pilot area">
           <PilotMap results={mapResults} selectedId={selectedId} onSelect={id => app.goto('venue', id)}
-            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} topPad={70} bottomPad={40} fit={mapFit}
-            onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}/>
+            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras}
+            onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
+            extras={extras} selectedExtraId={facility?.id || null} onSelectExtra={id => app.goto('facility', id)}
+            fitExtras={fitExtras} alertIds={L.alertIds}/>
           <MapLegend kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={PIN.labels} style={{ top: 16, left: 16 }}/>
+          <LayerToggles shown={L.shown} forced={forced} onChange={L.setShown} style={{ top: 76, right: 16 }}/>
         </section>
       </div>
     </div>

@@ -16,6 +16,7 @@ import { VenuePhotos } from '../photos/VenuePhotos';
 import { AskPlace } from '../ask/AskPlace';
 import { useVenueSays, VenueSays, VenueFooterLinks } from './VenueSays';
 import { useTrackVenueView } from '../track';
+import { VenueAccessExtras, VenueReportsBanner } from '../layers/VenueAccessExtras';
 
 // ─────────────────────────────────────────────────────────────
 // VENUE — verdict first, plain language, detail on demand
@@ -90,6 +91,9 @@ function V2VenueView({ app }) {
         </h1>
         <p style={{ fontSize: 15, color: C2.slate, margin: '0 0 16px', fontFamily: F2 }}>{v.kind} · {v.address ? `${v.address}, ` : ''}{v.area} · {v.mins} min walk</p>
 
+        {/* today's temporary problems (F3) — prominent, but never a verdict */}
+        <VenueReportsBanner app={app} venue={v}/>
+
         {/* THE verdict */}
         <div style={{ background: meta.bg, borderRadius: 18, padding: 20, marginBottom: 10 }}>
           <V2Verdict kind={verdict.kind} big/>
@@ -111,6 +115,9 @@ function V2VenueView({ app }) {
         <Freshness key={v.id} app={app} venue={v}/>
 
         <VenuePhotos app={app} venueId={v.id}/>
+
+        {/* partner programs, nearest accessible toilet, report a problem (F3) */}
+        <VenueAccessExtras app={app} venue={v}/>
 
         {/* community voice */}
         {firstReview && (

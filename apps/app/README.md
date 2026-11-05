@@ -23,6 +23,7 @@ and ships with the landing page on GitHub Pages. This folder is separate and dep
 | Sign-in | Clerk (Vercel Marketplace) — `/sign-in`, `/sign-up` |
 | Database | Neon Postgres, Sydney (Vercel Marketplace) + Drizzle ORM |
 | Places | OpenStreetMap via Overpass (ODbL — keep the attribution) |
+| Toilets | National Public Toilet Map, data.gov.au (CC BY 3.0 AU — keep the attribution) |
 | Map | MapLibre GL + OpenFreeMap tiles (free, no key) |
 | Review photos | Vercel Blob, **private** stores in `syd1`: `roam-access-photos` (Production), `roam-access-photos-dev` (Preview + Development) |
 | AI | Vercel AI Gateway via AI SDK 7 (`ai`), model `anthropic/claude-haiku-5.5` (zero data retention); needs Node ≥ 22 |
@@ -91,6 +92,7 @@ scripts/
   migrate.ts          applies pending migrations (runs before every build)
   db-describe.ts      `\d`-style schema dump
   seed-osm.ts         imports places from OpenStreetMap (idempotent)
+  import-toilets.ts   toilets (National Public Toilet Map) + beach items → dev DB, or `--sql` seed
   test-user.ts        Clerk test users for headless testing
 ```
 
@@ -113,6 +115,12 @@ scripts/
 - Tables: `venue_claims`, `venue_replies`, `needs_cards`, `user_roles`, `venue_views`
   (`lib/db/schema-venues.ts`). All user rows cascade from `profiles`, so “Delete my account”
   removes them; `venue_views` holds counts only, never a user id.
+
+**Access layers** (`lib/layers/`, `lib/data/layers.ts`, `components/pilot/layers/`): public
+toilets and beach access items (`facilities`), partner badges (`venue_badges`) and temporary
+reports that expire (`temp_barriers`). Screens: `#/toilets`, `#/beach`, `#/facility/<id>`;
+admin: `/admin/layers`. Listings show as "not yet confirmed"; badges are the partner's claim;
+neither changes a verdict.
 
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
 you". OpenStreetMap accessibility tags show up as "Check first — not yet confirmed".

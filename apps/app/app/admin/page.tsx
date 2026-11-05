@@ -25,7 +25,7 @@ export default function AdminPage() {
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 64px', fontFamily: 'Inter, system-ui, sans-serif', color: C.char }}>
       <p style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 12, letterSpacing: '.14em', textTransform: 'uppercase', color: C.slate, margin: 0 }}>
-        Roam Access · pilot admin
+        Roam Access · pilot admin · <a href="/admin/layers" style={{ color: C.teal }}>Access layers</a>
       </p>
       <Suspense fallback={<p role="status">Loading…</p>}>
         <Admin/>
