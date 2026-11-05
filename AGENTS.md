@@ -130,8 +130,13 @@ another branch added. It is removed. Instead:
   Constraints: add them inside a new `CREATE TABLE`, or guard with a `DO $$ … IF NOT EXISTS
   (SELECT 1 FROM pg_constraint WHERE conname = '…') … $$` block.
 - **Never drop, rename, truncate or change a column's type.** The runner refuses
-  `DROP`, `RENAME`, `TRUNCATE`, `ALTER COLUMN … TYPE`, `DELETE FROM` and
-  `BEGIN/COMMIT` (each file already runs in its own transaction).
+  `DROP`, `RENAME`, `TRUNCATE`, `ALTER COLUMN … TYPE` and `DELETE FROM` anywhere (including
+  inside `DO` blocks), and transaction control — `BEGIN`, `COMMIT`, `ROLLBACK`, `END`,
+  `START TRANSACTION`, `SAVEPOINT` — as statements (each file already runs in its own
+  transaction). The `BEGIN … END` of a PL/pgSQL body is fine: anything between `$$` (or
+  `$tag$`) quotes is not treated as transaction control, so write guarded constraints as a
+  normal `DO $$ BEGIN … END $$;` block. Rules: `apps/app/scripts/lib/migration-rules.ts`
+  (tests: `npx tsx scripts/lib/migration-rules.test.ts`).
 - **Never edit a migration after it merges.** Need a change? Add a new file.
   Note that preview and local builds apply your migration to the shared dev DB *before*
   merge — if you change an unmerged migration that already ran there, rename it (new

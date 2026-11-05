@@ -13,24 +13,13 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { connectPg } from './lib/pg';
+import { migrationViolation } from './lib/migration-rules';
 
 const DIR = path.join(__dirname, '..', 'migrations');
 const NAME = /^\d{12}_[a-z0-9][a-z0-9_-]*\.sql$/;
 // Advisory lock key: parallel builds (several previews at once) take turns.
 const LOCK = 'roam-access:migrations';
 
-// Destructive statements are refused outright: parallel branches share the
-// dev database, and a drop/rename on one breaks every other.
-const FORBIDDEN: [RegExp, string][] = [
-  [/\bdrop\s+(table|column|index|constraint|schema|type|view|function|trigger|sequence|extension)\b/i, 'DROP'],
-  [/\brename\b/i, 'RENAME'],
-  [/\btruncate\b/i, 'TRUNCATE'],
-  [/\balter\s+column\s+\S+\s+(set\s+data\s+)?type\b/i, 'ALTER COLUMN … TYPE'],
-  [/\bdelete\s+from\b/i, 'DELETE FROM'],
-  [/^\s*(begin|commit|rollback)\b/im, 'transaction control (the runner wraps each file in a transaction)'],
-];
-
-const stripSqlComments = (sql: string) => sql.replace(/\/\*[\s\S]*?\*\//g, '').replace(/--.*$/gm, '');
 const sha = (s: string) => createHash('sha256').update(s).digest('hex').slice(0, 16);
 
 function loadFiles() {
@@ -39,10 +28,8 @@ function loadFiles() {
   if (bad.length) throw new Error(`Bad migration file name(s): ${bad.join(', ')} — use YYYYMMDDHHMM_<slug>.sql`);
   return all.map(name => {
     const sql = readFileSync(path.join(DIR, name), 'utf8');
-    const code = stripSqlComments(sql);
-    for (const [re, what] of FORBIDDEN) {
-      if (re.test(code)) throw new Error(`${name}: ${what} is not allowed — migrations are additive only (see AGENTS.md).`);
-    }
+    const what = migrationViolation(sql);
+    if (what) throw new Error(`${name}: ${what} is not allowed — migrations are additive only (see AGENTS.md).`);
     return { name, sql, checksum: sha(sql) };
   });
 }
