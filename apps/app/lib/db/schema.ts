@@ -58,6 +58,12 @@ export const reviews = pgTable('reviews', {
   // "Step-free way in through another entrance?" (migration 202611061445).
   entranceAlt: text('entrance_alt').$type<EntranceAlt>(),
   entranceNote: text('entrance_note'),
+  // F6 · sensory (migration 202611061600_sensory_content): what the reviewer
+  // noticed, and when they say it's usually quiet. Never changes a verdict.
+  sensoryNoise: text('sensory_noise').$type<SensoryNoise>(),
+  sensoryLight: text('sensory_light').$type<SensoryLight>(),
+  sensoryCrowd: text('sensory_crowd').$type<SensoryCrowd>(),
+  quietTimes: text('quiet_times').array().$type<SensorySlot[]>().notNull().default(sql`'{}'::text[]`),
 }, t => [
   index('reviews_venue_idx').on(t.venueId),
   index('reviews_user_idx').on(t.userId),
@@ -66,6 +72,11 @@ export const reviews = pgTable('reviews', {
 ]);
 
 export type EntranceAlt = 'side' | 'back' | 'lift' | 'other' | 'none';
+export type SensoryNoise = 'quiet' | 'some' | 'loud';
+export type SensoryLight = 'soft' | 'bright' | 'harsh';
+export type SensoryCrowd = 'few' | 'some' | 'busy';
+export type SensorySlot = 'early' | 'midday' | 'afternoon' | 'evening';
+export type SensoryDayKind = 'weekday' | 'weekend';
 
 export const saved = pgTable('saved', {
   userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
@@ -260,6 +271,8 @@ export type MappingEvent = typeof mappingEvents.$inferSelect;
 
 // F5 · venues & councils (venue_claims, venue_replies, needs_cards, user_roles, venue_views)
 export * from './schema-venues';
+// F6 · sensory content (sensory_reports)
+export * from './schema-sensory';
 export type Facility = typeof facilities.$inferSelect;
 export type VenueBadge = typeof venueBadges.$inferSelect;
 export type TempBarrier = typeof tempBarriers.$inferSelect;

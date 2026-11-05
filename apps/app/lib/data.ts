@@ -6,6 +6,8 @@ import { FEATURE_IDS, NEED_IDS, type VerdictKind } from './pilot-data';
 import { getConfirmationStats } from './data/trust';
 import type { EntranceAlt } from './db/schema';
 import { ENTRANCE_ALTS, ENTRANCE_NOTE_MAX } from './trust/entrance';
+import { getSensoryReports, parseSensoryInput, saveReviewSensory, sensoryColumns } from './data/sensory';
+import { buildSensoryVM } from './sensory/summary';
 
 const { venues, reviews, profiles, saved, microAnswers } = schema;
 
@@ -20,29 +22,37 @@ export async function ensureProfile(userId: string) {
 
 export async function getVenueVMs(): Promise<VenueVM[]> {
   const db = getDb();
-  const [vs, rs, confirm, qs] = await Promise.all([
+  const [vs, rs, confirm, qs, ss] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
     getConfirmationStats(),
     db.select().from(microAnswers).where(eq(microAnswers.hidden, false)),
+    getSensoryReports(),
   ]);
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
   const quickByVenue = new Map<string, typeof qs>();
   for (const q of qs) quickByVenue.set(q.venueId, [...(quickByVenue.get(q.venueId) || []), q]);
-  return vs.map(v => buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id), quickByVenue.get(v.id) || []));
+  const sensoryByVenue = new Map<string, typeof ss>();
+  for (const x of ss) sensoryByVenue.set(x.venueId, [...(sensoryByVenue.get(x.venueId) || []), x]);
+  const now = Date.now();
+  return vs.map(v => ({
+    ...buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id), quickByVenue.get(v.id) || []),
+    sensory: buildSensoryVM(byVenue.get(v.id) || [], sensoryByVenue.get(v.id) || [], now),
+  }));
 }
 
 export async function getVenueVM(id: string): Promise<VenueVM | null> {
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const [rs, confirm, qs] = await Promise.all([
+  const [rs, confirm, qs, ss] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
     getConfirmationStats(id),
     db.select().from(microAnswers).where(and(eq(microAnswers.venueId, id), eq(microAnswers.hidden, false))),
+    getSensoryReports(id),
   ]);
-  return buildVenueVM(v, rs, confirm.get(id), qs);
+  return { ...buildVenueVM(v, rs, confirm.get(id), qs), sensory: buildSensoryVM(rs, ss) };
 }
 
 export async function getMyStats(userId: string) {
@@ -109,7 +119,7 @@ export async function getVenueReviews(venueId: string, viewerId: string) {
 
 const VERDICTS: VerdictKind[] = ['works', 'check', 'barrier'];
 
-export async function createReview(userId: string, input: { venueId?: unknown; verdict?: unknown; features?: unknown; note?: unknown; entranceAlt?: unknown; entranceNote?: unknown }) {
+export async function createReview(userId: string, input: { venueId?: unknown; verdict?: unknown; features?: unknown; note?: unknown; entranceAlt?: unknown; entranceNote?: unknown; sensory?: unknown }) {
   const db = getDb();
   if (typeof input.venueId !== 'string') return { error: 'venueId required' } as const;
   if (!VERDICTS.includes(input.verdict as VerdictKind)) return { error: 'verdict must be works, check or barrier' } as const;
@@ -126,12 +136,14 @@ export async function createReview(userId: string, input: { venueId?: unknown; v
   const entranceAlt = ENTRANCE_ALTS.some(a => a.id === input.entranceAlt) ? input.entranceAlt as EntranceAlt : null;
   const entranceNote = entranceAlt && entranceAlt !== 'none' && typeof input.entranceNote === 'string'
     ? input.entranceNote.trim().slice(0, ENTRANCE_NOTE_MAX) || null : null;
+  const sensory = parseSensoryInput(input.sensory);
   const profile = await ensureProfile(userId);
 
   const [created] = await db.insert(reviews).values({
     venueId: v.id, userId, verdict: input.verdict as VerdictKind,
-    needs: profile.needs, features, note, entranceAlt, entranceNote,
-  }).returning({ id: reviews.id });
+    needs: profile.needs, features, note, entranceAlt, entranceNote, ...sensoryColumns(sensory),
+  }).returning({ id: reviews.id, createdAt: reviews.createdAt });
+  await saveReviewSensory(userId, v.id, created.id, sensory, created.createdAt);
   const [venue, myStats, count] = await Promise.all([
     getVenueVM(v.id),
     getMyStats(userId),

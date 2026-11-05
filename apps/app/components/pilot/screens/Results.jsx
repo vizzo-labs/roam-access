@@ -12,6 +12,7 @@ import { ra2Search } from '@/lib/pilot/match';
 import { VerdictReasons } from '../trust/VerdictReasons';
 import { useTrackSearch } from '../track';
 import { BadgeFilter, useBadgeFilter } from '../layers/BadgeFilter';
+import { QuietFilter, useQuietFilter } from '../sensory/QuietFilter';
 
 // ─────────────────────────────────────────────────────────────
 // RESULTS — one verdict per card
@@ -20,7 +21,9 @@ function V2Results({ app }) {
   const h = useV2Heading('results-' + (app.query?.label || ''));
   const query = app.query || { cats: [], tags: [], label: 'All places' };
   const badgeFilter = useBadgeFilter(app);
-  const all = badgeFilter.apply(ra2Search(app.venues, query, app.user?.needs || []));
+  const quietFilter = useQuietFilter();
+  const matched = badgeFilter.apply(ra2Search(app.venues, query, app.user?.needs || []));
+  const all = quietFilter.apply(matched);
   const [limit, setLimit] = React.useState(25);
   const results = all.slice(0, limit);
   useTrackSearch(all);
@@ -74,6 +77,7 @@ function V2Results({ app }) {
         </p>
 
         <BadgeFilter filter={badgeFilter}/>
+        <QuietFilter filter={quietFilter} list={matched}/>
 
         {results.map(r => (
           <button key={r.id} onClick={() => app.goto('venue', r.id)} style={{

@@ -125,6 +125,18 @@ reports that expire (`temp_barriers`). Screens: `#/toilets`, `#/beach`, `#/facil
 admin: `/admin/layers`. Listings show as "not yet confirmed"; badges are the partner's claim;
 neither changes a verdict.
 
+**Sensory content** (`lib/sensory/`, `lib/data/sensory.ts`, `components/pilot/sensory/`): noise,
+light and crowds from reviews (optional questions, plus "when were you there?" and "when is it
+usually quiet?") and from "I'm here — how is it right now?" check-ins on the venue page
+(`POST /api/venues/[id]/sensory`; a new one within 2 hours replaces your last). The venue page
+shows quiet times ("Usually quiet before 10am — 3 reports"), "quiet now" (a check-in from the last
+90 minutes, else the pattern for this time of day, in Sydney time), and **What to expect** — a
+step-by-step story (arrival → entrance → inside → toilet) from review photos, their descriptions
+and community facts, with a text-only fallback. Results can filter by "Quiet now" / "Has quiet
+times". Columns `reviews.sensory_noise|sensory_light|sensory_crowd|quiet_times`, table
+`sensory_reports`. Sensory facts describe the place and **never change a verdict**. Tests:
+`npx tsx lib/sensory/summary.test.ts`.
+
 **The honesty rule** (`lib/venues.ts`): only community reviews can make a place "Works for
 you". OpenStreetMap accessibility tags show up as "Check first — not yet confirmed".
 Quick answers ("Help fill the gaps") are a one-question community review: they count toward
