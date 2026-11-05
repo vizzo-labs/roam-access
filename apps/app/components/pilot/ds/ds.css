@@ -1,0 +1,64 @@
+/* Design-system states that inline styles can't express (hover, pressed,
+   animation, scrollers). Colours themselves come from the live C2 palette in
+   the components; these rules only add tints and motion. Every animation here
+   stops under prefers-reduced-motion and the in-app "Reduce motion" switch. */
+
+/* Hover / pressed: a translucent overlay works on any background colour
+   (paper, stone, teal) without knowing it — so high contrast keeps working. */
+.ds-press { -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) {
+  .ds-press:not(:disabled):not([aria-disabled="true"]):hover {
+    background-image: linear-gradient(rgba(26, 26, 26, 0.05), rgba(26, 26, 26, 0.05));
+  }
+}
+.ds-press:not(:disabled):not([aria-disabled="true"]):active {
+  background-image: linear-gradient(rgba(26, 26, 26, 0.10), rgba(26, 26, 26, 0.10));
+}
+.ds-press:disabled, .ds-press[aria-disabled="true"] { cursor: not-allowed; }
+
+/* Horizontal scroller (chip rows, action rows). The scrollbar stays thin but
+   visible: it's the only cue that more chips are off-screen. */
+.ds-scroll-x {
+  display: flex; overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain; scroll-padding-inline: 22px;
+}
+/* Focus rings must not be clipped by the scroller. */
+.ds-scroll-x { padding-top: 5px; padding-bottom: 7px; margin-top: -5px; margin-bottom: -7px; }
+
+/* Skeleton shimmer */
+@keyframes ds-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+.ds-skel {
+  background-color: #EDEAE2;
+  background-image: linear-gradient(90deg, rgba(250, 249, 246, 0) 0%, rgba(250, 249, 246, 0.75) 50%, rgba(250, 249, 246, 0) 100%);
+  background-size: 50% 100%; background-repeat: no-repeat;
+  animation: ds-shimmer 1.4s ease-in-out infinite;
+}
+:root[data-ra-contrast="high"] .ds-skel { background-color: #DCD8CE; }
+@media (prefers-reduced-motion: reduce) { .ds-skel { animation: none; background-image: none; } }
+[data-ra-motion="reduce"] .ds-skel { animation: none; background-image: none; }
+
+/* Sheets */
+@keyframes ds-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ds-rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.ds-scrim { animation: ds-fade-in 200ms ease-out both; }
+.ds-sheet-in { animation: ds-rise 260ms cubic-bezier(0.2, 0, 0, 1) both; }
+@media (prefers-reduced-motion: reduce) { .ds-scrim, .ds-sheet-in { animation: none; } }
+[data-ra-motion="reduce"] .ds-scrim, [data-ra-motion="reduce"] .ds-sheet-in { animation: none; }
+
+/* SnapSheet: the drag surface must not scroll the page while dragging. */
+.ds-snap-handle { touch-action: none; }
+.ds-snap-body { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+
+/* A row that links somewhere: underline the title on hover, like a link. */
+@media (hover: hover) {
+  .ds-row-link:hover .ds-row-title { text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* Full-bleed rows and the sheet grip sit inside scrolling / clipped
+   containers: draw their focus ring inside so it's never cut off. */
+.ds-row-link:focus-visible, .ds-snap-grip:focus-visible, [role="tab"]:focus-visible { outline-offset: -3px; }
+
+/* /ds preview toolbar: sticky only where there's room for it. */
+.ds-preview-head { position: static; }
+@media (min-width: 900px) { .ds-preview-head { position: sticky; top: 0; } }
