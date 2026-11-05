@@ -74,6 +74,8 @@ dates as `6 November 2026`; plain, first-person, short sentences ("I use a wheel
   `DEV_DATABASE_URL` (separate Neon database). Falls back to `DATABASE_URL` with a warning
   only if the dev URL is missing. Every script uses the same picker — never read
   `process.env.DATABASE_URL` directly.
+- The dev DB is already migrated and seeded (232 Manly venues, no users). You rarely need
+  `npm run db:seed`; the public Overpass API often refuses automated requests anyway.
 - **Never run migrations, seeds or writes against production yourself.** The production
   build applies migrations; the orchestrator deploys.
 

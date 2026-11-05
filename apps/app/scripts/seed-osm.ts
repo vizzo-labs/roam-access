@@ -93,12 +93,13 @@ const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.p
 
 async function fetchOverpass(): Promise<{ elements: El[] }> {
   let last = '';
-  for (let attempt = 0; attempt < 6; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     const endpoint = OVERPASS[attempt % OVERPASS.length];
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'roam-access-pilot-seed/0.1 (+https://roamaccess.com.au)' },
       body: 'data=' + encodeURIComponent(overpassQuery()),
+      signal: AbortSignal.timeout(120_000),
     }).catch(e => ({ ok: false, status: 0, text: async () => String(e) }) as const);
     if (res.ok) return (await (res as Response).json()) as { elements: El[] };
     last = `Overpass ${res.status} at ${endpoint}: ${(await res.text()).slice(0, 200)}`;
