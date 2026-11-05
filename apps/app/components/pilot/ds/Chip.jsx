@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2, F2 } from '../ui/palette';
 import { Icon } from './Icon';
 import { GUTTER, RADIUS, TARGET, tone as toneOf, transition } from './tokens';
@@ -54,9 +55,10 @@ function FilterChip({ children, selected = false, onChange, icon, count, disable
 
 // RemovableChip — an applied filter you can clear. One button: "Remove filter: Cafés".
 function RemovableChip({ children, onRemove, removeLabel, style }) {
+  const t = useT();
   return (
     <button type="button" className="ds-press" onClick={onRemove}
-      aria-label={removeLabel || (typeof children === 'string' ? `Remove filter: ${children}` : undefined)}
+      aria-label={removeLabel || (typeof children === 'string' ? t('ds.removeFilter', { name: children }) : undefined)}
       style={{
         ...chipBase, minHeight: TARGET.min, padding: '0 10px 0 16px', fontSize: 15, cursor: 'pointer',
         background: C2.tealSoft, color: C2.teal, border: `1.5px solid ${C2.teal}`, ...style,

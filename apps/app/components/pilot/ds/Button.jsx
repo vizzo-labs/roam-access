@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2, F2 } from '../ui/palette';
 import { Icon } from './Icon';
 import { RADIUS, TARGET, transition } from './tokens';
@@ -10,13 +11,14 @@ import { RADIUS, TARGET, transition } from './tokens';
 const Pressable = React.forwardRef(function Pressable(
   { href, external = false, onClick, disabled, type = 'button', className = '', children, ...rest }, ref,
 ) {
+  const t = useT();
   const cls = `ds-press ${className}`.trim();
   if (href && !disabled) {
     return (
       <a ref={ref} href={href} onClick={onClick} className={cls}
         {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} {...rest}>
         {children}
-        {external && <span className="ra-sr-only"> (opens in a new tab)</span>}
+        {external && <span className="ra-sr-only"> {t('common.opensNewTab')}</span>}
       </a>
     );
   }

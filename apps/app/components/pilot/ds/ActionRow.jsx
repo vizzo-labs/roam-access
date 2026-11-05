@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2, F2 } from '../ui/palette';
 import { Pressable } from './Button';
 import { Icon } from './Icon';
@@ -15,9 +16,10 @@ import { RADIUS, transition } from './tokens';
 //     { id: 'save', label: saved ? 'Saved' : 'Save', icon: 'bookmark', pressed: saved, onClick },
 //   ]
 // Leave out actions that don't apply (no phone → no Call); don't disable them.
-function ActionRow({ actions, label = 'Actions', style }) {
+function ActionRow({ actions, label, style }) {
+  const t = useT();
   return (
-    <div role="group" aria-label={label} className="ds-scroll-x" style={{ display: 'flex', gap: 4, ...style }}>
+    <div role="group" aria-label={label || t('ds.actions')} className="ds-scroll-x" style={{ display: 'flex', gap: 4, ...style }}>
       {actions.filter(Boolean).map(a => {
         const on = a.pressed === true;
         const circle = a.primary

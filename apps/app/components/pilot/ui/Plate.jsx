@@ -2,9 +2,11 @@
 
 import React from 'react';
 import { C2, M2 } from './palette';
+import { useT } from '../i18n/I18nProvider';
 
 // Placeholder photo plate.
-function V2Plate({ h = 150, label = 'venue photo', style = {} }) {
+function V2Plate({ h = 150, label, style = {} }) {
+  const t = useT();
   return (
     <div aria-hidden="true" style={{
       height: h, borderRadius: 18,
@@ -12,7 +14,7 @@ function V2Plate({ h = 150, label = 'venue photo', style = {} }) {
       display: 'flex', alignItems: 'flex-end', padding: 12,
       fontFamily: M2, fontSize: 11, color: C2.slate, textTransform: 'uppercase', letterSpacing: '0.08em',
       boxSizing: 'border-box', ...style,
-    }}>{label}</div>
+    }}>{label || t('app.photoPlaceholder')}</div>
   );
 }
 

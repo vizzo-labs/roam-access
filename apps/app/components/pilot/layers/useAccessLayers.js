@@ -12,7 +12,7 @@ function readShown() {
   try {
     const s = JSON.parse(localStorage.getItem(SHOWN_KEY) || 'null');
     return { toilets: !!s?.toilets, beach: !!s?.beach };
-  } catch (e) { return { toilets: false, beach: false }; }
+  } catch { return { toilets: false, beach: false }; }
 }
 
 async function call(path, body) {
@@ -70,7 +70,7 @@ export function useAccessLayers() {
     setShown: (layer, on) => {
       setShown(s => {
         const next = { ...s, [layer]: on };
-        try { localStorage.setItem(SHOWN_KEY, JSON.stringify(next)); } catch (e) {}
+        try { localStorage.setItem(SHOWN_KEY, JSON.stringify(next)); } catch { /* private mode */ }
         return next;
       });
     },

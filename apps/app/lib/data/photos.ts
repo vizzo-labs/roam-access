@@ -22,6 +22,9 @@ export type PhotoVM = {
   id: string; kind: PhotoKind; kindLabel: string; alt: string;
   src: string; thumb: string; width: number; height: number;
   reviewId: string | null; who: string; when: string; mine: boolean;
+  // For translation (#21): the reviewer's first need + how many more, and the
+  // date; the app builds "who" and "when" in the reader's language.
+  whoNeed: string | null; whoMore: number; at: string;
 };
 
 const kindLabel = (k: string) => PHOTO_KINDS.find(x => x.id === k)?.label ?? 'Photo';
@@ -32,12 +35,18 @@ export function whoFor(needs: string[]) {
   return ns[0] ? ns[0].who + (ns.length > 1 ? ` (+${ns.length - 1})` : '') : 'Community member';
 }
 
+function whoParts(needs: string[]) {
+  const ns = RA2_NEEDS.filter(x => needs.includes(x.id));
+  return { whoNeed: ns[0]?.id ?? null, whoMore: Math.max(0, ns.length - 1) };
+}
+
 function toVM(p: typeof reviewPhotos.$inferSelect, needs: string[], viewerId: string, now = Date.now()): PhotoVM {
   return {
     id: p.id, kind: p.kind as PhotoKind, kindLabel: kindLabel(p.kind), alt: p.alt,
     src: `/api/photos/${p.id}`, thumb: `/api/photos/${p.id}?size=thumb`,
     width: p.width, height: p.height, reviewId: p.reviewId,
     who: whoFor(needs), when: ago(+p.createdAt, now), mine: p.userId === viewerId,
+    ...whoParts(needs), at: new Date(p.createdAt).toISOString(),
   };
 }
 

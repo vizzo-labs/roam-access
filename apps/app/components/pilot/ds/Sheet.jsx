@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2, F2 } from '../ui/palette';
 import { useRA2Dialog } from '../ui/useDialog';
 import { IconButton } from './IconButton';
@@ -32,6 +33,7 @@ function Handle({ style }) {
 //   <Sheet open={open} onClose={close} title="Filters" footer={<Button full onClick={apply}>Show 12 places</Button>}>…</Sheet>
 // ─────────────────────────────────────────────────────────────────────────
 function Sheet({ open, onClose, title, description, children, footer, closeLabel, position = 'absolute', maxWidth = 520, id }) {
+  const t = useT();
   const ref = useRA2Dialog(open, onClose);
   const wide = useWideViewport();
   const [drag, setDrag] = React.useState(0);
@@ -82,7 +84,7 @@ function Sheet({ open, onClose, title, description, children, footer, closeLabel
             <h2 id={`${hid}-title`} style={{ ...TYPE.title3, fontSize: 20, margin: 0 }}>{title}</h2>
             {description && <p id={`${hid}-desc`} style={{ ...TYPE.footnote, color: C2.slate, margin: '4px 0 0' }}>{description}</p>}
           </div>
-          <IconButton icon="close" variant="ghost" label={closeLabel || `Close ${title}`} onClick={onClose}/>
+          <IconButton icon="close" variant="ghost" label={closeLabel || t('ds.sheet.closeNamed', { title })} onClick={onClose}/>
         </div>
         <div style={{ overflowY: 'auto', padding: `${SPACE.sm}px ${GUTTER}px ${footer ? SPACE.sm : SPACE.xl}px`, flex: '1 1 auto', minHeight: 0 }}>
           {children}
@@ -115,12 +117,13 @@ function Sheet({ open, onClose, title, description, children, footer, closeLabel
 //   </div>
 // ─────────────────────────────────────────────────────────────────────────
 const SNAPS = ['peek', 'half', 'full'];
-const SNAP_WORDS = { peek: 'collapsed', half: 'half screen', full: 'full screen' };
 
 function SnapSheet({
   label, snap = 'half', onSnapChange, header, children,
   peekHeight = 132, halfRatio = 0.5, topGap = 72, bottomInset = 0, style,
 }) {
+  const t = useT();
+  const word = s => t(`ds.snap.${s}`);
   const sheetRef = React.useRef(null);
   const handleRef = React.useRef(null);
   const reduced = useReducedMotion();
@@ -141,7 +144,7 @@ function SnapSheet({
   const go = (next) => {
     if (!SNAPS.includes(next) || next === snap) return;
     onSnapChange?.(next);
-    setAnnounce(`${label}: ${SNAP_WORDS[next]}`);
+    setAnnounce(t('ds.snap.announce', { label, size: word(next) }));
   };
   const step = (d) => go(SNAPS[Math.min(SNAPS.length - 1, Math.max(0, SNAPS.indexOf(snap) + d))]);
 
@@ -187,7 +190,7 @@ function SnapSheet({
     if (snap === 'peek' && !e.currentTarget.querySelector('.ds-snap-top')?.contains(e.target)) go('half');
   };
 
-  const next = snap === 'full' ? 'collapse' : 'expand';
+  const next = snap === 'full' ? t('ds.snap.collapse') : t('ds.snap.expand');
   return (
     <section ref={sheetRef} aria-label={label} onFocusCapture={onFocusCapture}
       style={{
@@ -201,7 +204,7 @@ function SnapSheet({
       <div className="ds-snap-top" onPointerDown={onPointerDown} onPointerMove={onPointerMove}
         onPointerUp={onPointerUp} onPointerCancel={onPointerUp} style={{ flexShrink: 0 }}>
         <button ref={handleRef} type="button" className="ds-snap-grip ds-snap-handle" onClick={onClick} onKeyDown={onKeyDown}
-          aria-label={`${label}: ${SNAP_WORDS[snap]}. Press to ${next}; arrow keys resize.`}
+          aria-label={t('ds.snap.handle', { label, size: word(snap), action: next })}
           style={{
             display: 'block', width: '100%', minHeight: 44, padding: '12px 0', border: 0,
             background: 'transparent', cursor: 'grab', borderRadius: `${RADIUS.xl}px ${RADIUS.xl}px 0 0`,

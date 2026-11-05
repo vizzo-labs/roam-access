@@ -3,16 +3,17 @@
 import React from 'react';
 import { PilotMap, MapLegend } from '../PilotMap';
 import { V2Shell } from '../ui/Shell';
-import { V2_VERDICT_META } from '../ui/Verdict';
 import { C2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { ra2Search, ra2ParseQuery } from '@/lib/pilot/match';
+import { ra2Search, ra2ParseQuery, ra2QueryLabel } from '@/lib/pilot/match';
 import { LayerMenu, layerExtras } from '../layers/LayerToggles';
 import { FacilityCard } from '../layers/FacilityCard';
 import { Button, GUTTER, IconButton, List, SPACE, SearchField, SegmentedControl, SnapSheet, TYPE } from '../ds';
 import { ExploreFilters } from '../explore/ExploreFilters';
 import { PlaceRow } from '../explore/PlaceRow';
-import { applyFilters, countsLine, verdictCounts } from '../explore/filters';
+import { CLEAR_FILTERS, applyFilters, countsLine, filtersOn, verdictCounts } from '../explore/filters';
+import { useT } from '../i18n';
+import { pinLabels } from '../WebLayout';
 
 const PEEK = 132;
 const SHEET_ROWS = 50;
@@ -23,6 +24,7 @@ const SHEET_ROWS = 50;
 // the sheet's handle is a button, and List/Map switches to the full list.
 // ─────────────────────────────────────────────────────────────
 function V2MapView({ app }) {
+  const t = useT();
   const query = app.query || { cats: [], tags: [], label: 'All places', raw: '' };
   const searched = ra2Search(app.venues, query, app.user?.needs || []);
   const results = applyFilters(searched, app.filters);
@@ -31,16 +33,17 @@ function V2MapView({ app }) {
   const [snap, setSnap] = React.useState('half');
   // Access layers (F3): a facility pin replaces the place list while selected.
   const [extraId, setExtraId] = React.useState(null);
-  const extras = layerExtras(app.layers);
+  const extras = layerExtras(app.layers, { t });
   const extra = extraId && extras.some(x => x.id === extraId) ? app.layers.facilityById(extraId) : null;
   const sel = extra ? null : results.find(r => r.id === selId) || null;
   const h = useV2Heading('map');
   const pinColor = { works: C2.blue, check: C2.amber, barrier: C2.red, unknown: '#475569' };
   const pinIcon = { works: '✓', check: '!', barrier: '✗', unknown: '?' };
-  const labels = Object.fromEntries(Object.entries(V2_VERDICT_META).map(([k, m]) => [k, m.label]));
+  const labels = pinLabels(t);
+  const queryLabel = ra2QueryLabel(query, t);
   const legendKinds = [...new Set(results.map(r => r.verdict.kind))];
 
-  const initialText = query.raw || (query.cats.length || query.tags.length ? query.label : '');
+  const initialText = query.raw || (query.cats.length || query.tags.length ? queryLabel : '');
   const [text, setText] = React.useState(initialText);
   const [shownFor, setShownFor] = React.useState(initialText);
   if (shownFor !== initialText) { setShownFor(initialText); setText(initialText); }
@@ -61,7 +64,7 @@ function V2MapView({ app }) {
 
   return (
     <V2Shell scroll={false} tabs app={app} active="home">
-      <h1 ref={h} tabIndex={-1} className="ra-sr-only">Map of places — {query.label}</h1>
+      <h1 ref={h} tabIndex={-1} className="ra-sr-only">{t('explore.mapHeading', { query: queryLabel })}</h1>
       <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
         <PilotMap results={results} selectedId={extra ? null : selId} onSelect={selectPin} origin={app.origin}
           extras={extras} selectedExtraId={extra?.id || null} onSelectExtra={selectExtra} alertIds={app.layers.alertIds}
@@ -72,12 +75,12 @@ function V2MapView({ app }) {
         {/* top: the same search + filters as the list */}
         <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 0, right: 0, zIndex: 6, padding: `0 ${GUTTER - 4}px`, pointerEvents: 'none' }}>
           <div style={{ pointerEvents: 'auto' }}>
-            <SearchField id="map-search" label="Search places" value={text} onChange={setText} floating
+            <SearchField id="map-search" label={t('ds.search.label')} value={text} onChange={setText} floating
               dirty={text.trim() !== initialText.trim() && !!text.trim()}
-              placeholder="Search places"
+              placeholder={t('ds.search.label')}
               onSubmit={t => { app.setQuery(ra2ParseQuery(t)); }}
               onVoice={() => app.goto('voice')}
-              back={{ label: 'Back to home', onClick: () => app.goto('home') }}/>
+              back={{ label: t('explore.backHome'), onClick: () => app.goto('home') }}/>
           </div>
           <div style={{ pointerEvents: 'auto', marginTop: SPACE.xs }}>
             <ExploreFilters app={app} counts={counts} bleed={false}/>
@@ -101,52 +104,52 @@ function V2MapView({ app }) {
           </div>
         )}
 
-        <SnapSheet label="Places list" snap={snap} onSnapChange={setSnap} peekHeight={PEEK} topGap={8}
+        <SnapSheet label={t('explore.placesSheet')} snap={snap} onSnapChange={setSnap} peekHeight={PEEK} topGap={8}
           header={(
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
               <div style={{ minWidth: 0, flex: '1 1 140px' }}>
-                <h2 style={{ ...TYPE.title3, margin: 0 }}>{results.length} {results.length === 1 ? 'place' : 'places'}</h2>
+                <h2 style={{ ...TYPE.title3, margin: 0 }}>{t('common.places', { count: results.length })}</h2>
                 <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {searched.length ? countsLine(counts) : 'Nothing matched'}
+                  {searched.length ? countsLine(counts, t) : t('explore.nothingMatched')}
                 </p>
               </div>
-              <SegmentedControl label="Show results as" value="map" onChange={v => v === 'list' && app.goto('results', null, { replace: true })}
-                options={[{ value: 'list', label: 'List', icon: 'list' }, { value: 'map', label: 'Map', icon: 'map' }]}/>
+              <SegmentedControl label={t('explore.showAs')} value="map" onChange={v => v === 'list' && app.goto('results', null, { replace: true })}
+                options={[{ value: 'list', label: t('explore.list'), icon: 'list' }, { value: 'map', label: t('explore.map'), icon: 'map' }]}/>
             </div>
           )}>
           <div ref={sheetBody}>
             {sel && (
               <div style={{ borderBottom: `6px solid ${C2.stone}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${SPACE.sm}px ${GUTTER - 8}px 0 ${GUTTER}px` }}>
-                  <p style={{ ...TYPE.overline, color: C2.slate, margin: 0 }}>Selected on the map</p>
-                  <IconButton icon="close" variant="ghost" size="sm" label={`Clear selection: ${sel.name}`} onClick={() => setSelId(null)}/>
+                  <p style={{ ...TYPE.overline, color: C2.slate, margin: 0 }}>{t('explore.selectedOnMap')}</p>
+                  <IconButton icon="close" variant="ghost" size="sm" label={t('explore.clearSelection', { name: sel.name })} onClick={() => setSelId(null)}/>
                 </div>
                 <PlaceRow app={app} place={sel} reasons={3} selected/>
                 <div style={{ display: 'flex', gap: SPACE.xs, padding: `0 ${GUTTER}px ${SPACE.md}px` }}>
-                  <Button style={{ flex: 1 }} onClick={() => app.goto('venue', sel.id)} iconRight="forward">See details</Button>
+                  <Button style={{ flex: 1 }} onClick={() => app.goto('venue', sel.id)} iconRight="forward">{t('explore.seeDetails')}</Button>
                   <IconButton icon="bookmark" pressed={app.world.saved.includes(sel.id)} size="lg"
-                    label={app.world.saved.includes(sel.id) ? `Remove ${sel.name} from saved` : `Save ${sel.name}`}
+                    label={app.world.saved.includes(sel.id) ? t('explore.unsaveNamed', { name: sel.name }) : t('explore.saveNamed', { name: sel.name })}
                     onClick={() => app.toggleSave(sel.id)} style={{ width: 52, height: 52 }}/>
                 </div>
               </div>
             )}
             {others.length > 0 && (
-              <List label={`Places: ${query.label}`}>
+              <List label={t('explore.placesList', { query: queryLabel })}>
                 {others.slice(0, SHEET_ROWS).map(r => <PlaceRow key={r.id} app={app} place={r} reasons={1}/>)}
               </List>
             )}
             {others.length > SHEET_ROWS && (
               <div style={{ padding: `${SPACE.md}px ${GUTTER}px` }}>
                 <Button full variant="ghost" onClick={() => app.goto('results', null, { replace: true })}>
-                  See all {results.length} in the list
+                  {t('explore.seeAllInList', { count: results.length })}
                 </Button>
               </div>
             )}
             {!results.length && (
               <div style={{ padding: `${SPACE.lg}px ${GUTTER}px` }}>
-                <p style={{ ...TYPE.callout, margin: '0 0 12px' }}>No places match. Try removing a filter above.</p>
-                {(app.filters.works || app.filters.hideBarriers) && (
-                  <Button variant="ghost" onClick={() => app.setFilters({ works: false, hideBarriers: false })}>Clear filters</Button>
+                <p style={{ ...TYPE.callout, margin: '0 0 12px' }}>{t('explore.noMatchMap')}</p>
+                {filtersOn(app.filters) && (
+                  <Button variant="ghost" onClick={() => app.setFilters(CLEAR_FILTERS)}>{t('explore.clearFilters')}</Button>
                 )}
               </div>
             )}

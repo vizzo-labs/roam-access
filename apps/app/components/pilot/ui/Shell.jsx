@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { C2, F2 } from './palette';
+import { useT } from '../i18n/I18nProvider';
 
 // ── Screen scaffold ───────────────────────────────────────────────────────
 // Flex column: scrollable content + fixed chrome (action bar, tabs) below it,
@@ -19,14 +20,15 @@ function V2Shell({ children, bg = null, scroll = true, bar = null, tabs = null, 
 }
 
 function V2TabBar({ active, app }) {
+  const t = useT();
   if (app.wide) return null; // the web layout's header carries navigation
   const items = [
-    { id: 'home',  label: 'Home',  d: 'M4 11.5 12 4l8 7.5M6 10v9h12v-9' },
-    { id: 'saved', label: 'Saved', d: 'M6 4h12v17l-6-4-6 4V4Z' },
-    { id: 'me',    label: 'Me',    d: 'M12 11a3.4 3.4 0 1 0 0-6.8A3.4 3.4 0 0 0 12 11ZM4.5 20c1.5-3.5 4.5-5 7.5-5s6 1.5 7.5 5' },
+    { id: 'home',  label: t('app.nav.home'),  d: 'M4 11.5 12 4l8 7.5M6 10v9h12v-9' },
+    { id: 'saved', label: t('app.nav.saved'), d: 'M6 4h12v17l-6-4-6 4V4Z' },
+    { id: 'me',    label: t('app.nav.me'),    d: 'M12 11a3.4 3.4 0 1 0 0-6.8A3.4 3.4 0 0 0 12 11ZM4.5 20c1.5-3.5 4.5-5 7.5-5s6 1.5 7.5 5' },
   ];
   return (
-    <nav aria-label="Primary" style={{
+    <nav aria-label={t('app.nav.primary')} style={{
       paddingTop: 8, paddingBottom: 'var(--ra-tabs-pad)',
       background: C2.paper, borderTop: `1px solid ${C2.hair}`,
       display: 'flex', flexShrink: 0,

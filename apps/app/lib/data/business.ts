@@ -152,11 +152,12 @@ export async function getVenueSays(venueId: string) {
   ]);
   const now = Date.now();
   const statementRow = rows.find(r => !r.reviewId);
-  const replies: Record<string, { body: string; when: string }> = {};
-  for (const r of rows) if (r.reviewId) replies[r.reviewId] = { body: r.body, when: ago(+r.updatedAt, now) };
+  // `when` is English (server pages); `at` lets the app format it in the reader's language.
+  const replies: Record<string, { body: string; when: string; at: string }> = {};
+  for (const r of rows) if (r.reviewId) replies[r.reviewId] = { body: r.body, when: ago(+r.updatedAt, now), at: new Date(r.updatedAt).toISOString() };
   return {
     claimed,
-    statement: statementRow ? { body: statementRow.body, when: ago(+statementRow.updatedAt, now) } : null,
+    statement: statementRow ? { body: statementRow.body, when: ago(+statementRow.updatedAt, now), at: new Date(statementRow.updatedAt).toISOString() } : null,
     replies,
   };
 }

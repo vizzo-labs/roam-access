@@ -4,6 +4,7 @@ import { getVenueReviews, getVenueVM } from '@/lib/data';
 import { getPhotosByReview } from '@/lib/data/photos';
 import { getAiRemaining, refundAiQuota, takeAiQuota } from '@/lib/data/ai-usage';
 import { askAboutPlace, QUESTION_MAX } from '@/lib/ai/ask';
+import { LOCALES } from '@/lib/i18n/locales';
 
 export const maxDuration = 30;
 const noStore = { 'Cache-Control': 'private, no-store' };
@@ -25,6 +26,8 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/venues/[id]
   const question = typeof body?.question === 'string' ? body.question.replace(/\s+/g, ' ').trim() : '';
   if (question.length < 3) return badRequest('Type a question first');
   if (question.length > QUESTION_MAX) return badRequest(`Questions can be up to ${QUESTION_MAX} characters`);
+  // Answer in the reader's language (#21); unknown values fall back to English.
+  const language = LOCALES.find(l => l.id === body?.locale)?.english ?? 'Australian English';
 
   const venue = await getVenueVM(id);
   if (!venue) return Response.json({ error: 'Not found' }, { status: 404 });
@@ -32,7 +35,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/venues/[id]
   // Nothing to answer from: say so without spending a question.
   if (!reviews.length) {
     return Response.json({
-      result: { answered: false, answer: 'Nobody has reviewed this place yet, so there’s nothing to answer from — and we won’t guess.', citations: [] },
+      result: { answered: false, answer: 'Nobody has reviewed this place yet, so there’s nothing to answer from — and we won’t guess.', answerKey: 'ask.noReviews', citations: [] },
       remaining: await getAiRemaining(userId, 'ask'),
     }, { headers: noStore });
   }
@@ -41,7 +44,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/venues/[id]
   if (remaining === null) return Response.json({ error: 'limit', message: 'You’ve used today’s questions. You can ask again tomorrow.', remaining: 0 }, { status: 429, headers: noStore });
   try {
     const photos = await getPhotosByReview(reviews.map(r => r.id), userId);
-    const result = await askAboutPlace(question, venue, reviews, photos);
+    const result = await askAboutPlace(question, venue, reviews, photos, undefined, language === 'English' ? 'Australian English' : language);
     return Response.json({ result, remaining }, { headers: noStore });
   } catch (e) {
     await refundAiQuota(userId, 'ask');

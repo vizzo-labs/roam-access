@@ -128,3 +128,61 @@ export function verdictSourceShort(venue: VenueLike, verdict: VerdictLike, needI
   return 'No reviews for your needs yet';
 }
 
+
+// ── Translated versions for the app (#21) ─────────────────────────────────
+// Same logic as above, worded through t() and dated through the locale's
+// formatter (fmt from useFormat()). The English functions above stay for
+// server pages and the public summary.
+type TFn = (key: string, params?: Record<string, string | number | null | undefined>) => string;
+type Fmt = { timeAgo: (d: string, now?: number) => string };
+
+export function factSourceT(t: TFn, fmt: Fmt, f: Fact, now = Date.now()) {
+  if (f.src === 'osm') return t('trust.source.osm');
+  if (f.src === 'venue') return t('trust.source.venue');
+  if (!f.n) return t('trust.source.community');
+  const base = f.quick && f.quick === f.n ? t('trust.fact.quickOnly', { count: f.n })
+    : f.quick ? t('trust.fact.someQuick', { count: f.n, quick: f.quick })
+    : t('trust.fact.reports', { count: f.n });
+  return f.last ? t('trust.fact.withLatest', { base, when: fmt.timeAgo(f.last, now) }) : base;
+}
+
+function whoLabelT(t: TFn, people: number, sameNeeds: number, needIds: string[]) {
+  if (!needIds.length) return t('trust.who.people', { count: people });
+  if (sameNeeds === people) {
+    if (needIds.length === 1 && RA2_NEEDS.some(x => x.id === needIds[0])) {
+      const id = needIds[0];
+      return t('trust.who.need', { count: people, who: t(`data.need.${id}.who`).toLocaleLowerCase(), whoPlural: t(`data.need.${id}.whoPlural`) });
+    }
+    return t('trust.who.withYourNeeds', { count: people });
+  }
+  if (sameNeeds > 0) return t('trust.who.someWithYourNeeds', { count: people, same: sameNeeds });
+  return t('trust.who.noneWithYourNeeds', { count: people });
+}
+
+export function verdictSourceT(t: TFn, fmt: Fmt, venue: VenueLike, verdict: VerdictLike, needIds: string[], now = Date.now()) {
+  const b = verdictBasis(venue, verdict, needIds);
+  if (b.people || b.quick) {
+    const people = b.people ? whoLabelT(t, b.people, b.sameNeeds, needIds) : null;
+    const quick = b.quick ? t('trust.quickAnswers', { count: b.quick }) : null;
+    const who = people && quick ? t('trust.who.and', { a: people, b: quick }) : (people || quick)!;
+    return t('trust.verdict.based', { who, when: fmt.timeAgo(b.latest!, now) }) + (b.hasOsm ? t('trust.verdict.plusOsm') : '');
+  }
+  if (b.osmOnly) return t('trust.verdict.osmOnly');
+  if (b.otherReviews) return t('trust.verdict.otherReviews', { count: b.otherReviews });
+  return t('trust.verdict.noReviews');
+}
+
+export function verdictSourceShortT(t: TFn, fmt: Fmt, venue: VenueLike, verdict: VerdictLike, needIds: string[], now = Date.now()) {
+  const b = verdictBasis(venue, verdict, needIds);
+  if (b.people || b.quick) {
+    const people = !b.people ? null
+      : !needIds.length || !b.sameNeeds ? t('trust.who.people', { count: b.people })
+      : b.sameNeeds === b.people ? t('trust.short.peopleWithNeeds', { count: b.people })
+      : t('trust.short.peopleSomeNeeds', { count: b.people, same: b.sameNeeds });
+    const quick = b.quick ? t('trust.quickAnswers', { count: b.quick }) : null;
+    const who = people && quick ? t('trust.short.plus', { a: people, b: quick }) : (people || quick)!;
+    return t('trust.short.line', { who, when: fmt.timeAgo(b.latest!, now) }) + (b.hasOsm ? t('trust.short.plusOsm') : '');
+  }
+  if (b.osmOnly) return t('trust.source.osm');
+  return t('trust.short.noReviews');
+}

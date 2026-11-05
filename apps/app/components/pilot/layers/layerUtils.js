@@ -11,12 +11,12 @@ export function metres(a, b) {
 }
 // Same rule as PilotApp: straight line +25% for streets, 80 m a minute.
 export const walkMins = (o, v) => Math.max(1, Math.round((metres(o, v) * 1.25) / 80));
-// Past ~40 minutes on foot, say the distance instead.
-export function distanceLabel(o, v) {
+// Past ~40 minutes on foot, say the distance instead. Pass the `t` from useT().
+export function distanceLabel(o, v, t) {
   const mins = walkMins(o, v);
-  if (mins <= 40) return `${mins} min walk`;
+  if (mins <= 40) return t('common.minWalk', { mins });
   const km = metres(o, v) / 1000;
-  return `${km < 10 ? km.toFixed(1) : Math.round(km)} km away`;
+  return t('layers.kmAway', { km: km < 10 ? km.toFixed(1) : Math.round(km) });
 }
 
 // ── Reports ──────────────────────────────────────────────────────────────
@@ -32,35 +32,34 @@ export function reportTypesFor(where) {
 
 export { reportType };
 
-export function ago(iso, now = Date.now()) {
-  const s = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
-  if (s < 90) return 'just now';
-  const m = Math.round(s / 60); if (m < 60) return `${m} minutes ago`;
-  const h = Math.round(m / 60); if (h < 24) return `${h} ${h === 1 ? 'hour' : 'hours'} ago`;
-  const d = Math.round(h / 24); return `${d} ${d === 1 ? 'day' : 'days'} ago`;
-}
-
-// "3:00 pm Saturday 7 November" — Sydney time, en-AU.
-export function until(iso) {
-  const d = new Date(iso);
-  const time = d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', timeZone: 'Australia/Sydney' });
-  const day = d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Australia/Sydney' });
-  return `${time} ${day}`;
+// "Saturday 7 November, 3:00 pm" — Sydney time, in the reader's language
+// (`intl` = useLocale().def.intl).
+export function until(iso, intl = 'en-AU') {
+  return new Date(iso).toLocaleString(intl, {
+    weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'Australia/Sydney',
+  });
 }
 
 // ── Toilets ──────────────────────────────────────────────────────────────
-// Short tags for a list row, most important first.
+// Short tags for a list row, most important first: ids, see toiletTagLabels.
 export function toiletTags(d) {
   const t = [];
-  if (d.changingPlaces) t.push('Changing Places');
-  else if (d.adultChange) t.push('Adult change room');
-  if (d.accessible) t.push('Accessible');
-  else if (d.ambulant) t.push('Ambulant only');
-  if (d.mlak24) t.push('MLAK 24 hours');
-  else if (d.mlakAfterHours) t.push('MLAK after hours');
-  if (d.shower || d.acShower) t.push('Shower');
+  if (d.changingPlaces) t.push('changingPlaces');
+  else if (d.adultChange) t.push('adultChange');
+  if (d.accessible) t.push('accessible');
+  else if (d.ambulant) t.push('ambulant');
+  if (d.mlak24) t.push('mlak24');
+  else if (d.mlakAfterHours) t.push('mlakAfterHours');
+  if (d.shower || d.acShower) t.push('shower');
   return t;
 }
+export const toiletTagLabels = (d, t, skip = []) => toiletTags(d).filter(x => !skip.includes(x)).map(x => t(`layers.tag.${x}`));
+
+// Translated labels for layer data (pass the `t` from useT()).
+export const reportLabel = (t, id) => t(`layers.report.${reportType(id) ? id : 'other'}.label`);
+export const reportBanner = (t, id) => t(`layers.report.${reportType(id) ? id : 'other'}.banner`);
+export const facilityKindLabel = (t, kind) => t(`layers.kind.${['toilet', 'beach', 'liberty_swing', 'ferry', 'walk'].includes(kind) ? kind : 'unknown'}`);
+export const badgeText = (t, id, field) => t(`layers.badge.${id}.${field}`);
 
 export function hoursLabel(d) {
   const h = (d.openingHours || '').replace(/^OPEN:\s*/i, '').trim();

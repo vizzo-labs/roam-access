@@ -2,11 +2,13 @@
 
 import React from 'react';
 import { C2, F2, M2 } from '../ui/palette';
+import { useT } from '../i18n';
 import { fetchGaps, peekGaps } from './gapsStore';
 
 // Entry point for "Help fill the gaps" — on Home and after a review.
 // Hidden when nothing nearby needs an answer (or the request fails).
 function GapsPrompt({ app, style = {}, onColor = false }) {
+  const t = useT();
   const [n, setN] = React.useState(() => peekGaps(app.origin)?.tasks?.length ?? null);
   const { lat, lng } = app.origin;
   React.useEffect(() => {
@@ -34,11 +36,11 @@ function GapsPrompt({ app, style = {}, onColor = false }) {
           </svg>
         </span>
         <span style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ display: 'block', fontFamily: M2, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: C2.slate, marginBottom: 6 }}>Help fill the gaps</span>
+          <span style={{ display: 'block', fontFamily: M2, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: C2.slate, marginBottom: 6 }}>{t('community.prompt.overline')}</span>
           <span style={{ display: 'block', fontSize: 17.5, fontWeight: 700, letterSpacing: '-0.015em', color: C2.char, marginBottom: 3 }}>
-            {n} {n === 1 ? 'place' : 'places'} near you {n === 1 ? 'needs' : 'need'} one quick answer
+            {t('community.prompt.title', { count: n })}
           </span>
-          <span style={{ display: 'block', fontSize: 14, color: C2.slate, lineHeight: 1.4 }}>Yes or no — one tap each. Only if you’ve been there.</span>
+          <span style={{ display: 'block', fontSize: 14, color: C2.slate, lineHeight: 1.4 }}>{t('community.prompt.sub')}</span>
         </span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
           <path d="M9 5l7 7-7 7" stroke={C2.teal} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>

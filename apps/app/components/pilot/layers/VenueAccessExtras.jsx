@@ -6,32 +6,35 @@
 import React from 'react';
 import { C2 } from '../ui/palette';
 import { Badge, Card, List, ListRow, SectionHeader, SourceBadge, SPACE, TYPE } from '../ds';
+import { UserText, useT } from '../i18n';
 import { TempReportBanner, ReportButton } from './TempReports';
 import { FacilityPin } from './bits';
-import { badgeDef, distanceLabel, nearestToilet, toiletTags, walkMins } from './layerUtils';
+import { badgeDef, badgeText, distanceLabel, nearestToilet, toiletTagLabels, walkMins } from './layerUtils';
 
 export function VenueReportsBanner({ app, venue }) {
   return <TempReportBanner app={app} reports={app.layers.reportsFor('venue', venue.id)} placeName={venue.name}/>;
 }
 
 export function PartnerBadges({ badges }) {
+  const t = useT();
   const defs = (badges || []).map(b => ({ b, d: badgeDef(b.badge) })).filter(x => x.d);
   if (!defs.length) return null;
   return (
     <Card padding={0} style={{ marginBottom: 10 }}>
       <section aria-labelledby="partner-h">
-        <SectionHeader id="partner-h" size="sm" title="Partner programs"
-          description="What partner programs say about this place. Not a community review — it doesn’t change the verdict."
+        <SectionHeader id="partner-h" size="sm" title={t('layers.badges.title')}
+          description={t('layers.badges.desc')}
           style={{ padding: `${SPACE.md}px ${SPACE.md}px 0` }}/>
-        <List label="Partner programs">
+        <List label={t('layers.badges.title')}>
           {defs.map(({ b, d }) => (
-            <ListRow key={b.badge} padX={SPACE.md} leading={<BadgeMark/>} title={d.label}
-              subtitle={<>{d.what}{b.note ? ` ${b.note}` : ''}</>}
+            <ListRow key={b.badge} padX={SPACE.md} leading={<BadgeMark/>} title={badgeText(t, d.id, 'label')}
+              subtitle={<>{badgeText(t, d.id, 'what')}{b.note ? <> <UserText>{b.note}</UserText></> : null}</>}
               meta={
                 <span style={{ display: 'flex', gap: SPACE.xs, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <SourceBadge source="partner">{d.partner}’s claim</SourceBadge>
-                  <a href={b.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ ...TYPE.footnote, color: C2.teal, fontWeight: 600, padding: '12px 0' }}>
-                    Source<span className="ra-sr-only"> for {d.label} (opens in a new tab)</span>
+                  <SourceBadge source="partner">{t('layers.badges.claim', { partner: d.partner })}</SourceBadge>
+                  <a href={b.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={t('layers.badges.sourceFor', { label: badgeText(t, d.id, 'label') })}
+                    style={{ ...TYPE.footnote, color: C2.teal, fontWeight: 600, padding: '12px 0' }}>
+                    {t('layers.badges.source')}
                   </a>
                 </span>
               }/>
@@ -54,18 +57,19 @@ export function BadgeMark({ size = 24 }) {
 }
 
 export function NearestToilet({ app, venue }) {
+  const t = useT();
   const near = nearestToilet(app.layers.facilities, venue);
   if (!near) return null;
   const f = near.facility;
-  const tags = toiletTags(f.details || {}).filter(t => t !== 'Accessible');
+  const tags = toiletTagLabels(f.details || {}, t, ['accessible']);
   const closed = app.layers.reportsFor('facility', f.id).some(r => r.type === 'toilet_closed');
   const mins = walkMins(venue, f);
   return (
-    <List label="Nearest accessible toilet" inset style={{ marginBottom: 10 }}>
+    <List label={t('layers.nearest.title')} inset style={{ marginBottom: 10 }}>
       <ListRow padX={SPACE.md} leading={<FacilityPin f={f}/>} onClick={() => app.goto('facility', f.id)}
-        title={<><span style={{ display: 'block', ...TYPE.caption, color: C2.slate, marginBottom: 2 }}>Nearest accessible toilet (listed)</span>{f.name}</>}
-        subtitle={`${mins <= 40 ? `${mins} min walk from here` : distanceLabel(venue, f)}${tags.length ? ` · ${tags.join(' · ')}` : ''}`}
-        meta={closed ? <Badge tone="warn" size="sm">Reported closed today</Badge> : null}/>
+        title={<><span style={{ display: 'block', ...TYPE.caption, color: C2.slate, marginBottom: 2 }}>{t('layers.nearest.listed')}</span>{f.name}</>}
+        subtitle={`${mins <= 40 ? t('layers.nearest.walkFromHere', { mins }) : distanceLabel(venue, f, t)}${tags.length ? ` · ${tags.join(' · ')}` : ''}`}
+        meta={closed ? <Badge tone="warn" size="sm">{t('layers.nearest.closed')}</Badge> : null}/>
     </List>
   );
 }

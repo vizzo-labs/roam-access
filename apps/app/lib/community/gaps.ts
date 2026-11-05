@@ -15,6 +15,9 @@ export type GapStatus = 'none' | 'unconfirmed' | 'mixed' | 'one';
 export type GapTask = {
   venueId: string; name: string; kind: string; area: string; mins: number;
   feature: FeatureId; question: string; helps: string; status: GapStatus; hint: string;
+  // For translation (#21): the app writes question / helps / hint in the
+  // reader's language from `feature`, `status` and these numbers.
+  yes: number; no: number; osm: 'yes' | 'partly' | 'no' | null;
 };
 
 type GapVenue = {
@@ -68,6 +71,7 @@ export function pickGaps(input: {
       const total = c ? c.yes + c.no : 0;
       const osm = OSM_TAG[f] ? v.osmTags?.[OSM_TAG[f]!] : undefined;
       let status: GapStatus, hint: string, value: number;
+      const osmWord = (osm && OSM_WORD[osm] ? OSM_WORD[osm] : null) as GapTask['osm'];
       if (!total && osm && OSM_WORD[osm]) {
         status = 'unconfirmed'; value = 32;
         hint = `OpenStreetMap says “${OSM_WORD[osm]}”, but nobody has confirmed it yet.`;
@@ -83,6 +87,7 @@ export function pickGaps(input: {
         top = {
           venueId: v.id, name: v.name, kind: v.kind, area: v.suburb || 'Manly', mins,
           feature: f, question: QUICK_QUESTIONS[f], helps: helpsWho(f), status, hint, score,
+          yes: c?.yes ?? 0, no: c?.no ?? 0, osm: status === 'unconfirmed' ? osmWord : null,
         };
       }
     }

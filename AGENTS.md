@@ -113,6 +113,14 @@ The users are disabled people. Every change must meet:
 UI copy in **Australian English (en-AU)**: "colour", "organise", "centre", "favourite";
 dates as `6 November 2026`; plain, first-person, short sentences ("I use a wheelchair").
 
+The app also ships in 简体中文, 日本語, 한국어 and Español (#21). **Every string a person can see
+or hear goes through `t()`** (`const t = useT()` from `components/pilot/i18n`): text,
+`aria-label`, placeholders, toasts, titles. Add the English to
+`apps/app/lib/i18n/messages/en/<namespace>.ts` and the four translations (marked
+machine-translated until a person reviews them); helpers that build text take `t` as an
+argument; dates via `useFormat()`; people's own words in `<UserText>`. Run
+`npm run i18n:check` before a PR. Details: `apps/app/lib/i18n/README.md`.
+
 ## Database
 
 - **Which database**: `apps/app/lib/db/url.ts` → `pickDatabaseUrl()`. Production

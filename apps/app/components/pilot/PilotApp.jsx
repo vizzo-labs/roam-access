@@ -33,22 +33,18 @@ import { V2Toilets } from './screens/Toilets';
 import { V2Beach } from './screens/Beach';
 import { V2Facility } from './screens/Facility';
 import { useAccessLayers } from './layers/useAccessLayers';
-import { I18nProvider } from './i18n';
+import { I18nProvider, useT } from './i18n';
 import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
 import { AppSkeleton } from './explore/AppSkeleton';
 
 const PREFS_KEY = 'ra2-a11y';
 
-const VIEW_TITLES = {
-  setup: 'Set your needs', 'setup-name': 'Your name',
-  home: 'Home', voice: 'Voice search', results: 'Search results', map: 'Map',
-  venue: 'Venue details', reviews: 'Community reviews', review: 'Write a review',
-  thanks: 'Thank you', saved: 'Saved places', me: 'Your profile',
-  gaps: 'Help fill the gaps',
-  card: 'My needs card',
-  toilets: 'Accessible toilets', beach: 'Beach access', facility: 'Access details',
-};
-const ROUTES = Object.keys(VIEW_TITLES);
+// Every route; its title (document.title + the route announcer) is app.view.<route>.
+const ROUTES = [
+  'setup', 'setup-name', 'home', 'voice', 'results', 'map', 'venue', 'reviews', 'review',
+  'thanks', 'saved', 'me', 'gaps', 'card', 'toilets', 'beach', 'facility',
+];
+const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'home'}`);
 const DARK_VIEWS = ['voice', 'thanks'];
 // Screens that render one venue: an id that isn't in the data is not a route.
 const VENUE_VIEWS = ['venue', 'reviews', 'review', 'thanks'];
@@ -143,16 +139,17 @@ function useConnection(isLoaded) {
 }
 
 function CantConnect({ offline }) {
+  const t = useT();
   return (
     <div role="main" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 28px', background: C2.paper, fontFamily: F2 }}>
       <div style={{ maxWidth: 420, margin: '0 auto', width: '100%' }}>
         <h1 style={{ fontSize: 28, margin: '0 0 10px', letterSpacing: '-0.02em' }}>
-          {offline ? 'You’re offline' : 'Can’t connect right now'}<span style={{ color: C2.rust }}>.</span>
+          {offline ? t('common.offline') : t('app.cantConnect')}<span style={{ color: C2.rust }}>.</span>
         </h1>
         <p role="status" style={{ fontSize: 17, lineHeight: 1.55, color: C2.slate, margin: '0 0 24px' }}>
-          Roam Access needs a connection to load places and reviews. Your reviews and saved places are safe — they’re stored with your account.
+          {t('app.needsConnection')}
         </p>
-        <V2BigBtn kind="primary" onClick={() => window.location.reload()}>Try again</V2BigBtn>
+        <V2BigBtn kind="primary" onClick={() => window.location.reload()}>{t('common.retry')}</V2BigBtn>
       </div>
     </div>
   );
@@ -164,10 +161,11 @@ export function PilotRoot() {
 }
 
 function PilotRootInner() {
+  const t = useT();
   const { isLoaded, isSignedIn } = useAuth();
   const { online, slow } = useConnection(isLoaded);
   if (!isLoaded && (!online || slow)) return <CantConnect offline={!online}/>;
-  if (!isLoaded) return <div className="ra-loading" role="status">Loading…</div>;
+  if (!isLoaded) return <div className="ra-loading" role="status">{t('common.loading')}</div>;
   if (!isSignedIn) return <SignedOut/>;
   return <RA2ErrorBoundary><PilotApp/></RA2ErrorBoundary>;
 }
@@ -186,6 +184,7 @@ function SignedOut() {
 }
 
 function PilotApp() {
+  const t = useT();
   const { userId } = useAuth();
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -198,9 +197,9 @@ function PilotApp() {
   if (failed) {
     return (
       <div role="main" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 28px', background: C2.paper, fontFamily: F2 }}>
-        <h1 style={{ fontSize: 26, margin: '0 0 10px', letterSpacing: '-0.02em' }}>Couldn’t load the pilot.</h1>
-        <p style={{ fontSize: 17, lineHeight: 1.5, color: C2.slate, margin: '0 0 22px' }}>Check your connection and try again.</p>
-        <V2BigBtn kind="primary" onClick={load}>Try again</V2BigBtn>
+        <h1 style={{ fontSize: 26, margin: '0 0 10px', letterSpacing: '-0.02em' }}>{t('app.loadFailed')}</h1>
+        <p style={{ fontSize: 17, lineHeight: 1.5, color: C2.slate, margin: '0 0 22px' }}>{t('common.checkConnection')}</p>
+        <V2BigBtn kind="primary" onClick={load}>{t('common.retry')}</V2BigBtn>
       </div>
     );
   }
@@ -209,6 +208,7 @@ function PilotApp() {
 }
 
 function PilotScreens({ initial, userId }) {
+  const t = useT();
   const { signOut } = useClerk();
   const wide = useWide();
   const install = useInstall();
@@ -282,10 +282,10 @@ function PilotScreens({ initial, userId }) {
 
   useEffect(() => {
     document.documentElement.dataset.raDark = DARK_VIEWS.includes(view) ? '1' : '';
-    document.title = `${VIEW_TITLES[view] || 'Home'} · Roam Access pilot`;
+    document.title = t('app.docTitle', { title: viewTitle(t, view) });
     setA11yOpen(false);
     setHoverId(null); // rows unmount without a mouseleave
-  }, [view, selectedId]);
+  }, [view, selectedId, t]);
 
   useEffect(() => {
     if (!toast) return;
@@ -329,8 +329,11 @@ function PilotScreens({ initial, userId }) {
     return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit };
   }, [wide, view, query, filters, savedIds, withMins, byId, selectedId, me.needs]);
 
+  // "your location" is shown in the app's language; Manly Wharf is a name.
+  const shownOrigin = origin.mine ? { ...origin, name: t('data.yourLocation') } : origin;
+
   const app = {
-    view, selectedId, user, query, origin, wide,
+    view, selectedId, user, query, origin: shownOrigin, wide,
     // Explore: filters shared by list + maps; setQuery narrows without navigating.
     filters,
     setFilters: (partial) => setFiltersState(f => ({ ...f, ...partial })),
@@ -343,12 +346,12 @@ function PilotScreens({ initial, userId }) {
     install: async () => {
       if (install.standalone) return;
       if (install.canPrompt) {
-        if (await install.prompt()) setToast('Installed — Roam Access is on your home screen.');
+        if (await install.prompt()) setToast(t('app.toast.installed'));
         return;
       }
       setToast(install.ios
-        ? 'In Safari, tap Share, then “Add to Home Screen”.'
-        : 'Open your browser menu and choose “Install app” or “Add to Home screen”.');
+        ? t('app.toast.installIos')
+        : t('app.toast.installOther'));
     },
     venues: withMins,
     venueById: id => byId.get(id),
@@ -373,7 +376,7 @@ function PilotScreens({ initial, userId }) {
       if (firstTime) setPilot(p => ({ ...p, testers: p.testers + 1 }));
       api('/api/profile', { method: 'PUT', body: JSON.stringify({ name: updated.name, needs: updated.needs, onboarded: true }) })
         .then(p => setMe(p))
-        .catch(() => setToast('Couldn’t save your profile — check your connection.'));
+        .catch(() => setToast(t('app.toast.profileFailed')));
     },
 
     runSearch: (parsed) => {
@@ -384,10 +387,10 @@ function PilotScreens({ initial, userId }) {
     toggleSave: (id) => {
       const on = !savedIds.includes(id);
       setSavedIds(s => (on ? [id, ...s.filter(x => x !== id)] : s.filter(x => x !== id)));
-      setToast(on ? 'Saved to your places.' : 'Removed from your places.');
+      setToast(on ? t('app.toast.saved') : t('app.toast.unsaved'));
       api('/api/saved', { method: 'PUT', body: JSON.stringify({ venueId: id, saved: on }) }).catch(() => {
         setSavedIds(s => (on ? s.filter(x => x !== id) : [id, ...s]));
-        setToast('Couldn’t update your saved places — check your connection.');
+        setToast(t('app.toast.savedFailed'));
       });
     },
 
@@ -416,7 +419,7 @@ function PilotScreens({ initial, userId }) {
         setReviewsVersion(x => x + 1);
         return true;
       } catch (e) {
-        setToast('Couldn’t send your review — check your connection and try again.');
+        setToast(t('app.toast.reviewFailed'));
         return false;
       }
     },
@@ -428,7 +431,7 @@ function PilotScreens({ initial, userId }) {
         if (r.venue) setVenues(vs => vs.map(v => (v.id === venueId ? r.venue : v)));
         return true;
       } catch (e) {
-        setToast('Couldn’t save your answer — check your connection and try again.');
+        setToast(t('app.toast.answerFailed'));
         return false;
       }
     },
@@ -437,53 +440,53 @@ function PilotScreens({ initial, userId }) {
     locateFromMap: ({ lat, lng }) => {
       const here = { lat, lng };
       if (metres(PILOT_AREA.origin, here) > PILOT_RADIUS_M) {
-        if (!farToastShown.current) setToast('You’re outside the pilot area — walking times stay from Manly Wharf.');
+        if (!farToastShown.current) setToast(t('app.toast.outsideArea'));
         farToastShown.current = true;
         return;
       }
       if (origin.mine && metres(origin, here) < 40) return; // ignore GPS jitter
-      if (!origin.mine) setToast('Showing where you are — walking times now start from you.');
+      if (!origin.mine) setToast(t('app.toast.showingYou'));
       setOrigin({ name: 'your location', lat, lng, mine: true });
     },
-    locateError: () => setToast('Couldn’t get your location — check that location is allowed for this site.'),
+    locateError: () => setToast(t('app.toast.locateError')),
 
     locateMe: () => {
-      if (!navigator.geolocation) { setToast('Location isn’t available on this device.'); return; }
+      if (!navigator.geolocation) { setToast(t('app.toast.noLocation')); return; }
       navigator.geolocation.getCurrentPosition(
         p => {
           const here = { lat: p.coords.latitude, lng: p.coords.longitude };
           if (metres(PILOT_AREA.origin, here) > PILOT_RADIUS_M) {
-            setToast('You’re outside the pilot area — walking times stay from Manly Wharf.');
+            setToast(t('app.toast.outsideArea'));
             return;
           }
           setOrigin({ name: 'your location', ...here, mine: true });
-          setToast('Walking times now start from where you are.');
+          setToast(t('app.toast.walkFromYou'));
         },
-        () => setToast('Couldn’t get your location — still measuring from Manly Wharf.'),
+        () => setToast(t('app.toast.locateFailed')),
         { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
       );
     },
 
     invite: async () => {
       const url = window.location.origin;
-      const text = 'Help test Roam Access — find places in Manly that actually work for people with disability.';
+      const text = t('app.invite.text');
       try {
-        if (navigator.share) { await navigator.share({ title: 'Roam Access pilot', text, url }); return; }
+        if (navigator.share) { await navigator.share({ title: t('app.invite.title'), text, url }); return; }
         await navigator.clipboard.writeText(url);
-        setToast('Link copied — paste it anywhere to invite someone.');
+        setToast(t('app.toast.linkCopied'));
       } catch (e) { /* share sheet dismissed */ }
     },
 
     signOut: () => signOut({ redirectUrl: '/' }),
 
     deleteAccount: async () => {
-      if (!window.confirm('Delete your account? This removes your needs, reviews and saved places from the pilot. It can’t be undone.')) return;
+      if (!window.confirm(t('app.deleteConfirm'))) return;
       try {
         await api('/api/profile', { method: 'DELETE' });
         try { localStorage.removeItem(visitKey); } catch (e) {}
         await signOut({ redirectUrl: '/' });
       } catch (e) {
-        setToast('Couldn’t delete your account — try again.');
+        setToast(t('app.toast.deleteFailed'));
       }
     },
   };
@@ -501,7 +504,7 @@ function PilotScreens({ initial, userId }) {
 
   const content = (
     <div id="ra-main" role="main" tabIndex={-1} style={{ position: 'absolute', inset: 0 }}>
-      <div className="ra-sr-only" role="status" aria-live="polite">{VIEW_TITLES[view] || ''}</div>
+      <div className="ra-sr-only" role="status" aria-live="polite">{viewTitle(t, view)}</div>
       <Screen app={app}/>
       <V2A11ySheet open={a11yOpen} onClose={() => setA11yOpen(false)} prefs={prefs} onChange={p => applyPrefs(p)}/>
       <V2Toast message={toast}/>
@@ -522,19 +525,24 @@ class RA2ErrorBoundary extends React.Component {
   componentDidCatch(err) { try { console.error('[roam-access]', err); } catch (e) {} }
   render() {
     if (!this.state.failed) return this.props.children;
-    return (
+    return <CrashScreen/>;
+  }
+}
+
+function CrashScreen() {
+  const t = useT();
+  return (
       <div role="main" style={{
         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 28px', background: C2.paper, color: C2.char, fontFamily: F2,
       }}>
-        <h1 style={{ fontSize: 28, lineHeight: 1.15, margin: '0 0 12px', letterSpacing: '-0.02em' }}>Something went wrong.</h1>
+        <h1 style={{ fontSize: 28, lineHeight: 1.15, margin: '0 0 12px', letterSpacing: '-0.02em' }}>{t('app.crash.title')}</h1>
         <p style={{ fontSize: 17, lineHeight: 1.5, color: C2.slate, margin: '0 0 24px' }}>
-          Reloading usually fixes it. Your reviews and saved places are safe.
+          {t('app.crash.body')}
         </p>
         <V2BigBtn kind="primary" onClick={() => { history.replaceState(null, '', window.location.pathname); window.location.reload(); }}>
-          Reload
+          {t('app.crash.reload')}
         </V2BigBtn>
       </div>
-    );
-  }
+  );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useT } from '../i18n/I18nProvider';
 import { C2, F2 } from '../ui/palette';
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -14,7 +15,8 @@ const ICON = { info: 'info', success: 'success', warn: 'warn', danger: 'error', 
 // `live`: 'polite' (role=status) when it appears after something happened,
 // 'assertive' (role=alert) only for errors that block the task, false for
 // static notes present on page load.
-function Banner({ tone = 'info', title, children, icon, action, onDismiss, dismissLabel = 'Dismiss', live = false, style }) {
+function Banner({ tone = 'info', title, children, icon, action, onDismiss, dismissLabel, live = false, style }) {
+  const tr = useT();
   const t = toneOf(tone === 'offline' ? 'neutral' : tone);
   const role = live === 'assertive' ? 'alert' : live ? 'status' : undefined;
   return (
@@ -34,7 +36,7 @@ function Banner({ tone = 'info', title, children, icon, action, onDismiss, dismi
             style={{ padding: 0, minHeight: 44, justifyContent: 'flex-start' }}>{action.label}</Button>
         )}
       </div>
-      {onDismiss && <IconButton icon="close" label={dismissLabel} variant="ghost" size="sm" onClick={onDismiss} style={{ marginTop: -8, marginBottom: -8 }}/>}
+      {onDismiss && <IconButton icon="close" label={dismissLabel || tr('ds.dismiss')} variant="ghost" size="sm" onClick={onDismiss} style={{ marginTop: -8, marginBottom: -8 }}/>}
     </div>
   );
 }

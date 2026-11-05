@@ -10,6 +10,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { useT } from './i18n';
+import { kindLabel } from '@/lib/i18n/data';
 
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 const TEAL = '#0A4F4F', PAPER = '#FAF9F6';
@@ -44,6 +46,11 @@ export function PilotMap({
   const alertRef = useRef(alertIds);
   // Latest props for the marker callbacks; runs before the effects below.
   useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId; });
+  // Pins are built outside React: they read the current words from a ref and
+  // are rebuilt when the language changes (it's part of the keys below).
+  const t = useT();
+  const tRef = useRef(t);
+  useEffect(() => { tRef.current = t; });
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [following, setFollowing] = useState(false);
@@ -55,7 +62,7 @@ export function PilotMap({
     // A narrowed search (≤ 80 places) shows every result as a full pin; the
     // whole area or a huge list keeps the quiet dots until street level.
     const fewResults = fit && markers.current.size <= 80;
-    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current);
+    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current, tRef.current);
   };
 
   // Create the map once.
@@ -112,7 +119,7 @@ export function PilotMap({
 
   // New result set: rebuild the pins, then frame the best matches. DOM order
   // is result order, so keyboard users reach the best matches first.
-  const key = results.map(r => r.id + ':' + r.verdict.kind).join('|');
+  const key = t.locale + '#' + results.map(r => r.id + ':' + r.verdict.kind).join('|');
   useEffect(() => {
     if (!ready || !ctx.current) return;
     const { map, lib } = ctx.current;
@@ -120,7 +127,7 @@ export function PilotMap({
     markers.current.forEach(m => m.mk.remove());
     markers.current.clear();
     for (const r of results) {
-      const el = pinButton(r, labels, () => onSelectRef.current(r.id));
+      const el = pinButton(r, labels, () => onSelectRef.current(r.id), t);
       // Anchored at the pin's tip, which sits exactly on the place.
       const mk = new lib.Marker({ element: el, anchor: 'bottom' }).setLngLat([r.lng, r.lat]).addTo(map);
       markers.current.set(r.id, { mk, el, kind: r.verdict.kind, icon: iconFor(r), state: null });
@@ -141,7 +148,7 @@ export function PilotMap({
   useEffect(() => { if (ready) repaint.current(); }, [ready, alertKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Facility pins (access layers): rebuilt when the set or a report changes.
-  const extraKey = extras.map(x => `${x.id}:${x.muted ? 1 : 0}:${alertIds?.has(x.id) ? 1 : 0}`).join('|');
+  const extraKey = t.locale + '#' + extras.map(x => `${x.id}:${x.muted ? 1 : 0}:${alertIds?.has(x.id) ? 1 : 0}`).join('|');
   useEffect(() => {
     if (!ready || !ctx.current) return;
     const { map, lib } = ctx.current;
@@ -151,7 +158,7 @@ export function PilotMap({
       const el = document.createElement('button');
       el.type = 'button';
       const alert = !!alertIds?.has(x.id);
-      el.setAttribute('aria-label', x.label + (alert ? ', temporary problem reported' : ''));
+      el.setAttribute('aria-label', alert ? t('app.map.withAlert', { label: x.label }) : x.label);
       Object.assign(el.style, { background: 'transparent', border: '0', padding: '0', cursor: 'pointer', lineHeight: '0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' });
       el.addEventListener('click', (e) => { e.stopPropagation(); onSelectExtraRef.current?.(x.id); });
       const mk = new lib.Marker({ element: el, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).addTo(map);
@@ -210,7 +217,7 @@ export function PilotMap({
       <div ref={box} style={{ position: 'absolute', inset: 0, background: '#EDEAE2', isolation: 'isolate' }}/>
       {ready && !failed && (
         <button type="button" onClick={locate} aria-pressed={following}
-          aria-label={following ? 'Stop following my location' : 'Show my location on the map'}
+          aria-label={following ? t('app.map.stopFollowing') : t('app.map.showMe')}
           style={{
             position: 'absolute', zIndex: 6, ...locateStyle,
             width: 48, height: 48, borderRadius: 999, cursor: 'pointer', padding: 0,
@@ -231,7 +238,7 @@ export function PilotMap({
         <p role="status" style={{
           position: 'absolute', left: 18, right: 18, top: '40%', margin: 0, textAlign: 'center',
           fontFamily: 'Inter, system-ui, sans-serif', fontSize: 15, color: '#5A5651',
-        }}>The map couldn’t load. The list view has every result.</p>
+        }}>{t('app.map.failed')}</p>
       )}
     </>
   );
@@ -287,10 +294,10 @@ export function pinSvg({ w, fill, stroke, iconColor, icon, badge, badgeColor, al
     + `</svg>`;
 }
 
-function pinButton(r, labels, onClick) {
+function pinButton(r, labels, onClick, t) {
   const el = document.createElement('button');
   el.type = 'button';
-  el.setAttribute('aria-label', `${r.name}, ${r.kind}, ${labels[r.verdict.kind]}`);
+  el.setAttribute('aria-label', t('app.map.pin', { name: r.name, kind: kindLabel(t, r.kind), verdict: labels[r.verdict.kind] }));
   Object.assign(el.style, {
     background: 'transparent', border: '0', padding: '0', cursor: 'pointer',
     display: 'flex', alignItems: 'flex-end', justifyContent: 'center', lineHeight: '0',
@@ -302,7 +309,7 @@ function pinButton(r, labels, onClick) {
 // Places with a verdict: a coloured pin at every zoom. Places with no info
 // yet: a quiet dot in the overview, a white pin at street level. Selected:
 // the big pin. Only re-draws a pin whose look actually changed.
-function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId = null) {
+function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId, t) {
   markers.forEach((m, id) => {
     const on = id === selectedId;
     const lift = !on && id === hoverId; // highlighted from the list, not selected
@@ -312,7 +319,7 @@ function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels,
     const quiet = unknown && !on && !lift && !detail && !alert;
     const state = `${on}|${lift}|${quiet}|${alert}`;
     if (m.baseLabel == null) m.baseLabel = m.el.getAttribute('aria-label');
-    m.el.setAttribute('aria-label', m.baseLabel + (alert ? ', temporary problem reported' : ''));
+    m.el.setAttribute('aria-label', alert ? t('app.map.withAlert', { label: m.baseLabel }) : m.baseLabel);
     m.el.setAttribute('aria-pressed', String(on));
     m.el.style.zIndex = on ? '5' : lift ? '4' : quiet ? '1' : unknown ? '2' : '3';
     if (m.state === state) return;
@@ -372,6 +379,7 @@ function paintExtras(markers, selectedId) {
 // Key for the map: verdict colours/badges, then the category symbols.
 // `compact` (phones) folds the symbols away behind a button.
 export function MapLegend({ kinds, colors, icons, labels, compact = false, style = {} }) {
+  const t = useT();
   const [open, setOpen] = useState(!compact);
   const row = { display: 'inline-flex', alignItems: 'center', gap: 8 };
   return (
@@ -392,19 +400,19 @@ export function MapLegend({ kinds, colors, icons, labels, compact = false, style
         <button type="button" aria-expanded={open} onClick={() => setOpen(o => !o)} style={{
           minHeight: 32, marginTop: 2, padding: '0 2px', border: 0, background: 'transparent', textAlign: 'left',
           font: '700 12.5px Inter, system-ui, sans-serif', color: TEAL, textDecoration: 'underline', textUnderlineOffset: 3, cursor: 'pointer',
-        }}>{open ? 'Hide symbols' : 'Show symbols'}</button>
+        }}>{open ? t('app.map.hideSymbols') : t('app.map.showSymbols')}</button>
       )}
       {open && (
         <ul style={{
           listStyle: 'none', margin: compact ? 0 : '4px 0 0', padding: '8px 0 0', borderTop: '1px solid #E5E2DA',
           display: 'grid', gridTemplateColumns: 'auto auto', gap: '6px 14px',
         }}>
-          {PLACE_ICON_LEGEND.map(([id, label]) => (
+          {PLACE_ICON_LEGEND.map(([id]) => (
             <li key={id} style={row}>
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d={PLACE_ICONS[id]} fill="none" stroke="#1A1A1A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              {label}
+              {t(`app.map.legend.${id}`)}
             </li>
           ))}
         </ul>

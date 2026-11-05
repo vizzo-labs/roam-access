@@ -7,11 +7,14 @@ import { V2Shell } from '../ui/Shell';
 import { C2, F2, M2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2ParseQuery } from '@/lib/pilot/match';
+import { useT } from '../i18n';
+import { EnglishSearchNote } from '../explore/EnglishSearchNote';
 
 // ─────────────────────────────────────────────────────────────
 // VOICE — real speech recognition, seamless scripted fallback
 // ─────────────────────────────────────────────────────────────
 function V2Voice({ app }) {
+  const t = useT();
   const [mode, setMode] = React.useState('starting'); // starting | listening | demo
   const [transcript, setTranscript] = React.useState('');
   // Set by the effect below; lets the example chips finish the flow too.
@@ -53,6 +56,8 @@ function V2Voice({ app }) {
       let latest = '';
       let silence = null;
       rec = new SR();
+      // Search understands English words (lib/pilot/match.js), so it listens
+      // in English; the screen says so in other languages.
       rec.lang = 'en-AU';
       rec.interimResults = true;
       rec.continuous = false;
@@ -96,17 +101,17 @@ function V2Voice({ app }) {
 
   const finalize = (text) => finalizeRef.current(text);
 
-  const statusLabel = mode === 'listening' ? 'Listening…' : mode === 'unavailable' ? 'Couldn’t hear you' : 'Getting ready…';
+  const statusLabel = mode === 'listening' ? t('explore.voice.listening') : mode === 'unavailable' ? t('explore.voice.unavailable') : t('explore.voice.starting');
   const h = useV2Heading('voice');
 
   return (
     <V2Shell bg={C2.teal}>
-      <h1 ref={h} tabIndex={-1} className="ra-sr-only">Voice search</h1>
+      <h1 ref={h} tabIndex={-1} className="ra-sr-only">{t('app.view.voice')}</h1>
       <div data-ra-oncolor="" style={{ padding: '14px 22px 0', display: 'flex', justifyContent: 'flex-end' }}>
         <button onClick={() => app.goto('home')} style={{
           minHeight: 48, padding: '0 20px', borderRadius: 999, border: '1.5px solid rgba(250,249,246,0.45)',
           background: 'transparent', color: C2.paper, fontFamily: F2, fontSize: 16, fontWeight: 600, cursor: 'pointer',
-        }}>Cancel</button>
+        }}>{t('common.cancel')}</button>
       </div>
 
       <div style={{ padding: '34px 26px 0', textAlign: 'center' }} data-ra-oncolor="">
@@ -144,22 +149,24 @@ function V2Voice({ app }) {
           fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.25,
           color: C2.paper, margin: '0 auto', maxWidth: 300, minHeight: 96, fontFamily: F2,
         }}>
-          {transcript ? `“${transcript}”` : mode === 'unavailable'
-            ? <span style={{ display: 'block', fontSize: 18, fontWeight: 500, letterSpacing: 0, lineHeight: 1.45 }}>Voice isn’t available here, or the mic wasn’t allowed. Tap an example below, or go back and type.</span>
+          {transcript ? <span lang="en-AU">“{transcript}”</span> : mode === 'unavailable'
+            ? <span style={{ display: 'block', fontSize: 18, fontWeight: 500, letterSpacing: 0, lineHeight: 1.45 }}>{t('explore.voice.unavailableBody')}</span>
             : ' '}
         </p>
       </div>
 
       <div data-ra-oncolor="" style={{ padding: '20px 26px 30px' }}>
         <h2 style={{ fontSize: 14, fontWeight: 600, color: 'rgba(250,249,246,0.75)', margin: '0 0 12px', fontFamily: F2 }}>
-          You can ask for things like
+          {t('explore.voice.examples')}
         </h2>
-        {RA2_VOICE_EXAMPLES.map(s => (
+        <EnglishSearchNote onColor style={{ margin: '0 0 12px' }}/>
+        {/* Shown in the app's language; searched with the English words. */}
+        {RA2_VOICE_EXAMPLES.map((s, i) => (
           <button key={s} onClick={() => finalize(s.replace(/[“”]/g, ''))} style={{
             width: '100%', textAlign: 'left', fontSize: 15.5, color: C2.paper, padding: '14px 16px',
             borderRadius: 12, background: 'rgba(250,249,246,0.1)', marginBottom: 8, lineHeight: 1.4,
             border: 0, cursor: 'pointer', fontFamily: F2, boxSizing: 'border-box',
-          }}>{s}</button>
+          }}>{t(`data.voiceExample.${i + 1}`)}</button>
         ))}
       </div>
     </V2Shell>
