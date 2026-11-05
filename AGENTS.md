@@ -11,7 +11,7 @@ worktree, merging small PRs to `main`. These rules keep that safe. Read this fil
 index.html, privacy.html, accessibility.html, assets/   landing page (GitHub Pages) — don't touch
 app/                 static investor demo (fictional data, JSX compiled by the root package.json) — don't touch
 apps/app/            THE PILOT: Next.js 16 + React 19, Clerk, Neon Postgres (Drizzle), MapLibre
-  app/               routes: (app)/ page + sign-in/up · admin/ · api/
+  app/               routes: (app)/ page + sign-in/up · admin/ · api/ · ds/ (design-system preview)
   components/pilot/
     PilotApp.jsx     root: hash routing, server-backed state, a11y prefs
     WebLayout.jsx    desktop (≥ 960px): header + panel + map
@@ -19,6 +19,7 @@ apps/app/            THE PILOT: Next.js 16 + React 19, Clerk, Neon Postgres (Dri
     ui/              shared primitives: palette (C2 live object, F2, M2, V2_H1), Logo, Mic,
                      Verdict, Shell + TabBar, Buttons (Big, Round, Back), Switch, Plate,
                      TileIcon, Toast, Dictate, useDialog, useHeading
+    ds/              THE DESIGN SYSTEM — tokens + components for all new UI (see "UI components")
     screens/         one file per screen (Welcome, Setup, SetupName, Home, Voice, Results,
                      Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet)
   lib/
@@ -34,6 +35,44 @@ apps/app/            THE PILOT: Next.js 16 + React 19, Clerk, Neon Postgres (Dri
 Keep new code in the module it belongs to; add a new file rather than growing a shared one.
 The palette `C2` is a **live object** (high contrast swaps values in place): read `C2.x` at
 render time, never copy it into a module-level constant.
+
+## UI components (design system)
+
+All new UI is built from **`apps/app/components/pilot/ds/`** — don't hand-roll buttons,
+cards, chips or sheets with inline styles. See every component in every state at **`/ds`**
+(local and Preview builds; admin-only in production), with live switches for high contrast,
+reduced motion and text size, plus a live contrast table. The UX study behind it:
+[`docs/ux-review.md`](docs/ux-review.md).
+
+```js
+import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE, GUTTER } from '../ds';
+```
+
+| Need | Use | Notes |
+|---|---|---|
+| Text styles, spacing, radii, shadows | `TYPE.title2`, `SPACE.md`, `GUTTER` (22), `RADIUS.lg`, `elevation(1)`, `tone('warn')` | Colour helpers read `C2` at call time, so high contrast works. Never put text under 13px; inputs use `TYPE.input` (16px). |
+| An action | `Button` (`primary` · `secondary` · `outline` · `ghost` · `plain` · `danger` · `rust`; `sm` 44 · `md` 52 · `lg` 60) | Pass `href` to make it a link and `external` to say "opens in a new tab". |
+| An icon-only action | `IconButton icon="close" label="Close filters"` | `label` is required and must name the thing. `pressed` makes it a toggle. Use `variant="floating"` over a map. |
+| Icons | `Icon name="directions"` | Always decorative (`aria-hidden`); the names are listed on `/ds`. |
+| A surface | `Card` (`outline` · `filled` · `tint` · `raised` · `brand`; `media` slot) | `onClick` or `href` makes the **whole** card one control, so use spans inside and no nested buttons. |
+| A list of places or settings | `List` + `ListRow` | A real `<ul>`; the whole row is one ≥ 56px target. `selected` is for map sync; `after` puts a separate control beside the row. |
+| Filters | `ChipGroup label=…` + `FilterChip` (`aria-pressed`, with a ✓ when on, optional `count`), `RemovableChip`, static `Chip` | The row scrolls sideways; use `wrap` when every option must stay visible. |
+| Status and provenance | `Badge`, `SourceBadge source="community" \| "osm" \| "venue" \| "partner" \| "photo"`, `Freshness date=…` | `SourceBadge` only shows where a fact came from and **never** decides a verdict. OSM is always "unconfirmed". |
+| Verdicts | the existing `ui/Verdict` (`V2Verdict`) | Unchanged: icon + colour + words. |
+| Section titles | `SectionHeader title level={2} action={{ label, ariaLabel, onClick }}` | A real heading with at most one action. |
+| Loading | `SkeletonList`, `SkeletonCard`, `Skeleton` | Announces one "Loading…" message; the shimmer stops when motion is reduced. |
+| Nothing to show | `EmptyState icon title body action` | Always give a next step. |
+| Inline messages | `Banner tone="info" \| "success" \| "warn" \| "danger" \| "offline"` | `live="polite"` when it appears after an action; `"assertive"` only for errors that block the user. |
+| Venue quick actions | `ActionRow actions=[Directions, Call, Website, Save, Share]` | Keep this order. Leave out an action that doesn't apply; don't disable it. |
+| Switching mode or panels | `SegmentedControl` (List · Map; a radiogroup) and `Tabs` + `TabPanel` | Roving tabindex with arrow keys and Home/End. |
+| A modal panel | `Sheet open onClose title footer` | A bottom sheet on phones and a dialog from 960px; focus is trapped and restored; Escape, the scrim and drag-down close it. |
+| A list over a map | `SnapSheet snap onSnapChange label header` | Peek · half · full. The handle is a button (click, Enter, arrow keys) and each change is announced; tabbing into a collapsed list opens it. |
+| Dates, plurals | `formatDate(d)` → "6 November 2026", `timeAgo(d)`, `plural(n, 'review')` | en-AU, Sydney time. |
+
+Rules: read `C2.x` at render time; animate only through CSS transitions or `dur()`, or check
+`useReducedMotion()`; check every new colour pair on `/ds` (text ≥ 4.5:1, control
+boundaries ≥ 3:1). If you need a component that isn't here, add it to `ds/` in its own file
+and to the `/ds` page, rather than to a screen.
 
 ## Honesty rules (non-negotiable)
 

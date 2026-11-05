@@ -34,6 +34,7 @@ app/(app)/            full-viewport layout for every app page
   sign-in, sign-up    Clerk components in the brand palette
 app/manifest.ts       PWA manifest (icons in public/icons, generated from assets/)
 app/admin/            testers, reviews, hide/show — ADMIN_EMAILS only
+app/ds/               design-system preview (open in dev/previews; admin-only in production)
 app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved · venues/[id]/reviews
 components/pilot/
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
@@ -43,6 +44,10 @@ components/pilot/
   ui/                 primitives: palette (C2 live object, F2, M2), Logo, Mic, Verdict,
                       Shell + TabBar, Buttons, Switch, Plate, TileIcon, Toast, Dictate,
                       useDialog (focus trap), useHeading (focus on navigation)
+  ds/                 design system: tokens (type, spacing, radii, elevation, motion, tones)
+                      + Button, IconButton, Card, Chip/FilterChip, Badge/SourceBadge,
+                      List/ListRow, SectionHeader, Skeleton, EmptyState, Banner, ActionRow,
+                      SegmentedControl/Tabs, Sheet/SnapSheet, Icon — see AGENTS.md
   screens/            one file per screen: Welcome, Setup, SetupName, Home, Voice, Results,
                       Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet
                       (+ useVenueReviews)
