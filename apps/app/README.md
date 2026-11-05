@@ -33,9 +33,11 @@ app/(app)/            full-viewport layout for every app page
   page.tsx            signed out → Welcome; signed in → the app (components/pilot)
   sign-in, sign-up    Clerk components in the brand palette
 app/manifest.ts       PWA manifest (icons in public/icons, generated from assets/)
-app/admin/            testers, reviews, hide/show — ADMIN_EMAILS only
+app/admin/            testers, reviews, hide/show, problem-report queue — ADMIN_EMAILS only
 app/ds/               design-system preview (open in dev/previews; admin-only in production)
-app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved · venues/[id]/reviews
+app/how-it-works/     public policy page: verdicts, sources, "payment never changes a verdict", privacy
+app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved ·
+                      venues/[id]/reviews · venues/[id]/confirm · venues/[id]/issues
 components/pilot/
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
   PilotMap.jsx        real map; pins are buttons, list view stays primary
@@ -51,10 +53,15 @@ components/pilot/
   screens/            one file per screen: Welcome, Setup, SetupName, Home, Voice, Results,
                       Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet
                       (+ useVenueReviews)
+  trust/              source + recency lines, verdict reasons, facts, "Still accurate?",
+                      Report a problem, the entrance follow-up question
 lib/
   pilot/match.js      verdict engine + query parsing (ra2Verdict, ra2Search, ra2ParseQuery)
   pilot-data.ts       needs, review questions, browse tiles, pilot area
-  venues.ts           reviews → facts (works / check / barriers) per need
+  venues.ts           reviews → facts (works / check / barriers) per need, each with its
+                      source, count and latest date; confirmed absence; other entrances
+  trust/              labels.ts (source + confidence wording) · entrance.ts
+  data/trust.ts       confirmations, problem reports, the admin queue
   data.ts             all database access
   db/url.ts           which database: prod only when VERCEL_ENV=production, else dev
   db/schema.ts        typed mirror of migrations/: venues · profiles · reviews · saved

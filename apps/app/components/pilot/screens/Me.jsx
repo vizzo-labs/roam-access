@@ -75,7 +75,39 @@ function V2Me({ app }) {
         </section>
 
         {/* settings rows */}
-        {rows.map(r => (
+        {rows.slice(0, -2).map(r => (
+          <button key={r.l} onClick={r.fn} style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+            minHeight: 66, padding: '10px 16px', marginBottom: 8, cursor: 'pointer', textAlign: 'left',
+            borderRadius: 16, fontFamily: F2, boxSizing: 'border-box',
+            border: r.hi ? `2px solid ${C2.teal}` : `1.5px solid ${C2.line}`,
+            background: r.hi ? C2.tealSoft : C2.paper,
+          }}>
+            <span>
+              <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: C2.char, marginBottom: 2 }}>{r.l}</span>
+              <span style={{ display: 'block', fontSize: 13, color: C2.slate }}>{r.m}</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
+              <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        ))}
+
+        <a href="/how-it-works" style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+          minHeight: 66, padding: '10px 16px', marginBottom: 8, textAlign: 'left', textDecoration: 'none',
+          borderRadius: 16, fontFamily: F2, boxSizing: 'border-box', border: `1.5px solid ${C2.line}`, background: C2.paper,
+        }}>
+          <span>
+            <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: C2.char, marginBottom: 2 }}>How Roam Access works</span>
+            <span style={{ display: 'block', fontSize: 13, color: C2.slate }}>How verdicts are made · payment never changes one · privacy</span>
+          </span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style={{ flexShrink: 0 }}>
+            <path d="M9 5l7 7-7 7" stroke={C2.slate} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </a>
+
+        {rows.slice(-2).map(r => (
           <button key={r.l} onClick={r.fn} style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
             minHeight: 66, padding: '10px 16px', marginBottom: 8, cursor: 'pointer', textAlign: 'left',
