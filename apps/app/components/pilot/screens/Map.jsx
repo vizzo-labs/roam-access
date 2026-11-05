@@ -8,12 +8,14 @@ import { useV2Heading } from '../ui/useHeading';
 import { ra2Search, ra2ParseQuery, ra2QueryLabel } from '@/lib/pilot/match';
 import { LayerMenu, layerExtras } from '../layers/LayerToggles';
 import { FacilityCard } from '../layers/FacilityCard';
-import { Button, GUTTER, IconButton, List, SPACE, SearchField, SegmentedControl, SnapSheet, TYPE } from '../ds';
+import { Button, GUTTER, List, SPACE, SearchField, SegmentedControl, SnapSheet, TYPE } from '../ds';
 import { ExploreFilters } from '../explore/ExploreFilters';
 import { PlaceRow } from '../explore/PlaceRow';
 import { CLEAR_FILTERS, applyFilters, countsLine, filtersOn, verdictCounts } from '../explore/filters';
 import { useT } from '../i18n';
 import { pinLabels } from '../WebLayout';
+import { PlacePreviewCard } from '../explore/PlacePreviewCard';
+import { invalidateGaps } from '../community/gapsStore';
 
 const PEEK = 132;
 const SHEET_ROWS = 50;
@@ -49,28 +51,72 @@ function V2MapView({ app }) {
   if (shownFor !== initialText) { setShownFor(initialText); setText(initialText); }
 
   const sheetBody = React.useRef(null);
+  const mapApi = React.useRef(null);
+  const area = React.useRef(null);
+  const cardRef = React.useRef(null);
+  const cardBox = React.useRef(null);
+  // Place preview card: tapping a pin snaps the sheet to its peek, which is
+  // exactly as tall as the card (capped; the card scrolls inside past that).
+  const [cardH, setCardH] = React.useState(260);
+  const [areaH, setAreaH] = React.useState(700);
   function selectPin(id) {
     setExtraId(null);
     setSelId(id);
-    if (snap === 'peek') setSnap('half');
-    // The selected place shows at the top of the sheet: scroll the sheet there.
-    requestAnimationFrame(() => sheetBody.current?.parentElement?.scrollTo({ top: 0 }));
+    setSnap('peek');
+    requestAnimationFrame(() => {
+      sheetBody.current?.parentElement?.scrollTo({ top: 0 });
+      cardRef.current?.focus({ preventScroll: true });
+    });
   }
-  function selectExtra(id) { setExtraId(id); setSnap('peek'); }
+  function closeCard() {
+    const pin = mapApi.current?.pinEl(selId);
+    setSelId(null);
+    setSnap('half');
+    if (pin) requestAnimationFrame(() => pin.focus());
+  }
+  function selectExtra(id) { setExtraId(id); setSelId(null); setSnap('peek'); }
+  React.useLayoutEffect(() => {
+    if (!sel) return;
+    const measure = () => {
+      if (cardBox.current) setCardH(cardBox.current.offsetHeight);
+      if (area.current) setAreaH(area.current.offsetHeight);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (cardBox.current) ro.observe(cardBox.current);
+    if (area.current) ro.observe(area.current);
+    return () => ro.disconnect();
+  }, [sel?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cardMax = Math.round(areaH * 0.62) - 56; // 44px handle + 12px under the header
+  const peekH = sel ? Math.min(cardH, cardMax) + 56 : PEEK;
 
   const others = sel ? results.filter(r => r.id !== sel.id) : results;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-  const sheetPx = snap === 'peek' ? PEEK : snap === 'half' ? Math.round(vh * 0.5) : vh;
+  const sheetPx = snap === 'peek' ? peekH : snap === 'half' ? Math.round(vh * 0.5) : vh;
+
+  const countsHeader = (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
+      <div style={{ minWidth: 0, flex: '1 1 140px' }}>
+        <h2 style={{ ...TYPE.title3, margin: 0 }}>{t('common.places', { count: results.length })}</h2>
+        <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {searched.length ? countsLine(counts, t) : t('explore.nothingMatched')}
+        </p>
+      </div>
+      <SegmentedControl label={t('explore.showAs')} value="map" onChange={v => v === 'list' && app.goto('results', null, { replace: true })}
+        options={[{ value: 'list', label: t('explore.list'), icon: 'list' }, { value: 'map', label: t('explore.map'), icon: 'map' }]}/>
+    </div>
+  );
 
   return (
     <V2Shell scroll={false} tabs app={app} active="home">
       <h1 ref={h} tabIndex={-1} className="ra-sr-only">{t('explore.mapHeading', { query: queryLabel })}</h1>
-      <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+      <div ref={area} style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
         <PilotMap results={results} selectedId={extra ? null : selId} onSelect={selectPin} origin={app.origin}
+          apiRef={mapApi} onMapClick={() => sel && closeCard()}
           extras={extras} selectedExtraId={extra?.id || null} onSelectExtra={selectExtra} alertIds={app.layers.alertIds}
           colors={pinColor} icons={pinIcon} labels={labels} topPad={190} bottomPad={Math.min(sheetPx, vh * 0.5) + 30}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
-          locateStyle={snap === 'full' ? { display: 'none' } : { right: 18, bottom: snap === 'peek' ? PEEK + 14 : 'calc(50% + 14px)' }}/>
+          locateStyle={snap === 'full' ? { display: 'none' } : { right: 18, bottom: snap === 'peek' ? peekH + 14 : 'calc(50% + 14px)' }}/>
 
         {/* top: the same search + filters as the list */}
         <div style={{ position: 'absolute', top: 'var(--ra-shell-top)', left: 0, right: 0, zIndex: 6, padding: `0 ${GUTTER - 4}px`, pointerEvents: 'none' }}>
@@ -104,35 +150,26 @@ function V2MapView({ app }) {
           </div>
         )}
 
-        <SnapSheet label={t('explore.placesSheet')} snap={snap} onSnapChange={setSnap} peekHeight={PEEK} topGap={8}
-          header={(
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
-              <div style={{ minWidth: 0, flex: '1 1 140px' }}>
-                <h2 style={{ ...TYPE.title3, margin: 0 }}>{t('common.places', { count: results.length })}</h2>
-                <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {searched.length ? countsLine(counts, t) : t('explore.nothingMatched')}
-                </p>
-              </div>
-              <SegmentedControl label={t('explore.showAs')} value="map" onChange={v => v === 'list' && app.goto('results', null, { replace: true })}
-                options={[{ value: 'list', label: t('explore.list'), icon: 'list' }, { value: 'map', label: t('explore.map'), icon: 'map' }]}/>
+        <SnapSheet label={t('explore.placesSheet')} snap={snap} onSnapChange={setSnap} peekHeight={peekH} topGap={8}
+          header={sel ? (
+            <div ref={cardBox}>
+              <PlacePreviewCard ref={cardRef} variant="sheet" place={sel} needs={app.user?.needs || []}
+                saved={app.world.saved.includes(sel.id)} onToggleSave={() => app.toggleSave(sel.id)}
+                onClose={closeCard}
+                onDetails={() => app.goto('venue', sel.id)}
+                onAddPhoto={() => app.goto('review', sel.id)}
+                onAnswer={async (feature, answer) => {
+                  const ok = await app.answerQuick({ venueId: sel.id, feature, answer });
+                  if (ok) invalidateGaps();
+                  return ok;
+                }}
+                reports={app.layers.reportsFor('venue', sel.id)}
+                onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); closeCard(); } }}
+                style={{ maxHeight: cardMax, overflowY: 'auto' }}/>
             </div>
-          )}>
+          ) : countsHeader}>
           <div ref={sheetBody}>
-            {sel && (
-              <div style={{ borderBottom: `6px solid ${C2.stone}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${SPACE.sm}px ${GUTTER - 8}px 0 ${GUTTER}px` }}>
-                  <p style={{ ...TYPE.overline, color: C2.slate, margin: 0 }}>{t('explore.selectedOnMap')}</p>
-                  <IconButton icon="close" variant="ghost" size="sm" label={t('explore.clearSelection', { name: sel.name })} onClick={() => setSelId(null)}/>
-                </div>
-                <PlaceRow app={app} place={sel} reasons={3} selected/>
-                <div style={{ display: 'flex', gap: SPACE.xs, padding: `0 ${GUTTER}px ${SPACE.md}px` }}>
-                  <Button style={{ flex: 1 }} onClick={() => app.goto('venue', sel.id)} iconRight="forward">{t('explore.seeDetails')}</Button>
-                  <IconButton icon="bookmark" pressed={app.world.saved.includes(sel.id)} size="lg"
-                    label={app.world.saved.includes(sel.id) ? t('explore.unsaveNamed', { name: sel.name }) : t('explore.saveNamed', { name: sel.name })}
-                    onClick={() => app.toggleSave(sel.id)} style={{ width: 52, height: 52 }}/>
-                </div>
-              </div>
-            )}
+            {sel && <div style={{ padding: `${SPACE.sm}px ${GUTTER}px` }}>{countsHeader}</div>}
             {others.length > 0 && (
               <List label={t('explore.placesList', { query: queryLabel })}>
                 {others.slice(0, SHEET_ROWS).map(r => <PlaceRow key={r.id} app={app} place={r} reasons={1}/>)}

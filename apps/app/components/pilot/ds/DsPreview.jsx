@@ -17,6 +17,7 @@ import {
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
   SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField,
 } from './index';
+import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
 const SAMPLE = [
   { id: 'a', name: 'Sample Café', kind: 'Cafe · 3 min walk', verdict: 'works', note: 'Step-free entry · Quiet mornings' },
@@ -408,6 +409,10 @@ export function DsPreview() {
             <SearchField id="ds-search-2" value="Food & drink" onChange={() => {}} dirty={false} onVoice={() => {}} floating
               back={{ label: 'Back to home', onClick: () => {} }}/>
           </div>
+        </Section>
+
+        <Section id="preview-card" title="PlacePreviewCard (map pin → card)" note="What a map pin opens. Photo (or the category icon and “No photo yet — add the first”) on the left; name + Save toggle, kind · area · walk, the personalised verdict, up to 3 access facts for the person’s needs (feature + symbol + state in words — OpenStreetMap is only ever “Unconfirmed”), the source and recency line, and today’s temporary report. “No info yet” makes the primary action “Answer 1 question”. Desktop: a non-modal dialog anchored to the pin (focus in on open, back to the pin on close; Escape, ✕ or a map click close it). Phones: the top of the bottom sheet at its peek. Samples use “I use a wheelchair or mobility aid”.">
+          <PlacePreviewSamples/>
         </Section>
 
         <Section id="sheet" title="Sheet (modal) · SnapSheet (persistent)" note="Sheet: focus trapped, Escape / close button / scrim / drag-down close it, focus returns. Bottom sheet on phones, dialog from 960px. SnapSheet: peek · half · full over a map; the handle is a button (click, Enter, Arrow keys) and the new size is announced.">

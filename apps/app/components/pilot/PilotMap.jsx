@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useT } from './i18n';
 import { kindLabel } from '@/lib/i18n/data';
+import { prefersReducedMotion } from './ds/tokens';
 
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 const TEAL = '#0A4F4F', PAPER = '#FAF9F6';
@@ -25,6 +26,9 @@ export function PilotMap({
   // Access layers (F3): facility pins (toilets, beach items) drawn as square
   // markers, and ids of places with a live temporary report (⚠ corner mark).
   extras = [], selectedExtraId = null, onSelectExtra, fitExtras = false, alertIds = null,
+  // Place preview card (desktop): a handle on the map + its pins, and a
+  // click on the map itself (not a pin) — used to close the card.
+  apiRef = null, onMapClick,
 }) {
   const box = useRef(null);
   const ctx = useRef(null); // { map, lib }
@@ -40,12 +44,13 @@ export function PilotMap({
   onLocateRef.current = onLocate;
   const onLocateErrorRef = useRef(onLocateError);
   onLocateErrorRef.current = onLocateError;
+  const onMapClickRef = useRef(onMapClick);
   const geoRef = useRef(null);
   const extraMarkers = useRef(new Map()); // id → { mk, el, state }
   const onSelectExtraRef = useRef(onSelectExtra);
   const alertRef = useRef(alertIds);
   // Latest props for the marker callbacks; runs before the effects below.
-  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId; });
+  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId; onMapClickRef.current = onMapClick; });
   // Pins are built outside React: they read the current words from a ref and
   // are rebuilt when the language changes (it's part of the keys below).
   const t = useT();
@@ -84,6 +89,7 @@ export function PilotMap({
         if (!map.isStyleLoaded() && /style/i.test(String(e?.error?.message || e?.error?.url || ''))) setFailed(true);
       });
       map.on('zoomend', () => repaint.current());
+      map.on('click', () => onMapClickRef.current?.());
 
       // "You are here": MapLibre draws the dot + accuracy circle; our own
       // 48px button (below) drives it, because the built-in one is too small.
@@ -105,12 +111,14 @@ export function PilotMap({
       if (autoLocate) map.once('load', () => { try { geo.trigger(); } catch (e) {} });
 
       ctx.current = { map, lib };
+      if (apiRef) apiRef.current = { map, pinEl: id => markers.current.get(id)?.el || null };
       setReady(true);
     }).catch((e) => { console.warn('[roam-access] map failed to load', e); setFailed(true); });
     return () => {
       cancelled = true;
       if (ctx.current) ctx.current.map.remove();
       ctx.current = null;
+      if (apiRef) apiRef.current = null;
       geoRef.current = null;
       markers.current.clear();
       extraMarkers.current.clear();
@@ -182,7 +190,7 @@ export function PilotMap({
       const p = map.project([sel.lng, sel.lat]);
       const { clientWidth: w, clientHeight: h } = map.getContainer();
       if (p.x < 40 || p.x > w - 40 || p.y < topPad - 10 || p.y > h - bottomPad) {
-        map.easeTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.getZoom(), 15), padding: { top: topPad, bottom: bottomPad, left: 0, right: 0 }, duration: 300 });
+        map.easeTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.getZoom(), 15), padding: { top: topPad, bottom: bottomPad, left: 0, right: 0 }, duration: prefersReducedMotion() ? 0 : 300 });
       }
     }
   }, [ready, selectedExtraId, extraKey]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -199,7 +207,7 @@ export function PilotMap({
       const p = map.project([sel.lng, sel.lat]);
       const { clientWidth: w, clientHeight: h } = map.getContainer();
       if (p.x < 40 || p.x > w - 40 || p.y < topPad - 10 || p.y > h - bottomPad) {
-        map.easeTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.getZoom(), 15), padding: { top: topPad, bottom: bottomPad, left: 0, right: 0 }, duration: 300 });
+        map.easeTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.getZoom(), 15), padding: { top: topPad, bottom: bottomPad, left: 0, right: 0 }, duration: prefersReducedMotion() ? 0 : 300 });
       }
     }
   }, [ready, selectedId]); // eslint-disable-line react-hooks/exhaustive-deps

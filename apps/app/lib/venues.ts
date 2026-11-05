@@ -53,6 +53,9 @@ export type VenueVM = {
   // Noise, light, crowds and quiet times (#17) — built in lib/data.ts from
   // reviews + check-ins. Describes the place; never changes the verdict.
   sensory?: SensoryVM | null;
+  // First visible review photo (an entrance photo if there is one), for the
+  // map preview card. Built in lib/data.ts; null when nobody has added one.
+  coverPhoto?: { url: string; alt: string } | null;
 };
 
 export type ConfirmationStat = { last: Date | string; count: number };
