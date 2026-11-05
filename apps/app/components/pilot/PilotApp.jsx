@@ -9,12 +9,24 @@ import { useRouter } from 'next/navigation';
 import { PILOT_AREA } from '@/lib/pilot-data';
 import { WebLayout, WebWelcome } from './WebLayout';
 import { useInstall } from './pwa';
-import {
-  C2, F2, RA2SetContrast,
-  V2Welcome, V2Setup, V2SetupName, V2Home, V2Voice, V2Results,
-  V2MapView, V2VenueView, V2AllReviews, V2ReviewView, V2Thanks, V2SavedView, V2Me,
-  V2A11ySheet, V2Toast, V2BigBtn, ra2Search, ra2Verdict,
-} from './legacy';
+import { ra2Search, ra2Verdict } from '@/lib/pilot/match';
+import { C2, F2, RA2SetContrast } from './ui/palette';
+import { V2Toast } from './ui/Toast';
+import { V2BigBtn } from './ui/Buttons';
+import { V2Welcome } from './screens/Welcome';
+import { V2Setup } from './screens/Setup';
+import { V2SetupName } from './screens/SetupName';
+import { V2Home } from './screens/Home';
+import { V2Voice } from './screens/Voice';
+import { V2Results } from './screens/Results';
+import { V2MapView } from './screens/Map';
+import { V2VenueView } from './screens/Venue';
+import { V2AllReviews } from './screens/AllReviews';
+import { V2ReviewView } from './screens/Review';
+import { V2Thanks } from './screens/Thanks';
+import { V2SavedView } from './screens/Saved';
+import { V2Me } from './screens/Me';
+import { V2A11ySheet } from './screens/A11ySheet';
 
 const PREFS_KEY = 'ra2-a11y';
 
