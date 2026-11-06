@@ -5,11 +5,15 @@
 //   npm run test-user -- create <name> [--port 3456]   → user + sign-in URL
 //   npm run test-user -- signin <name> [--port 3456]   → fresh sign-in URL
 //   npm run test-user -- delete <name>                 → Clerk user + dev DB rows
+//                                                         + that user's photo files
+//   npm run test-user -- orphans                       → list photo files in the dev
+//                                                         Blob store no row names (read-only)
 //
 // Only ever touches `<name>+clerk_test@example.com` users, and only deletes DB
 // rows on the DEV database. Never use this on real users.
 
 import { connectPg } from './lib/pg';
+import { deleteUserPhotoFiles, listOrphanPhotoFiles } from './lib/test-user-photos';
 
 const API = 'https://api.clerk.com/v1';
 const key = process.env.CLERK_SECRET_KEY;
@@ -45,9 +49,20 @@ async function signInUrl(userId: string, port: string) {
 
 async function main() {
   const [cmd, name] = process.argv.slice(2).filter(a => !a.startsWith('--'));
+  if (cmd === 'orphans') {
+    const { client, target } = await connectPg();
+    try {
+      if (target !== 'dev') throw new Error('refusing: the dev database only');
+      const r = await listOrphanPhotoFiles(client);
+      console.log(`${r.total} file(s) in the Blob store · ${r.rows} photo row(s) in the dev DB · ${r.orphans.length} file(s) no row names:`);
+      for (const o of r.orphans) console.log(`  ${o.pathname}  ${o.size} B  ${o.uploadedAt.toISOString()}`);
+      if (r.orphans.length) console.log('Not deleted: they can\'t be tied to a user. Check them by hand.');
+    } finally { await client.end(); }
+    return;
+  }
   const portIdx = process.argv.indexOf('--port');
   const port = portIdx > 0 ? process.argv[portIdx + 1] : '3000';
-  if (!cmd || !name) throw new Error('usage: test-user <create|signin|delete> <name> [--port N]');
+  if (!cmd || !name) throw new Error('usage: test-user <create|signin|delete> <name> [--port N] · test-user orphans');
   const email = emailFor(name);
   if (!email.endsWith('+clerk_test@example.com')) throw new Error('refusing: not a Clerk test email');
 
@@ -69,14 +84,10 @@ async function main() {
     const { client, target } = await connectPg();
     try {
       if (target !== 'dev') throw new Error('refusing to delete rows outside the dev database');
-      // Photo images live in the dev Blob store: delete them first (rows cascade).
-      const photos = await client.query('SELECT pathname, thumb_pathname FROM review_photos WHERE user_id = $1', [user.id]).catch(() => ({ rows: [] }));
-      const paths = photos.rows.flatMap((p: { pathname: string; thumb_pathname: string }) => [p.pathname, p.thumb_pathname]);
-      if (paths.length) {
-        const { del } = await import('@vercel/blob');
-        await del(paths);
-        console.log(`deleted ${paths.length} photo file(s) from the dev Blob store`);
-      }
+      // Photo files live in the dev Blob store: delete this user's first and
+      // check they're gone (rows cascade from the profile below).
+      const ph = await deleteUserPhotoFiles(client, user.id);
+      console.log(`deleted ${ph.files} photo file(s) (${ph.photos} photo(s)) from the dev Blob store`);
       // Reviews, saved places and photo rows cascade from the profile.
       const r = await client.query('DELETE FROM profiles WHERE user_id = $1', [user.id]);
       console.log(`deleted ${r.rowCount} profile row(s) (+ cascaded reviews/saved) from the dev DB`);
