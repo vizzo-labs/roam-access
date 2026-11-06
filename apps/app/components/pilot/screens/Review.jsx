@@ -13,6 +13,7 @@ import { ra2NeedTags } from '@/lib/pilot/match';
 import { EntranceQuestion } from '../trust/EntranceQuestion';
 import { EntranceMarker } from '../arrival/EntranceMarker';
 import { entrancePayload, entranceShown } from '../arrival/entranceForm';
+import { ReviewStepsEntry } from '../arrival/ReviewStepsEntry';
 import { ReviewPhotos, useReviewPhotos, PhotoSuggestion } from '../photos/ReviewPhotos';
 import { SensoryQuestions, EMPTY_SENSORY } from '../sensory/SensoryQuestions';
 import { useT } from '../i18n';
@@ -178,6 +179,9 @@ function V2ReviewView({ app }) {
             }}/>
           <V2Dictate onText={t => setNote(n => (n ? n.trimEnd() + ' ' : '') + t)}/>
         </div>
+
+        {/* Getting there (I4): optional, saved on its own — never blocks Send. */}
+        <ReviewStepsEntry venue={v}/>
 
         <div style={{ marginTop: 20 }}>
           <V2BigBtn kind="primary" onClick={send} disabled={!choice || sending || !!photoBlock} ariaDescribedBy="rev-hint">
