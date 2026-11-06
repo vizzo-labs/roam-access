@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Map Manly: mapping-day kit for the Manly town centre · Roam Access (draft)</title>
+<!-- SOURCE TEMPLATE. Edit this file, then run scripts/build_kit.py to make kit.html. -->
+<style>
+  :root {
+    --teal: #0A4F4F; --teal-deep: #073838; --rust: #9C2D0E; --paper: #FAF9F6; --stone: #EDEAE2;
+    --char: #1A1A1A; --slate: #5A5651; --line: #8A8680; --hair: #DDD9CF; --teal-soft: #E8F1F1;
+    --amber: #854D0E; --amber-bg: #F6ECDD; --red-bg: #F6E2DA;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--char); font: 1.0625rem/1.6 Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--teal); text-underline-offset: 0.15em; }
+  a:hover { color: var(--teal-deep); }
+  :focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; border-radius: 2px; }
+  .skip { position: absolute; left: 8px; top: -60px; background: var(--char); color: #fff; padding: 10px 14px; border-radius: 6px; z-index: 10; }
+  .skip:focus { top: 8px; color: #fff; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 22px; }
+  header.top { background: var(--teal); color: #fff; padding: 28px 0 30px; }
+  header.top a { color: #fff; }
+  .logo { font-weight: 700; font-size: 1.35rem; letter-spacing: -0.03em; margin: 0 0 18px; }
+  .logo .slash { color: #F7B79F; }
+  h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 12px; }
+  h2 { font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.02em; margin: 2.4em 0 0.5em; padding-top: 0.6em; border-top: 3px solid var(--teal); }
+  h3 { font-size: 1.25rem; line-height: 1.3; margin: 1.6em 0 0.4em; }
+  h4 { font-size: 1.05rem; margin: 1.2em 0 0.3em; }
+  .lede { font-size: 1.2rem; max-width: 46em; margin: 0; }
+  .draft { display: inline-block; background: #FDE68A; color: #1A1A1A; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 0 0 14px; }
+  .meta { margin: 14px 0 0; font-size: 0.95rem; opacity: 0.95; }
+  nav.toc { background: #fff; border: 1px solid var(--hair); border-radius: 12px; padding: 14px 20px; margin: 26px 0; }
+  nav.toc h2 { border: 0; margin: 0 0 6px; padding: 0; font-size: 1.1rem; }
+  nav.toc ol { margin: 0; padding-left: 1.4em; columns: 2; column-gap: 2em; }
+  nav.toc li { break-inside: avoid; padding: 2px 0; }
+  nav.toc a { display: inline-block; min-height: 28px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 18px 0; }
+  .card { background: #fff; border: 1px solid var(--hair); border-radius: 12px; padding: 14px 16px; }
+  .card .big { display: block; font-size: 2rem; font-weight: 800; color: var(--teal); line-height: 1.1; }
+  .card .small, .small { font-size: 0.92rem; color: var(--slate); }
+  .callout { background: var(--teal-soft); border-left: 6px solid var(--teal); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 16px 0; }
+  .callout.warn { background: var(--amber-bg); border-left-color: var(--amber); }
+  .callout.stop { background: var(--red-bg); border-left-color: var(--rust); }
+  .callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+  .table-wrap { overflow-x: auto; margin: 12px 0 18px; }
+  table.data { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.97rem; }
+  table.data caption { text-align: left; font-size: 0.92rem; color: var(--slate); padding: 0 0 6px; }
+  table.data th, table.data td { border: 1px solid var(--hair); padding: 7px 9px; vertical-align: top; text-align: left; }
+  table.data thead th { background: var(--stone); }
+  table.data tr.total th, table.data tr.total td { font-weight: 700; background: var(--stone); }
+  .num { text-align: right !important; font-variant-numeric: tabular-nums; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 0.92em; background: var(--stone); padding: 1px 5px; border-radius: 4px; }
+  pre { background: #fff; border: 1px solid var(--hair); border-radius: 10px; padding: 14px 16px; white-space: pre-wrap; font: 0.95rem/1.55 "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  figure { margin: 18px 0; }
+  figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 8px; }
+  figcaption { font-size: 0.92rem; color: var(--slate); margin-top: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--char); }
+  .legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .shape { flex: none; vertical-align: middle; }
+  .zone-badge { display: inline-flex; align-items: center; justify-content: center; width: 1.7em; height: 1.7em; border-radius: 6px; color: #fff; font-weight: 800; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } nav.toc ol { columns: 1; } }
+  .copy { background: #fff; border: 1px dashed var(--line); border-radius: 10px; padding: 14px 18px; }
+  .copy p:first-child { margin-top: 0; }
+  ul.tight li, ol.tight li { margin: 3px 0; }
+  .check li { list-style: none; position: relative; padding-left: 1.7em; }
+  .check li::before { content: ""; position: absolute; left: 0; top: 0.3em; width: 1em; height: 1em; border: 2px solid var(--char); border-radius: 3px; }
+  ul.check { padding-left: 0.4em; }
+  .agenda { display: grid; grid-template-columns: 7.5em 1fr; gap: 0; border: 1px solid var(--hair); border-radius: 10px; overflow: hidden; background: #fff; }
+  .agenda > * { padding: 8px 12px; border-bottom: 1px solid var(--hair); margin: 0; }
+  .agenda dt { font-weight: 700; background: var(--stone); }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; font-weight: 700; color: var(--slate); margin: 0; }
+  footer { margin: 60px 0 40px; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 0.92rem; color: var(--slate); }
+
+  /* Zone sheets */
+  .sheet { background: #fff; border: 1px solid var(--hair); border-radius: 12px; padding: 18px 20px; margin: 26px 0; }
+  .sheet-head h3 { margin: 4px 0 10px; font-size: 1.45rem; display: flex; align-items: center; gap: 10px; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 6px 16px; margin: 0; }
+  .facts div { border-left: 4px solid var(--zc, var(--teal)); padding-left: 10px; }
+  .facts dt { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--slate); font-weight: 700; }
+  .facts dd { margin: 0; font-size: 0.95rem; line-height: 1.4; }
+  .zone-map { margin: 12px 0 8px; }
+  .zone-map figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; }
+  .credit { font-size: 0.82rem; }
+  .howto { font-size: 0.95rem; margin: 8px 0; }
+  .dotted { border-bottom: 3px dotted #C2410C; }
+  table.tasks { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  table.tasks thead th { text-align: left; background: var(--stone); padding: 5px 8px; border: 1px solid var(--hair); }
+  table.tasks td, table.tasks tbody th { border: 1px solid var(--hair); padding: 5px 8px; vertical-align: top; text-align: left; font-weight: normal; }
+  table.tasks tbody th.num { white-space: nowrap; text-align: left !important; width: 4.8em; }
+  table.tasks .lab { font-weight: 800; margin-left: 4px; }
+  table.tasks tr { break-inside: avoid; }
+  table.tasks td:nth-child(2) { width: 34%; }
+  .sub, .kind, .known { color: var(--slate); font-size: 0.86rem; }
+  .known { font-style: italic; }
+  .osm { font-size: 0.82rem; }
+  ul.checks { margin: 0; padding: 0; list-style: none; }
+  ul.checks li { margin: 1px 0; }
+  .q { font-weight: 600; }
+  .opt { display: inline-flex; align-items: center; gap: 3px; margin-right: 9px; white-space: nowrap; }
+  .tick { display: inline-block; width: 0.85em; height: 0.85em; border: 1.5px solid var(--char); border-radius: 2px; }
+  .sheet-foot { font-size: 0.92rem; margin: 12px 0 4px; }
+  .notes { height: 70px; border: 1px solid var(--line); border-radius: 6px; background: repeating-linear-gradient(#fff, #fff 22px, var(--hair) 23px); }
+  body.sheets-only { background: #fff; }
+  /* Phones: long text tables stack into cards (ARIA roles keep them tables for screen readers). */
+  @media screen and (max-width: 720px) {
+    table.stack, table.stack tbody, table.stack tr, table.stack th, table.stack td { display: block; width: auto !important; }
+    table.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    table.stack tr { border: 1px solid var(--hair); border-radius: 8px; margin: 0 0 10px; background: #fff; }
+    table.stack th, table.stack td { border: 0 !important; }
+    table.stack tbody th { background: var(--stone); }
+    table.tasks tbody th.num { width: auto; }
+  }
+  body.sheets-only .sheet { border: 0; padding: 0; margin: 0 auto 40px; max-width: 980px; }
+
+  @media print {
+    @page { size: A4; margin: 11mm 11mm 12mm; }
+    body { background: #fff; font-size: 10.5pt; line-height: 1.45; }
+    .wrap { max-width: none; padding: 0; }
+    header.top { background: #fff; color: var(--char); padding: 0 0 8px; border-bottom: 3px solid var(--teal); }
+    header.top a { color: var(--char); }
+    .logo { color: var(--teal); } .logo .slash { color: var(--rust); }
+    .skip, nav.toc, .noprint { display: none !important; }
+    h2 { break-before: page; border-top: 0; padding-top: 0; margin-top: 0; font-size: 17pt; }
+    h2.keep { break-before: auto; }
+    h3 { font-size: 13pt; break-after: avoid; } h4 { break-after: avoid; }
+    .card, .callout, figure, table.data tr, .copy, .agenda { break-inside: avoid; }
+    a { color: var(--char); }
+    .sheet { break-before: page; border: 0; padding: 0; margin: 0; }
+    body.sheets-only .sheet:first-of-type { break-before: auto; }
+    .zone-map img { max-height: 150mm; width: auto; max-width: 100%; margin: 0 auto; }
+    table.tasks { font-size: 8.6pt; }
+    .osm { display: none; }
+    .facts dd { font-size: 9pt; }
+    .copy { border-style: solid; }
+    .table-wrap { overflow: visible; }
+    table.data { font-size: 8.8pt; }
+    table.data th, table.data td { padding: 4px 5px; }
+    table.data a { text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the kit</a>
+<header class="top">
+  <div class="wrap">
+    <p class="logo" aria-label="Roam Access">roam<span class="slash" aria-hidden="true">/</span>access</p>
+    <p class="draft">Draft for Romy to approve. Not published. Nobody has been contacted.</p>
+    <h1>Map Manly: the mapping-day kit</h1>
+    <p class="lede">Everything for one Saturday that maps the Manly town centre for step-free routing: the task list, six walking zones with printable sheets, a field guide, how to run an accessible day, invitations, the OpenStreetMap community steps, and how we measure the result.</p>
+    <p class="meta">Built {{built}} from OpenStreetMap data as of {{osm_date}}. Town centre box: S −33.8020, W 151.2805, N −33.7935, E 151.2905 (about 1 km × 0.95 km).</p>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<nav class="toc" aria-labelledby="toc-h">
+  <h2 id="toc-h">In this kit</h2>
+  <ol>
+    <li><a href="#glance">At a glance</a></li>
+    <li><a href="#why">Why this day</a></li>
+    <li><a href="#tasks">The task list and the six zones</a></li>
+    <li><a href="#guide">Field guide: what to record and how</a></li>
+    <li><a href="#roam">Roam Access on the same walk</a></li>
+    <li><a href="#day">Running the day</a></li>
+    <li><a href="#access">An accessible event</a></li>
+    <li><a href="#safety">Safety, materials and budget</a></li>
+    <li><a href="#recruit">Recruiting and sign-up</a></li>
+    <li><a href="#osm">OpenStreetMap community rules</a></li>
+    <li><a href="#measure">Measuring the result</a></li>
+    <li><a href="#decisions">Decisions for Romy</a></li>
+    <li><a href="#sheets">Zone sheets A–F (print these)</a></li>
+    <li><a href="#files">Files and data</a></li>
+  </ol>
+</nav>
+
+<section aria-labelledby="glance">
+<h2 id="glance" class="keep">At a glance</h2>
+<div class="cards">
+  <p class="card"><span class="big">{{points}}</span> numbered points to check, in 6 zones</p>
+  <p class="card"><span class="big">{{crossings}}</span> crossings with no kerb or tactile paving info</p>
+  <p class="card"><span class="big">{{entrances}}</span> venues whose entrance is missing or incomplete</p>
+  <p class="card"><span class="big">{{steps}} + {{slopes}}</span> flights of steps and slope checkpoints</p>
+  <p class="card"><span class="big">{{person_hours}} h</span> person-hours: 6 pairs for about {{pair_hours}} hours each</p>
+</div>
+<p><strong>The plan:</strong> 12 people in 6 pairs, each pair with at least one person with lived experience of disability. Each pair takes one zone, starts and ends at a step-free meeting point, and walks a loop of 1–3 km over about three hours with rests. On the way they record kerbs, entrances, steps and slopes in OpenStreetMap, and mark step-free entrances and arrival steps in Roam Access.</p>
+<p><strong>With fewer people</strong> (5–6, as the routing spike assumed): run 3 pairs on the three flat zones with the most venues (C, D, E), and do zones A, B and F on a second morning. Or keep all six zones and do only crossings and entrances, which matter most for routing, and leave slopes and footpaths for later.</p>
+<div class="callout warn">
+  <p><strong>Why the estimate is higher than the spike’s 20–29 hours.</strong> This list comes from fresh data, so it counts every gap (including the {{crossing_nodes}} crossings that exist only as a point on the road, with no crossing path drawn). It also adds Roam Access entrance pins, photos and arrival steps at each venue, and a slower walking pace (2.5 km/h) for mixed-ability pairs with rests.</p>
+</div>
+</section>
+
+<section aria-labelledby="why">
+<h2 id="why">Why this day</h2>
+<p>Roam Access wants to show a step-free walking route to a venue’s accessible entrance. The routing spike (draft PR #18, <code>docs/research/step-free-routing-spike.md</code>) found that the routing engine works, but a route is only as good as OpenStreetMap. In the town centre today:</p>
+<ul class="tight">
+  <li><strong>Kerbs:</strong> only {{kerb_both}}% of the {{crossing_ways}} crossing paths say what the kerb is like at both ends. For a wheelchair user, a kerb without a ramp is the most common barrier on an otherwise flat route.</li>
+  <li><strong>Slope:</strong> almost no footpath has a mapped slope (<code>incline</code>). The engine guesses slopes from a coarse elevation model and misses short, steep bits.</li>
+  <li><strong>Entrances:</strong> {{entrance_pct}}% of the {{venues}} venues have an entrance point near them, and none of those says whether it is step-free. Without one, a route ends at the middle of the building or the street.</li>
+  <li><strong>Steps:</strong> mapped well, but most flights don’t say how many steps, whether there’s a handrail or whether there’s a ramp.</li>
+</ul>
+<p>One well-organised day fixes most of this for the town centre. The data goes into OpenStreetMap, where everyone can use it, including Roam Access’s own routing after its next data refresh.</p>
+</section>
+
+<section aria-labelledby="tasks">
+<h2 id="tasks">The task list and the six zones</h2>
+<p>The list comes from a fresh OpenStreetMap download (<code>scripts/fetch_osm.py</code>, then <code>scripts/build_tasks.py</code>). It includes:</p>
+<ul class="tight">
+  <li>every crossing in the town centre without kerb type at both ends or without tactile paving ({{crossings}}, of which {{crossing_nodes}} are only a point on the road; their kerbs go on the sheet and the data lead adds them);</li>
+  <li>every venue without an entrance point ({{entrances_new}}), and every venue whose mapped entrance lacks <code>wheelchair</code>, <code>door</code>, <code>automatic_door</code> or <code>width</code>;</li>
+  <li>slope checkpoints every 120 m on the corridors the spike named (The Corso, Belgrave St, Sydney Rd, East and West Esplanade, Darley Rd), plus footpaths the elevation model rated 8% or steeper;</li>
+  <li>every flight of steps missing <code>step_count</code>, <code>handrail</code> or <code>ramp</code>;</li>
+  <li>{{path_km}} km of footpaths missing <code>surface</code>, <code>smoothness</code> or <code>width</code>. These are lines on the maps, not numbered points: pairs note them as they pass.</li>
+</ul>
+<p>The points are split into six zones of similar effort. Each zone has a meeting point and a walking order that starts and ends there.</p>
+<figure>
+  <img src="@OVERVIEW_IMG" alt="Overview map of the Manly town centre split into six shaded zones. Zone A covers the hilly streets west of Belgrave Street around Ivanhoe Park and Raglan Street. Zone B is the harbour front around Manly Wharf and West Esplanade. Zone C is the strip along Belgrave and Whistler Streets. Zone D is North Steyne and the streets behind it. Zone E is The Corso. Zone F is south of Wentworth Street around Darley Road and East Esplanade. Each zone has a meeting point marked M.">
+  <figcaption>The six zones and their meeting points (M). Map © OpenStreetMap contributors (ODbL), OpenFreeMap, © OpenMapTiles.</figcaption>
+</figure>
+<!--@ZONE_TABLE-->
+<div class="callout">
+  <p><strong>Meeting points must be checked first.</strong> They are flat public spaces in OpenStreetMap, but nobody has checked them on the ground for this day. Walk all six on the recce (see <a href="#day">Running the day</a>) with a wheelchair user, and move any that don’t work.</p>
+</div>
+<p><strong>How the hours are worked out:</strong> 5 minutes per crossing, 7 per new entrance (including the Roam Access pin, photo and arrival steps), 5 per entrance check, 4 per slope checkpoint, 3 per flight of steps, 1 per 100 m of footpath to note, walking at 2.5 km/h with 35% added for street layout, then 25% for editing and upload. They are estimates; the recce will tell.</p>
+</section>
+
+<section aria-labelledby="guide">
+<h2 id="guide">Field guide: what to record and how</h2>
+<p class="eyebrow">Print pages: this section is two A4 pages</p>
+<div class="callout stop">
+  <p><strong>The golden rule: only record what you see on the ground today.</strong> Never copy from Google Maps, Street View, Apple Maps, real-estate photos or any other map. Their data is copyright and can’t go into OpenStreetMap. If you can’t see it or measure it, leave it out.</p>
+</div>
+
+<h3>What to record, with the exact OpenStreetMap tags</h3>
+<div class="table-wrap"><table class="data stack">
+<caption>What to record at each kind of point. Values in <code>code</code> are the OpenStreetMap tags. Definitions from the OpenStreetMap wiki and the Australian Tagging Guidelines.</caption>
+<thead><tr><th scope="col">Point</th><th scope="col">What to look at</th><th scope="col">Tags</th></tr></thead>
+<tbody>
+<tr><th scope="row">Kerb at each end of a crossing</th>
+<td>Is there a kerb ramp? Measure the lip where the ramp meets the road. Is there tactile paving (the bumpy tiles)?</td>
+<td><code>barrier=kerb</code> on the point where the crossing meets the kerb, plus<br>
+<code>kerb=flush</code> (level, about 0 cm) · <code>kerb=lowered</code> (3 cm or less) · <code>kerb=raised</code> (more than 3 cm) · <code>kerb=rolled</code> (rounded)<br>
+<code>kerb:height=0.02</code> (metres; 2 cm)<br>
+<code>tactile_paving=yes</code> · <code>no</code> · <code>incorrect</code> (wrong place or direction)</td></tr>
+<tr><th scope="row">The crossing itself</th>
+<td>Lights? Zebra stripes? Nothing marked?</td>
+<td><code>crossing=traffic_signals</code> · <code>crossing=uncontrolled</code> (zebra) · <code>crossing=unmarked</code> (kerb ramps but no markings; the Australian guidelines say “unmarked”, not “informal”)</td></tr>
+<tr><th scope="row">Slope of a footpath</th>
+<td>The steepest stretch you’d actually use, not the average. Which way is uphill?</td>
+<td><code>incline=6%</code> (positive means uphill in the direction the path is drawn; the data lead sets the sign) · <code>incline=up</code> or <code>down</code> if you couldn’t measure</td></tr>
+<tr><th scope="row">Footpath surface</th>
+<td>What it’s made of and how bumpy it is for small wheels.</td>
+<td><code>surface=asphalt</code> · <code>concrete</code> · <code>paving_stones</code> · <code>bricks</code> · <code>sett</code> · <code>wood</code> · <code>compacted</code> · <code>gravel</code> · <code>grass</code> · <code>sand</code><br>
+<code>smoothness=excellent</code> · <code>good</code> · <code>intermediate</code> (fine for a wheelchair) · <code>bad</code> · <code>very_bad</code> · <code>horrible</code></td></tr>
+<tr><th scope="row">Footpath width</th>
+<td>The narrowest clear width, between obstacles (poles, bins, café tables).</td>
+<td><code>width=1.8</code> (metres, with a dot) · <code>est_width=1.5</code> if you estimated</td></tr>
+<tr><th scope="row">Entrance</th>
+<td>Where the door is, which door, steps or ramp at the door, door type, automatic or not, clear width.</td>
+<td><code>entrance=main</code> · <code>secondary</code> · <code>service</code> · <code>yes</code> (a point on the building outline)<br>
+<code>wheelchair=yes</code> (no step) · <code>limited</code> (one step of 7 cm or less) · <code>no</code> (a higher step)<br>
+<code>door=hinged</code> · <code>sliding</code> · <code>revolving</code> · <code>folding</code> · <code>no</code><br>
+<code>automatic_door=no</code> · <code>button</code> · <code>motion</code> · <code>continuous</code><br>
+<code>width=0.85</code> (clear opening, metres)</td></tr>
+<tr><th scope="row">Steps</th>
+<td>Count every step. Handrails on which side? Is there a ramp on or beside the steps?</td>
+<td><code>step_count=12</code> · <code>handrail=yes</code>/<code>no</code>, or <code>handrail:left=yes</code> · <code>handrail:right=yes</code> · <code>handrail:center=yes</code> (sides are relative to the drawn direction; the app handles this)<br>
+<code>ramp=yes</code>/<code>no</code> · <code>ramp:wheelchair=yes</code> · <code>ramp:stroller=yes</code> (narrow wheel channels) · <code>ramp:bicycle=yes</code></td></tr>
+</tbody></table></div>
+<p class="howto"><strong>Not sure? Leave it out.</strong> A blank tells the router “check first”; a wrong value tells it something false. Write what you saw on the sheet, and the data lead will decide.</p>
+
+
+<h3>How to measure</h3>
+<div class="two">
+<div>
+<h4>Kerbs and doors: tape measure</h4>
+<ul class="tight">
+  <li><strong>Kerb lip:</strong> stand on the footpath. Put the tape’s end on the road surface at the bottom of the kerb ramp and read the height of the lip in centimetres. Measure in the middle of the ramp, where a wheel would go.</li>
+  <li><strong>Door width:</strong> the clear opening with the door fully open, from the door face to the stop on the other side. Not the frame.</li>
+  <li><strong>Footpath width:</strong> at the narrowest point you pass, between fixed obstacles.</li>
+  <li>Write centimetres on the sheet; the data lead converts to metres.</li>
+</ul>
+</div>
+<div>
+<h4>Slope: a phone and a ruler</h4>
+<ul class="tight">
+  <li><strong>iPhone:</strong> the built-in <strong>Measure</strong> app (in Utilities) → <strong>Level</strong>. It shows degrees.</li>
+  <li><strong>Android:</strong> <strong>Clinometer + bubble level</strong> by plaincode (free, with ads), or the open-source <strong>Clinometer</strong> by BasicAirData. Calibrate it on a flat table first.</li>
+  <li>Lay a ruler or a short spirit level along the footpath and put the phone on it, lengthways in the direction of travel. This evens out bumpy pavers.</li>
+  <li>Measure the steepest part you’d use, in 2–3 places. Write the highest steady reading and which way is uphill.</li>
+  <li>Phone readings are approximate. That is fine: we record what people will meet, not a survey for building approval.</li>
+</ul>
+</div>
+</div>
+<div class="table-wrap"><table class="data">
+<caption>Degrees to percent (percent = tan(degrees) × 100). Australian Standard AS 1428.1 limits, as reported by secondary sources (the standard itself is paywalled).</caption>
+<thead><tr><th scope="col" class="num">Phone says</th><th scope="col" class="num">Percent</th><th scope="col" class="num">Ratio</th><th scope="col">What it means</th></tr></thead>
+<tbody>
+<tr><td class="num">1°</td><td class="num">1.7%</td><td class="num">1:57</td><td>Flat to most people.</td></tr>
+<tr><td class="num">1.4°</td><td class="num">2.5%</td><td class="num">1:40</td><td>The usual most for crossfall (sideways tilt).</td></tr>
+<tr><td class="num">2.9°</td><td class="num">5%</td><td class="num">1:20</td><td>The most for a walkway without handrails.</td></tr>
+<tr><td class="num">4.1°</td><td class="num">7.1%</td><td class="num">1:14</td><td>The most for a ramp (with handrails and landings).</td></tr>
+<tr><td class="num">7.1°</td><td class="num">12.5%</td><td class="num">1:8</td><td>The most for a short kerb ramp. Hard work for many manual wheelchair users.</td></tr>
+</tbody></table></div>
+
+
+<h3>Photos</h3>
+<ul class="tight">
+  <li><strong>No faces, no number plates,</strong> no children, no one’s home through a window. Wait until people pass, or point the camera down. If someone is in the shot, take it again.</li>
+  <li>Photograph the thing: the kerb from the footpath, the door from straight on, the steps from the bottom.</li>
+  <li>Ask before photographing inside a shop or café. If staff say no, don’t.</li>
+  <li>Photos for Roam Access go through the app, which removes location data before upload. Photos you take for the data lead go into the shared folder and are deleted 30 days after the day.</li>
+</ul>
+
+<h3>Which app</h3>
+<div class="two">
+<div class="card">
+<h4>Everyone: StreetComplete (Android and iPhone)</h4>
+<p>It asks one simple question at a time about what’s around you, and can’t write a wrong tag. It asks about kerb type at crossings, tactile paving (switched on for Australia), steps (count, handrail, ramp, which way is up) and footpath surface. Turn on the smoothness question in Settings before the day.</p>
+<p class="small">Free. Version 64 (October 2026) is the first stable iPhone release, so iPhone users should also install the fallback below.</p>
+</div>
+<div class="card">
+<h4>Entrances: Every Door (Android and iPhone)</h4>
+<p>Its Entrances mode puts an entrance on the building outline and asks the entrance type and <code>wheelchair</code>. Write door type, automatic door and width on the sheet.</p>
+<p class="small">Experienced pairs can use <strong>MapComplete → OnWheels</strong> in the phone’s browser (mapcomplete.org/onwheels), which also asks door type, automatic door and width. It needs mobile data.</p>
+</div>
+</div>
+<ul class="tight">
+  <li><strong>On paper (the zone sheet):</strong> slopes, kerb heights in centimetres, door and footpath widths, and the crossings that are only a point on the road. No beginner app asks these well. The data lead enters them in the iD editor in the week after, and checks the direction of each slope.</li>
+  <li><strong>Fallbacks:</strong> Go Map!! (iPhone) and Vespucci (Android) can edit any tag, but they are full editors for experienced mappers.</li>
+  <li><strong>Hashtag:</strong> in StreetComplete and Every Door you can’t always type a changeset comment. The data lead adds <code>#MapManly2026</code> to paper-based edits; app edits are counted by account and time window instead.</li>
+</ul>
+
+
+<h3>Your OpenStreetMap account</h3>
+<ol class="tight">
+  <li>At home, go to <strong>openstreetmap.org</strong> → <strong>Sign Up</strong>. Use your email and a password, or sign in with Google, Apple, Microsoft, Facebook, GitHub or Wikipedia.</li>
+  <li>Choose a <strong>display name</strong>. It is public and shows on every edit. You don’t have to use your real name, but it must not be misleading. You can change it later.</li>
+  <li>Open the email “Welcome to OpenStreetMap” and click the link. Your account only works after this. No email? Use “Resend the confirmation email”.</li>
+  <li>Open StreetComplete and Every Door and log in with that account. Send the display name to the organiser if you’re happy to be listed on the event’s wiki page (optional).</li>
+</ol>
+<p class="small"><strong>Your own account, always.</strong> Everyone edits as themselves; no shared accounts. OpenStreetMap’s terms say you must be at least 16 to register yourself; people aged 13–15 can take part only through an account a parent or adult sets up.</p>
+
+</section>
+
+<section aria-labelledby="roam">
+<h2 id="roam">Roam Access on the same walk</h2>
+<p>At every venue on your sheet, also add what you found in Roam Access. It takes two minutes and helps the next person straight away, before any map refresh. These features shipped in PRs #17 (step-free entrance pin) and #19 (step-by-step arrival).</p>
+<div class="two">
+<div>
+<h3>Mark the step-free entrance</h3>
+<ol class="tight">
+  <li>Open the place in Roam Access. Under <strong>Getting there</strong>, tap <strong>Mark the entrance</strong> (or <strong>Share your experience</strong>).</li>
+  <li>In <strong>Tell us more</strong>, answer <strong>Step-free way in?</strong>
+    <ul>
+      <li><strong>Yes:</strong> tap <strong>Show where the step-free entrance is</strong>.</li>
+      <li><strong>No:</strong> say if there is another way in (side, back, lift) and mark that one.</li>
+    </ul>
+  </li>
+  <li>Choose <strong>Which door is it?</strong>: Main entrance, At the side, At the back, Via a lift or Another door.</li>
+  <li>Put the pin on the door: drag it, tap the map, use the arrow buttons, or <strong>Use my current location</strong> while standing at the door. No map? Describe where it is in words.</li>
+  <li><strong>Add a photo of this entrance</strong> and describe it (“Side door with a ramp and a handrail”).</li>
+  <li>Tap <strong>Send it</strong>.</li>
+</ol>
+<p>If someone already marked it, answer <strong>Still the way in?</strong> with <strong>Yes</strong> or <strong>Changed</strong>.</p>
+</div>
+<div>
+<h3>Add the arrival steps</h3>
+<ol class="tight">
+  <li>On the same place, find <strong>Step by step from the street</strong> and tap <strong>Add the first steps</strong> (or <strong>Add your steps</strong>).</li>
+  <li><strong>Where I started:</strong> e.g. “The Corso” or “The bus stop on Belgrave St”.</li>
+  <li>Write short steps in order, one thing per step. Say what you see: kerbs, ramps, doors, lifts. <strong>Add a step</strong> for each one.</li>
+  <li>Add a photo of the way in if it helps, and describe it.</li>
+  <li>Tap <strong>Share my steps</strong>.</li>
+</ol>
+<p>If steps are already there and they worked for you, tap <strong>This worked for me</strong>.</p>
+</div>
+</div>
+<div class="callout">
+  <p><strong>Honesty rules still apply.</strong> Only record what you experienced today. Your entries show your lived experience (“Wheelchair user”), never your name. Entrances and arrival steps help people find the way in; they never change a place’s verdict. Only community reviews do that.</p>
+</div>
+</section>
+
+<section aria-labelledby="day">
+<h2 id="day">Running the day</h2>
+<h3>Agenda (a Saturday morning)</h3>
+<dl class="agenda">
+  <dt>8:45</dt><dd>Organisers set up at the base: welcome table, quiet corner, water, printed sheets, chargers.</dd>
+  <dt>9:15</dt><dd>Arrive. Help desk: OpenStreetMap account, app installed, join the mapping day in Roam Access, needs set.</dd>
+  <dt>9:30</dt><dd>Welcome and Acknowledgement of Country. Briefing (15 min): why, the golden rule, safety, photos, the zone sheets.</dd>
+  <dt>9:45</dt><dd>Practice together outside the base (15 min): one kerb, one door, one slope reading, one Roam Access entrance pin.</dd>
+  <dt>10:00</dt><dd>Pairs leave for their zones. Mapping, about 3 hours. Rest at least every 45 minutes. Message the base at 11:00 and 12:00.</dd>
+  <dt>13:00</dt><dd>Back at the base. Upload anything still on phones; hand sheets and photos to the data lead. Lunch.</dd>
+  <dt>13:45</dt><dd>Wrap-up (20 min): what we found, the Roam Access leaderboard on screen, first coverage numbers, thank you.</dd>
+  <dt>14:15</dt><dd>Close. In the next week the data lead enters paper notes, draws the crossings that are only points, and reviews every change.</dd>
+</dl>
+
+<h3>Roles</h3>
+<div class="table-wrap"><table class="data">
+<caption>Who does what on the day</caption>
+<thead><tr><th scope="col">Role</th><th scope="col">How many</th><th scope="col">What they do</th></tr></thead>
+<tbody>
+<tr><th scope="row">Lead organiser</th><td>1</td><td>Runs the day, the briefing and timekeeping; the contact for the venue and the OpenStreetMap community.</td></tr>
+<tr><th scope="row">OpenStreetMap data lead</th><td>1</td><td>An experienced mapper. Helps with accounts and apps, answers tagging questions, reviews every changeset after the day, and enters the paper notes (slopes, widths, door details) and the {{crossing_nodes}} point-only crossings in the iD editor.</td></tr>
+<tr><th scope="row">Access and welcome</th><td>1</td><td>Welcome table, access requests, the quiet space, interpreters and captions, and the check-in messages. A seated role.</td></tr>
+<tr><th scope="row">First aider</th><td>1</td><td>Current first-aid certificate; stays at the base with the kit and a phone. Can be the access and welcome person.</td></tr>
+<tr><th scope="row">Mapping pairs</th><td>6 pairs (12 people)</td><td>One zone each. In each pair one person measures, the other records; swap every half hour.</td></tr>
+<tr><th scope="row">Base mappers (optional)</th><td>any</td><td>Seated roles: answer Roam Access quick questions, check photos, help the data lead.</td></tr>
+</tbody></table></div>
+
+<h3>Pairs</h3>
+<ul class="tight">
+  <li><strong>Every pair includes someone with lived experience of disability</strong> where we can: a wheelchair or scooter user, someone who uses a walking aid, someone who is blind or has low vision, or someone with another access need. They notice what others miss, and their reviews in Roam Access carry their lived experience.</li>
+  <li>Pair people who’ve mapped before with people who haven’t. Students and OSM mappers make good partners for disabled community members who know the area.</li>
+  <li>Match zones to people: flat zones (C, D, E) suit wheelchair and scooter users; hilly zones (A, F) suit walkers. Let each pair choose; nobody has to explain why.</li>
+  <li>Support workers come free and are not counted as mappers.</li>
+</ul>
+
+<h3>Before the day</h3>
+<ul class="check tight">
+  <li>Four weeks before: post the draft wiki page and the note to the OpenStreetMap Australia community (<a href="#osm">drafts below</a>), and open sign-ups.</li>
+  <li>Three weeks before: book the base, and Auslan or captions if anyone asks. Order any materials.</li>
+  <li>Two weeks before: <strong>recce walk</strong> with a wheelchair user: check all six meeting points, the base, the accessible toilet, shade and rest stops on each loop. Re-run <code>build_tasks.py</code> if OpenStreetMap has changed.</li>
+  <li>One week before: send each pair their zone sheet and the field guide, and ask everyone to make their OpenStreetMap account and install the app at home.</li>
+  <li>Two days before: check the weather and the heat forecast; confirm or move the day.</li>
+  <li>The day before: print the sheets (one per pair plus spares) and charge everything.</li>
+</ul>
+</section>
+
+<section aria-labelledby="access">
+<h2 id="access">An accessible event</h2>
+<p>The day itself has to work for the people we’re mapping for.</p>
+<div class="two">
+<div>
+<h3>The base</h3>
+<ul class="check tight">
+  <li>Step-free entry, checked on the recce, not just listed.</li>
+  <li>An accessible toilet on site or within 100 m on a step-free path.</li>
+  <li>Shade and seats, inside and out; a quiet space anyone can use without explaining why.</li>
+  <li>Close to the ferry and to accessible bus stops; accessible parking and a drop-off point nearby.</li>
+  <li>Water refill, and a fridge or esky for medication.</li>
+</ul>
+<h3>On the loops</h3>
+<ul class="check tight">
+  <li>Rest stops with shade and seats at least every 45 minutes; the recce marks them on the sheets.</li>
+  <li>Every pair carries water and a phone with the base’s number saved.</li>
+  <li>Anyone can stop at any time. A half-done zone is fine.</li>
+</ul>
+</div>
+<div>
+<h3>Communication</h3>
+<ul class="check tight">
+  <li>Auslan interpreters or live captions on request, for the briefing and the wrap-up. Ask at sign-up; book early.</li>
+  <li>Large-print (18 pt) and digital copies of the field guide and sheets; a plain-text version for screen readers.</li>
+  <li>Briefing said, written and shown. Face the group; use a microphone if there is one.</li>
+  <li>Easy Read version of the invitation on request.</li>
+</ul>
+<h3>At sign-up, ask only</h3>
+<ul class="check tight">
+  <li>“What do you need to take part?” (interpreter, captions, support worker, large print, quiet space, food needs, a flat zone).</li>
+  <li>Never ask for a diagnosis. Keep the answers private and delete them after the day.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="safety">
+<h2 id="safety">Safety, materials and budget</h2>
+<h3>Safety</h3>
+<div class="two">
+<div>
+<h4>At crossings</h4>
+<ul class="tight">
+  <li><strong>Never stand on the road to measure.</strong> Measure kerbs from the footpath, at the edge, when no cars are turning.</li>
+  <li>One person measures, the other watches traffic and bikes.</li>
+  <li>Cross only with the lights or when it’s clear, like anyone else. Don’t press crossing buttons just to test them.</li>
+  <li>The harbour-front path and The Corso are shared with bikes and scooters: keep to one side.</li>
+  <li>Don’t block doorways, kerb ramps or footpaths while you work.</li>
+</ul>
+</div>
+<div>
+<h4>Heat and sun</h4>
+<ul class="tight">
+  <li>In Sydney from November the UV index is usually extreme by mid-morning. Hats, sunscreen (SPF 50+), sunglasses, long sleeves; reapply every 2 hours.</li>
+  <li>Drink water at every rest stop. Wheelchair users and some people with disability are more at risk in heat.</li>
+  <li>If the Bureau of Meteorology forecasts 32 °C or more, or a heatwave warning, move the day or finish by 11:30.</li>
+  <li>Start and end check-ins at the base; a message at 11:00 and 12:00. If a pair doesn’t answer within 15 minutes, call them.</li>
+</ul>
+</div>
+</div>
+<p><strong>Private property:</strong> survey from public places only. To measure a door, ask staff first; if they say no, leave it and note “not measured”. Be friendly: “We’re mapping step-free access for an open community map.”</p>
+
+<h3>Materials</h3>
+<div class="two">
+<ul class="check tight">
+  <li>Zone sheets, one per pair plus spares, on clipboards; pencils</li>
+  <li>6 tape measures (5 m, metric) and 6 short rulers or 30 cm spirit levels for slopes</li>
+  <li>6 power banks and cables</li>
+  <li>Sunscreen, spare hats, water bottles and a refill station</li>
+  <li>First-aid kit, including a heat pack and cold packs</li>
+</ul>
+<ul class="check tight">
+  <li>Large-print copies of the field guide</li>
+  <li>Name stickers (first name only, optional)</li>
+  <li>The Roam Access join poster (from the app’s organiser kit) and a screen for the leaderboard</li>
+  <li>Optional: hi-vis vests, so people can see you near crossings</li>
+  <li>Lunch, with options for food needs</li>
+</ul>
+</div>
+
+<h3>Rough budget (A$, estimates)</h3>
+<div class="table-wrap"><table class="data">
+<caption>For 12–15 people. The large costs only apply if someone asks for them, but budget for them so we can always say yes.</caption>
+<thead><tr><th scope="col">Item</th><th scope="col" class="num">Low</th><th scope="col" class="num">High</th><th scope="col">Note</th></tr></thead>
+<tbody>
+<tr><th scope="row">Base venue</th><td class="num">0</td><td class="num">400</td><td>A community room, library room or a partner’s space.</td></tr>
+<tr><th scope="row">Auslan interpreters (on request)</th><td class="num">0</td><td class="num">1,400</td><td>Usually two interpreters for over an hour, with a minimum booking; get a quote.</td></tr>
+<tr><th scope="row">Live captions (on request)</th><td class="num">0</td><td class="num">500</td><td>Remote captioning for the briefing and the wrap-up.</td></tr>
+<tr><th scope="row">Lunch, water, snacks</th><td class="num">250</td><td class="num">400</td><td>About A$20–25 a person.</td></tr>
+<tr><th scope="row">Tape measures, levels, clipboards</th><td class="num">120</td><td class="num">200</td><td>Reusable for later days.</td></tr>
+<tr><th scope="row">Power banks, sunscreen, hats, first aid</th><td class="num">150</td><td class="num">300</td><td>Borrow where we can.</td></tr>
+<tr><th scope="row">Printing (large print too)</th><td class="num">50</td><td class="num">100</td><td></td></tr>
+<tr><th scope="row">Travel help and thank-you</th><td class="num">0</td><td class="num">450</td><td>Taxi vouchers for people who need them; small gift cards.</td></tr>
+<tr class="total"><th scope="row">Total</th><td class="num">about 570</td><td class="num">about 3,750</td><td>Insurance not included (see below).</td></tr>
+</tbody></table></div>
+
+<div class="callout warn">
+<h3>Questions for Romy: insurance and liability</h3>
+<p>This kit does not answer these. Check them with the insurer or an adviser before inviting anyone.</p>
+<ul class="tight">
+  <li>Does our public liability insurance cover an event in public streets with volunteers? Does the base venue need a certificate of currency?</li>
+  <li>Do we need personal accident cover for volunteers? Under NSW work health and safety law, what duties do we owe volunteers?</li>
+  <li>Do we need council permission to gather in a public place (for example a meeting point in a plaza or park)?</li>
+  <li>If students under 18 come: what supervision, consent and Working with Children Check rules apply?</li>
+  <li>Who is responsible for photos taken on the day, and for the sign-up information about people’s access needs (Privacy Act)?</li>
+  <li>Who is the first aider, and do we need a written incident and emergency plan?</li>
+</ul>
+</div>
+</section>
+
+<section aria-labelledby="recruit">
+<h2 id="recruit">Recruiting and sign-up</h2>
+<p>Fill in the <strong>[brackets]</strong> once Romy has decided the date and base. All texts are plain English, short sentences, with the most important facts first.</p>
+
+<h3>Email invitation</h3>
+<div class="copy">
+<p><strong>Subject:</strong> Help map Manly for wheelchair users and people with disability, Saturday [date]</p>
+<p>Hi [name],</p>
+<p>Would you like to help make Manly easier to get around for people with disability?</p>
+<p>On <strong>Saturday [date], 9:15 am to 2:15 pm</strong>, we’re walking the Manly town centre in pairs to record kerb ramps, slopes, steps and step-free entrances. We add what we find to OpenStreetMap, the free map used by many apps, and to Roam Access, an app that tells disabled people whether a place will work for them.</p>
+<p><strong>You don’t need any experience.</strong> We’ll show you how on the day. You need a phone and an hour at home beforehand to set up a free account.</p>
+<ul>
+  <li><strong>Where:</strong> [base], Manly. Step-free, with an accessible toilet. Close to Manly Wharf and buses.</li>
+  <li><strong>What:</strong> a short briefing, about 3 hours of walking or rolling with rests (flat routes available), then lunch together.</li>
+  <li><strong>Access:</strong> tell us what you need to take part. Auslan, captions, a support worker (free entry), large print, a quiet space, a flat route. We’ll arrange it.</li>
+</ul>
+<p>We especially welcome people with lived experience of disability. You know what matters.</p>
+<p><strong>Sign up:</strong> [join link] (join code <strong>[CODE]</strong>), or reply to this email.</p>
+<p>Thanks,<br>[Name], Roam Access<br>[phone] · [email]</p>
+</div>
+
+<h3>Social media post</h3>
+<div class="copy">
+<p>Help map Manly! ♿🗺️</p>
+<p>Saturday [date], 9:15 am. We’re checking kerb ramps, slopes and step-free entrances around the Manly town centre, and adding them to OpenStreetMap and the Roam Access app.</p>
+<p>No experience needed. Flat routes, rests, lunch. Auslan and captions on request.</p>
+<p>Join: [join link] · code [CODE]</p>
+<p>#MapManly #accessibility #OpenStreetMap #NorthernBeaches</p>
+<p><em>Image description to add with the post:</em> “Two people look at a kerb ramp at a crossing on The Corso, Manly. One uses a wheelchair; the other holds a tape measure.” (Use a real photo from the recce, taken with consent, no faces of passers-by.)</p>
+</div>
+
+<h3>Flyer (A4 or A5)</h3>
+<p>A printable flyer is in <a href="flyer.html">flyer.html</a> (<a href="pdf/flyer-a4.pdf">A4 PDF</a>). It uses 16 pt text and above, high contrast, no text over images, and a plain-text version below for screen readers and email. For the event-specific QR code, print the join poster from the app’s organiser kit (<code>/events/[CODE]/kit</code>) once the event exists.</p>
+
+<h3>Who to invite (list only: nobody has been contacted)</h3>
+<div class="table-wrap"><table class="data">
+<caption>Groups to approach, once Romy approves</caption>
+<thead><tr><th scope="col">Who</th><th scope="col">Why</th></tr></thead>
+<tbody>
+<tr><th scope="row">Northern Beaches Council’s access committee (Disability Inclusion Advisory Committee or similar; check the current name)</th><td>Local disabled residents and the council’s access staff; the council owns most kerbs and footpaths.</td></tr>
+<tr><th scope="row">Local disability groups and services: e.g. Physical Disability Council of NSW, Spinal Cord Injuries Australia, Vision Australia and Guide Dogs NSW/ACT, Deaf Australia NSW, People with Disability Australia, local NDIS providers and day programs</th><td>People with lived experience to lead pairs; they can share with members.</td></tr>
+<tr><th scope="row">OpenStreetMap community in Australia: the Oceania forum category, the talk-au list, Discord #oceania, OSGeo Oceania (the local chapter)</th><td>Experienced mappers to be the data lead and partners. We have to give them notice anyway.</td></tr>
+<tr><th scope="row">University GIS, geography, urban planning and occupational therapy students (Macquarie, UNSW, Sydney, UTS, Western Sydney)</th><td>Keen, often need volunteer hours; good partners for first-time mappers.</td></tr>
+<tr><th scope="row">Manly community: Manly Community Centre, Manly Library, Rotary or Lions clubs, surf life saving clubs</th><td>Local knowledge, a possible base, and word of mouth.</td></tr>
+<tr><th scope="row">Roam Access pilot testers</th><td>Already use the app and know why entrances matter.</td></tr>
+</tbody></table></div>
+
+<h3>Sign-up in Roam Access</h3>
+<p>The app already has mapping days (<code>mapping_events</code> and <code>mapping_event_members</code>; code in <code>apps/app/lib/data/community.ts</code>). <strong>Romy creates the event; this kit did not create one.</strong></p>
+<ol class="tight">
+  <li>Sign in to Roam Access as an admin and open <strong>/admin/community</strong>.</li>
+  <li>Under <strong>New mapping day</strong>, fill in <strong>Name</strong> (“Map Manly”), <strong>Area</strong> (“Manly town centre”), <strong>Date</strong>, <strong>Starts</strong> 09:15 and <strong>Ends</strong> 14:15 (Sydney time). Leave <strong>Join code</strong> empty to get one like <code>MAP-7K2Q</code>, or type your own (e.g. <code>MAPMANLY</code>).</li>
+  <li>Press <strong>Create mapping day</strong>. The page shows the join code and links to the <strong>join page</strong> (<code>/join/CODE</code>), the <strong>leaderboard</strong> (<code>/events/CODE</code>) and the app’s own <strong>organiser kit</strong> (<code>/events/CODE/kit</code>) with a QR join poster and a briefing script.</li>
+  <li>Put the join link and code into the invitations above. People who join appear in the Mappers count; the leaderboard is anonymous unless someone chooses to show a name.</li>
+</ol>
+<p>The app counts Roam Access contributions only. OpenStreetMap edits are counted with the changeset hashtag (see below).</p>
+</section>
+
+<section aria-labelledby="osm">
+<h2 id="osm">OpenStreetMap community rules</h2>
+<p>The OpenStreetMap Foundation’s <a href="https://osmfoundation.org/wiki/Organised_Editing_Guidelines">Organised Editing Guidelines</a> cover coordinated editing by organisations. They say they are not meant for “mapping parties between friends”, but a public event run by a company for its product is close enough that we follow them in full. It’s also good manners: local mappers will see a burst of edits in Manly.</p>
+<h3>What we do</h3>
+<ul class="check tight">
+  <li><strong>A wiki page</strong> at <code>Organised Editing/Activities/Map Manly 2026</code>, listed on <a href="https://wiki.openstreetmap.org/wiki/Organised_Editing/Activities">Organised Editing/Activities</a>, before we announce the day (draft below).</li>
+  <li><strong>Tell the community at least two weeks before</strong>, in a public, archived place: the <a href="https://community.openstreetmap.org/c/communities/oceania/73">Oceania category of the OpenStreetMap forum</a> (there is no Australia category) and the talk-au mailing list. Reply to messages within two working days while the event runs.</li>
+  <li><strong>One hashtag</strong>, <code>#MapManly2026</code>, in changeset comments, with a link to the wiki page where the app allows it.</li>
+  <li><strong>Everyone uses their own account</strong>; no shared or throwaway accounts, no misleading names.</li>
+  <li><strong>Ground survey only</strong>: no copying from other maps; aerial imagery only from layers built into the editors.</li>
+  <li><strong>Clean-up afterwards</strong>: the data lead reviews every changeset from the day within a week and fixes mistakes.</li>
+  <li><strong>A short results write-up</strong> on the wiki page and the forum thread.</li>
+</ul>
+<p class="small">Other places the Australian community talks: Discord #oceania, Matrix <code>#osmworld_oceania:matrix.org</code>, and OSGeo Oceania (the local chapter). There’s also the <a href="https://wiki.openstreetmap.org/wiki/Australian_Tagging_Guidelines/Cycling_and_Foot_Paths">Australian Tagging Guidelines for footpaths</a>, which the field guide follows.</p>
+
+<h3>Draft wiki page (not published)</h3>
+<pre>== Map Manly 2026 ==
+Organised Editing/Activities/Map Manly 2026
+
+'''Organiser:''' Roam Access (Vizzo Labs), an app that tells people with disability
+whether a place will work for them. Contact: [name], [email], OSM user [display name].
+
+'''When:''' Saturday [date], 9:30–14:00 AEDT, with follow-up edits by the data lead
+until [date + 7 days].
+
+'''Where:''' Manly town centre, Sydney, NSW
+(bbox -33.8020,151.2805,-33.7935,151.2905).
+
+'''Goal:''' Survey on the ground what step-free routing needs: kerb type and tactile
+paving at every crossing, entrances of shops and venues (entrance, wheelchair, door,
+automatic_door, width), steps (step_count, handrail, ramp), slope (incline) on the main
+footpaths, and footpath surface, smoothness and width. Before the day 13% of crossing
+ways had kerb information at both ends and no venue entrance had a wheelchair tag.
+
+'''Why:''' So that anyone's wheelchair routing (including ours, via self-hosted Valhalla)
+can avoid kerbs and steps, and end at the right door.
+
+'''Hashtag:''' #MapManly2026
+
+'''Participants:''' about 12 volunteers in pairs, including people with disability,
+each using their own OSM account. Accounts listed here with their consent: [list].
+
+'''Tools:''' StreetComplete, Every Door, MapComplete (OnWheels), iD. No imports, no
+automated edits, no data from other maps. Paper notes from the survey are entered by
+the data lead, [display name], who reviews every changeset from the day.
+
+'''Task list:''' generated from OSM (Overpass) as GeoJSON: [link once published].
+
+'''Training:''' field guide: [link once published]. Tagging follows the wiki and the
+Australian Tagging Guidelines.
+
+'''Metrics:''' share of crossings with kerb at both ends, venues with an entrance,
+steps fully tagged, footpaths with surface/smoothness/width, before and after.
+
+'''Discussion:''' [forum thread link]
+
+'''Results:''' (to be added after the day)</pre>
+
+<h3>Draft note to the OSM community in Australia (not posted)</h3>
+<p>For the Oceania category of the forum, at least two weeks before the day:</p>
+<pre>Title: Map Manly 2026: a one-day accessibility survey of Manly town centre, [date]
+
+Hi all,
+
+We're organising a small mapping day in the Manly town centre (Sydney) on
+Saturday [date]. About 12 volunteers, in pairs that include people with disability,
+will survey kerbs and tactile paving at crossings, venue entrances, steps, footpath
+slope and surface, so that wheelchair routing works properly there.
+
+- Survey on the ground only; everyone uses their own account.
+- Apps: StreetComplete, Every Door, MapComplete; paper notes entered in iD by our data
+  lead, [display name], who will review every changeset from the day.
+- Hashtag #MapManly2026. Wiki page: [link].
+- We follow the Australian Tagging Guidelines (e.g. crossing=unmarked for kerb ramps
+  without markings).
+
+The organiser is Roam Access, an accessibility app. The data stays in OSM under the ODbL
+for everyone. Local mappers are very welcome to join, or to check our edits.
+Questions or concerns: reply here or message [display name].
+
+Thanks,
+[name]</pre>
+
+</section>
+
+<section aria-labelledby="measure">
+<h2 id="measure">Measuring the result</h2>
+<p>Run the same measure before and after. <code>scripts/coverage.py</code> extends the routing spike’s coverage script to the town-centre box, with targets:</p>
+<pre>python3 -I docs/mapping-day/scripts/coverage.py docs/mapping-day/data/osm-centre-{{osm_date}}.json
+# a week after the day, once the data lead has finished:
+python3 -I docs/mapping-day/scripts/fetch_osm.py --label after
+python3 -I docs/mapping-day/scripts/coverage.py docs/mapping-day/data/osm-centre-{{osm_date}}.json docs/mapping-day/data/osm-centre-after-&lt;date&gt;.json</pre>
+<!--@COVERAGE_TABLE-->
+<p><strong>Roam Access targets</strong> (from the admin pages, not the script): a step-free entrance pin or a “no step-free way in” review for at least 60 town-centre venues, and arrival steps for at least 30.</p>
+<div class="callout warn">
+  <p><strong>Routing won’t change on the day.</strong> Edits appear on openstreetmap.org within minutes, but Roam Access routing (and any other router) only uses them after its next data refresh: the spike recommends rebuilding a self-hosted Valhalla weekly or nightly; hosted services such as OpenRouteService can be weeks behind. Check the routes again after the first refresh that includes the day’s edits.</p>
+</div>
+</section>
+
+<section aria-labelledby="decisions">
+<h2 id="decisions">Decisions for Romy</h2>
+<ul class="check tight">
+  <li><strong>Date.</strong> Suggested: <strong>Saturday 5 December 2026</strong> (two days after the International Day of People with Disability, 3 December), or Saturday 28 November. Both leave 3–4 weeks to recruit and give the OSM community notice. Summer heat argues for a morning only; autumn (March 2027) is cooler if we can wait.</li>
+  <li><strong>Base and meeting points.</strong> A step-free base near the wharf with an accessible toilet (e.g. a library or community-centre room, to be checked and booked). Confirm the six meeting points on the recce.</li>
+  <li><strong>Budget.</strong> About A$570 without interpreters or captions, up to about A$3,750 with everything on request.</li>
+  <li><strong>Insurance and liability.</strong> The questions above, before any invitation goes out.</li>
+  <li><strong>Who leads.</strong> A lead organiser (Romy or a delegate) and an experienced OpenStreetMap data lead, ideally a local mapper from the OSM Australia community.</li>
+  <li><strong>Hashtag and account.</strong> Approve <code>#MapManly2026</code> and who the OSM community contact is.</li>
+</ul>
+</section>
+
+<section aria-labelledby="sheets">
+<h2 id="sheets">Zone sheets A–F</h2>
+<p class="noprint">Each sheet prints on its own pages: map first, then the checklist in walking order. A separate file with only the sheets is <a href="zone-sheets.html">zone-sheets.html</a> (<a href="pdf/zone-sheets.pdf">PDF</a>).</p>
+<!--@ZONE_SHEETS-->
+</section>
+
+<section aria-labelledby="files">
+<h2 id="files">Files and data</h2>
+<ul class="tight">
+  <li><code>data/tasks.geojson</code>: every numbered point with its zone, type, what’s missing and its OpenStreetMap link. Open it in iD (Map Data → custom data), JOSM or geojson.io.</li>
+  <li><code>data/paths.geojson</code>: footpaths missing surface, smoothness or width. <code>data/zones.geojson</code>: zone outlines, loops and meeting points. <code>data/zones.json</code>: everything the sheets are built from.</li>
+  <li><code>data/osm-centre-{{osm_date}}.json</code>: the OpenStreetMap extract used (© OpenStreetMap contributors, ODbL).</li>
+  <li><code>scripts/</code>: <code>fetch_osm.py</code> (download), <code>build_tasks.py</code> (task list and zones), <code>render_maps.sh</code> + <code>maps/render.html</code> (zone maps), <code>coverage.py</code> (before and after), <code>build_kit.py</code> (this page and the sheets).</li>
+</ul>
+<p>To rebuild everything with fresh data:</p>
+<pre>python3 -I docs/mapping-day/scripts/fetch_osm.py
+python3 -I docs/mapping-day/scripts/build_tasks.py
+sh docs/mapping-day/scripts/render_maps.sh        # Node 22+ and Google Chrome
+python3 -I docs/mapping-day/scripts/coverage.py docs/mapping-day/data/osm-centre-&lt;date&gt;.json
+python3 -I docs/mapping-day/scripts/build_kit.py
+sh docs/mapping-day/scripts/print_pdfs.sh</pre>
+</section>
+
+<footer>
+  <p>Roam Access · Map Manly mapping-day kit · draft for internal review. Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, available under the Open Database Licence. Basemap: <a href="https://openfreemap.org">OpenFreeMap</a>, © <a href="https://openmaptiles.org">OpenMapTiles</a>.</p>
+</footer>
+</main>
+</body>
+</html>
