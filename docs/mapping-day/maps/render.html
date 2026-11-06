@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Mapping day zone map (render source)</title>
+<!-- Render source for the static zone maps in the kit. Served by scripts/render_maps.sh;
+     ?zone=A … F for one zone, ?overview=1 for all zones. Not part of the app. -->
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  #map { position: absolute; inset: 0; }
+  .mk { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
+        color: #fff; box-sizing: border-box; border: 2px solid #fff; box-shadow: 0 0 0 1.5px #1a1a1a; }
+  .mk.crossing { width: 26px; height: 26px; border-radius: 50%; background: #B42318; }
+  .mk.entrance { width: 26px; height: 26px; border-radius: 4px; background: #1D4ED8; }
+  .mk.steps { width: 30px; height: 30px; background: #6B21A8; border: 0; box-shadow: none;
+              clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); font-size: 12px; }
+  .mk.slope { width: 30px; height: 27px; background: #8A4B00; clip-path: polygon(50% 0, 100% 100%, 0 100%);
+              border: 0; box-shadow: none; padding-top: 8px; font-size: 12px; }
+  .mk.meet { width: 40px; height: 40px; border-radius: 50%; background: #111; font-size: 18px; border: 3px solid #FACC15; box-shadow: 0 0 0 2px #111; }
+  .zl { font-weight: 900; font-size: 40px; color: #fff; -webkit-text-stroke: 1.5px #111; text-shadow: 0 0 4px #111; }
+  .maplibregl-ctrl-attrib { font-size: 12px !important; background: rgba(255,255,255,.92) !important; }
+  .scale { position: absolute; left: 10px; bottom: 10px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const zone = q.get('zone');
+const overview = q.has('overview');
+const SHAPE = { crossing: 'crossing', crossing_partial: 'crossing', crossing_node: 'crossing',
+                entrance: 'entrance', entrance_check: 'entrance', steps: 'steps', slope: 'slope' };
+Promise.all(['../data/tasks.geojson', '../data/zones.geojson', '../data/paths.geojson'].map(u => fetch(u).then(r => r.json())))
+.then(([tasks, zones, paths]) => {
+  const zf = zones.features.filter(f => f.properties.kind === 'zone' && (overview || f.properties.zone === zone));
+  const b = new maplibregl.LngLatBounds();
+  zf.forEach(f => f.geometry.coordinates[0].forEach(c => b.extend(c)));
+  const map = new maplibregl.Map({
+    container: 'map', style: 'https://tiles.openfreemap.org/styles/positron', bounds: b,
+    fitBoundsOptions: { padding: overview ? 30 : 46 }, attributionControl: false,
+    interactive: false, fadeDuration: 0, canvasContextAttributes: { preserveDrawingBuffer: true },
+  });
+  map.addControl(new maplibregl.AttributionControl({ compact: false,
+    customAttribution: 'Tasks: Roam Access from OpenStreetMap data' }), 'bottom-right');
+  map.addControl(new maplibregl.ScaleControl({ maxWidth: 140, unit: 'metric' }), 'bottom-left');
+  map.on('load', () => {
+    map.addSource('zones', { type: 'geojson', data: { type: 'FeatureCollection', features: zf } });
+    map.addLayer({ id: 'zone-fill', type: 'fill', source: 'zones', paint: { 'fill-color': ['get', 'colour'], 'fill-opacity': overview ? 0.16 : 0.06 } });
+    map.addLayer({ id: 'zone-line', type: 'line', source: 'zones', paint: { 'line-color': ['get', 'colour'], 'line-width': 3, 'line-dasharray': [3, 2] } });
+    if (!overview) {
+      map.addSource('paths', { type: 'geojson', data: { type: 'FeatureCollection', features: paths.features.filter(f => f.properties.zone === zone) } });
+      map.addLayer({ id: 'paths', type: 'line', source: 'paths', paint: { 'line-color': '#C2410C', 'line-width': 3.5, 'line-opacity': 0.75, 'line-dasharray': [1.2, 1] } });
+      // Nudge markers that would overlap so every number stays readable; a thin leader
+      // line joins a nudged marker to its true spot.
+      // [x, y, radius]: the meeting point is bigger, so it gets a wider berth.
+      const placed = zones.features.filter(f => f.properties.kind === 'meeting_point' && f.properties.zone === zone)
+        .map(f => { const p = map.project(f.geometry.coordinates); return [p.x, p.y, 23]; });
+      const leaders = [];
+      tasks.features.filter(f => f.properties.zone === zone).forEach(f => {
+        const p = map.project(f.geometry.coordinates);
+        let best = [0, 0];
+        outer: for (let r = 0; r <= 90; r += 15) {
+          const steps = r ? 12 : 1;
+          for (let k = 0; k < steps; k++) {
+            const a = (k / steps) * 2 * Math.PI - Math.PI / 2;
+            const o = [Math.round(r * Math.cos(a)), Math.round(r * Math.sin(a))];
+            if (placed.every(q => Math.hypot(p.x + o[0] - q[0], p.y + o[1] - q[1]) >= 15 + q[2])) { best = o; break outer; }
+          }
+        }
+        placed.push([p.x + best[0], p.y + best[1], 14]);
+        if (best[0] || best[1]) leaders.push({ type: 'Feature', geometry: { type: 'LineString', coordinates: [f.geometry.coordinates, map.unproject([p.x + best[0], p.y + best[1]]).toArray()] } });
+        const el = document.createElement('div');
+        el.className = 'mk ' + SHAPE[f.properties.kind];
+        el.innerHTML = '<span>' + f.properties.n + '</span>';
+        new maplibregl.Marker({ element: el, offset: best }).setLngLat(f.geometry.coordinates).addTo(map);
+      });
+      map.addSource('leaders', { type: 'geojson', data: { type: 'FeatureCollection', features: leaders } });
+      map.addLayer({ id: 'leaders', type: 'line', source: 'leaders', paint: { 'line-color': '#111', 'line-width': 1.5 } });
+    } else {
+      zf.forEach(f => {
+        const c = f.geometry.coordinates[0]; let x = 0, y = 0;
+        c.slice(0, -1).forEach(p => { x += p[0]; y += p[1]; });
+        const el = document.createElement('div'); el.className = 'zl'; el.textContent = f.properties.zone;
+        new maplibregl.Marker({ element: el }).setLngLat([x / (c.length - 1), y / (c.length - 1)]).addTo(map);
+      });
+    }
+    zones.features.filter(f => f.properties.kind === 'meeting_point' && (overview || f.properties.zone === zone)).forEach(f => {
+      const el = document.createElement('div'); el.className = 'mk meet'; el.innerHTML = '<span>M</span>';
+      new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(f.geometry.coordinates).addTo(map);
+    });
+    map.once('idle', () => { document.title = 'READY'; document.body.dataset.ready = '1'; });
+  });
+});
+</script>
+</body>
+</html>

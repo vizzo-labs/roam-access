@@ -1,0 +1,115 @@
+{
+ "source": "docs/research/step-free-routing/data/valhalla-routes.json (spike, draft PR #18): edges Valhalla rated >= 8% on any route",
+ "ways": [
+  {
+   "way": 4640572,
+   "name": "Fairlight Street",
+   "max_grade": 10
+  },
+  {
+   "way": 42747212,
+   "name": "Marine Parade",
+   "max_grade": 10
+  },
+  {
+   "way": 151671733,
+   "name": "path",
+   "max_grade": 12
+  },
+  {
+   "way": 174199840,
+   "name": "Stuart Street",
+   "max_grade": 10
+  },
+  {
+   "way": 175992866,
+   "name": "footway",
+   "max_grade": 10
+  },
+  {
+   "way": 179942600,
+   "name": "Collins Beach Path",
+   "max_grade": 14
+  },
+  {
+   "way": 180169291,
+   "name": "Collins Beach Road",
+   "max_grade": 12
+  },
+  {
+   "way": 262939763,
+   "name": "Manly to Spit Bridge Walk",
+   "max_grade": 10
+  },
+  {
+   "way": 518735434,
+   "name": "Darley Road",
+   "max_grade": 8
+  },
+  {
+   "way": 558930933,
+   "name": "path",
+   "max_grade": 10
+  },
+  {
+   "way": 561374294,
+   "name": "footway",
+   "max_grade": 10
+  },
+  {
+   "way": 949557545,
+   "name": "path",
+   "max_grade": 8
+  },
+  {
+   "way": 967218232,
+   "name": "cycleway",
+   "max_grade": 9
+  },
+  {
+   "way": 1177968275,
+   "name": "footway",
+   "max_grade": 12
+  },
+  {
+   "way": 1228124506,
+   "name": "footway",
+   "max_grade": 9
+  },
+  {
+   "way": 1234863702,
+   "name": "footway",
+   "max_grade": 14
+  },
+  {
+   "way": 1273244460,
+   "name": "footway",
+   "max_grade": 10
+  },
+  {
+   "way": 1273244481,
+   "name": "footway",
+   "max_grade": 11
+  },
+  {
+   "way": 1273244483,
+   "name": "footway",
+   "max_grade": 12
+  },
+  {
+   "way": 1273244486,
+   "name": "footway",
+   "max_grade": 9
+  },
+  {
+   "way": 1273244493,
+   "name": "footway",
+   "max_grade": 8
+  },
+  {
+   "way": 1354278675,
+   "name": "Fairlight Street",
+   "max_grade": 11
+  }
+ ]
+}

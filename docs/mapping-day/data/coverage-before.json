@@ -1,0 +1,27 @@
+{
+ "file": "osm-centre-2026-11-06.json",
+ "osm_base": "2026-11-06T08:17:50Z",
+ "footpath_km": 20.1,
+ "surface_pct": 68.4,
+ "smoothness_pct": 0.0,
+ "width_pct": 11.3,
+ "incline_pct": 0.0,
+ "crossing_ways": 61,
+ "crossings_kerb_both_pct": 13.1,
+ "crossings_tactile_pct": 18.0,
+ "crossing_nodes_unresolved": 24,
+ "kerb_nodes": {
+  "lowered": 21,
+  "raised": 1,
+  "unknown": 5,
+  "flush": 5
+ },
+ "steps": 26,
+ "steps_complete_pct": 19.2,
+ "venues": 113,
+ "venues_entrance_pct": 25.7,
+ "venues_entrance_wheelchair_pct": 0.0,
+ "entrance_nodes": 17,
+ "corridor_points": 22,
+ "corridor_incline_pct": 0.0
+}
