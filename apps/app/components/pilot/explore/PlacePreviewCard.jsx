@@ -26,6 +26,16 @@ import { firstQuestion, keyFacts } from '@/lib/pilot/key-facts';
 // Honesty: the card shows the verdict ra2Verdict gave; facts come from
 // lib/pilot/key-facts (OpenStreetMap is only ever "Unconfirmed").
 
+// How the card was opened. Focus moves into the card either way; its outline
+// shows only when the last input was the keyboard (Enter/Space on a pin), so
+// a mouse or touch open doesn't draw a heavy ring around the whole card.
+// Every control inside keeps its own :focus-visible ring (globals.css).
+let lastInput = 'pointer';
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', () => { lastInput = 'keyboard'; }, true);
+  window.addEventListener('pointerdown', () => { lastInput = 'pointer'; }, true);
+}
+
 const STATE = {
   yes:         { icon: '✓', fg: () => C2.blue },
   no:          { icon: '✗', fg: () => C2.red },
@@ -161,6 +171,7 @@ const PlacePreviewCard = React.forwardRef(function PlacePreviewCard({
 
   return (
     <div ref={ref} className="ra-preview-card" tabIndex={dialog ? -1 : undefined}
+      data-focus-ring={lastInput === 'keyboard' ? 'on' : 'off'}
       role={dialog ? 'dialog' : 'group'} aria-labelledby={headingId}
       onKeyDown={onKeyDown}
       style={{ boxSizing: 'border-box', padding: sheet ? `0 0 ${SPACE.xs}px` : SPACE.sm, color: C2.char, ...surface, ...style }}>

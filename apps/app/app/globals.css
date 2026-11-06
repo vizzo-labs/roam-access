@@ -158,6 +158,10 @@
     .noscript-note { max-width: 620px; margin: 80px auto; padding: 0 24px; font-size: 17px; line-height: 1.6; }
 
 /* ── Pilot additions ─────────────────────────────────────────────────── */
+/* Map place preview card: the container takes focus when it opens; its ring
+   shows for keyboard opens only (PlacePreviewCard sets data-focus-ring). */
+.ra-preview-card[data-focus-ring="off"]:focus,
+.ra-preview-card[data-focus-ring="off"]:focus-visible { outline: none; }
 html.ra-phone #root { position: absolute; inset: 0; }
 .ra-auth-brand { display: inline-flex; margin: 8px 0 18px; border-radius: 10px; }
 .ra-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
