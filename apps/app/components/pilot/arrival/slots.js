@@ -27,8 +27,12 @@
 // and recency on every fact, never a verdict.
 import { ArrivalNearby } from './ArrivalNearby';
 import { ArrivalSteps } from './ArrivalSteps';
+import { RouteAvoidingSteps } from './RouteAvoidingSteps';
 
 export const ARRIVAL_SLOTS = [
+  // Getting there 6: a route avoiding mapped steps to the entrance (only
+  // where a routing server is set up — renders nothing otherwise).
+  { id: 'route', Component: RouteAvoidingSteps },
   // Getting there 2 (I2): nearest accessible parking, drop-off, stop or
   // wharf and toilet; then the community's step-by-step arrival.
   { id: 'nearby', Component: ArrivalNearby },

@@ -44,9 +44,11 @@ function SegmentedControl({ label, options, value, onChange, full = false, style
             aria-checked={on} tabIndex={on ? 0 : -1} onClick={() => onChange(o.value)}
             className={on ? undefined : 'ds-press'}
             style={{
-              flex: full ? 1 : '0 0 auto', minHeight: TARGET.min, padding: '0 16px', borderRadius: RADIUS.pill,
+              flex: full ? '1 1 0' : '0 0 auto', minWidth: 0, minHeight: TARGET.min, padding: full ? '6px 12px' : '0 16px', borderRadius: RADIUS.pill,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              fontFamily: F2, fontSize: 15, fontWeight: on ? 700 : 600, cursor: 'pointer', whiteSpace: 'nowrap',
+              fontFamily: F2, fontSize: 15, fontWeight: on ? 700 : 600, cursor: 'pointer',
+              // `full`: long labels (other languages, 150% text) wrap instead of running off the edge.
+              whiteSpace: full ? 'normal' : 'nowrap', textAlign: 'center', lineHeight: 1.2,
               background: on ? C2.paper : 'transparent', color: on ? C2.teal : C2.char,
               border: on ? `2px solid ${C2.teal}` : '2px solid transparent',
               boxShadow: on ? '0 1px 3px rgba(26,26,26,0.12)' : 'none',
