@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { PublicShell } from '@/components/community/PublicShell';
 import { FactList, NeedList } from '@/components/community/Summary';
 import { auDate, basisLine, getVenueSummary } from '@/lib/data/summary';
+import { getBestEntrances } from '@/lib/data/entrances';
+import { GettingTherePublic } from '@/components/community/GettingThere';
 
 // Public, read-only access summary of one place. No login, no personal data.
 export async function generateMetadata({ params }: PageProps<'/v/[id]'>): Promise<Metadata> {
@@ -27,7 +29,7 @@ export default function Page({ params }: PageProps<'/v/[id]'>) {
 
 async function Summary({ params }: { params: PageProps<'/v/[id]'>['params'] }) {
   const { id } = await params;
-  const s = await getVenueSummary(id);
+  const [s, entrances] = await Promise.all([getVenueSummary(id), getBestEntrances(id)]);
   if (!s) notFound();
   const v = s.venue;
   return (
@@ -45,6 +47,8 @@ async function Summary({ params }: { params: PageProps<'/v/[id]'>['params'] }) {
 
       <h2>What people found</h2>
       <div className="pub-card"><FactList s={s}/></div>
+
+      <GettingTherePublic venue={v} entrance={entrances.get(id) ?? null}/>
 
       <h2>How this works</h2>
       <p>

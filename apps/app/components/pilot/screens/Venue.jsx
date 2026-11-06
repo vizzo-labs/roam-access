@@ -21,6 +21,8 @@ import { useTrackVenueView } from '../track';
 import { VenueAccessExtras, VenueReportsBanner } from '../layers/VenueAccessExtras';
 import { SensorySummary } from '../sensory/SensorySummary';
 import { WhatToExpect } from '../sensory/WhatToExpect';
+import { GettingThere } from '../arrival/GettingThere';
+import { useDirections } from '../arrival/directions';
 import {
   ActionRow, Button, Card, Freshness as FreshnessBadge, GUTTER, RADIUS, SPACE,
   ScreenHeader, SectionHeader, SkeletonText, TYPE,
@@ -57,6 +59,8 @@ function V2VenueView({ app }) {
   React.useEffect(() => { app.markVisited(v.id); }, [v.id]); // eslint-disable-line
   useTrackVenueView(v.id);
   const says = useVenueSays(v.id);
+  // Directions go to the step-free entrance when someone marked one (I1).
+  const dir = useDirections(v, needs);
 
   const quick = v.quick || 0;
   const revPart = t('venue.from.reviews', { count: v.verified });
@@ -87,8 +91,7 @@ function V2VenueView({ app }) {
 
   const actions = [
     { id: 'dir', label: t('venue.action.directions'), icon: 'directions', primary: true, external: true,
-      href: `https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lng}`,
-      ariaLabel: t('venue.action.directionsAria', { name: v.name }) },
+      href: dir.href, ariaLabel: dir.ariaLabel },
     v.phone && { id: 'call', label: t('venue.action.call'), icon: 'phone', href: 'tel:' + v.phone.replace(/[^+\d]/g, ''), ariaLabel: t('venue.action.callAria', { name: v.name }) },
     v.website && { id: 'web', label: t('venue.action.website'), icon: 'globe', href: v.website, external: true, ariaLabel: t('venue.action.websiteAria', { name: v.name }) },
     { id: 'save', label: saved ? t('venue.action.saved') : t('venue.action.save'), icon: 'bookmark', pressed: saved, onClick: () => app.toggleSave(v.id),
@@ -133,7 +136,12 @@ function V2VenueView({ app }) {
           </div>
         </section>
 
-        <ActionRow label={t('venue.actions', { name: v.name })} actions={actions} style={{ marginBottom: SPACE.lg }}/>
+        <ActionRow label={t('venue.actions', { name: v.name })} actions={actions} style={{ marginBottom: dir.toEntrance ? SPACE.xs : SPACE.lg }}/>
+        {dir.toEntrance && (
+          <p style={{ ...TYPE.footnote, color: C2.char, margin: `0 0 ${SPACE.lg}px`, textAlign: 'center' }}>
+            {t('arrival.dir.caption', { where: t(`arrival.kind.${dir.entrance.kind}.short`), app: dir.appName })}
+          </p>
+        )}
 
         {/* barriers first when they exist; every fact with its source + recency */}
         <FactList kind="barrier" facts={verdict.barriers}/>
@@ -141,6 +149,9 @@ function V2VenueView({ app }) {
         <FactList kind="check" facts={verdict.checks} style={{ marginBottom: SPACE.md }}/>
 
         <Freshness key={v.id} app={app} venue={v}/>
+
+        {/* Getting there (I1): the right door, and directions to it */}
+        <GettingThere key={'arrive-' + v.id} app={app} venue={v}/>
 
         {/* sensory content (F6 #17) — describes the place, never the verdict */}
         <WhatToExpect key={'story-' + v.id} app={app} venue={v}/>

@@ -1,6 +1,7 @@
 'use client';
 // /ds samples for the place preview card: photo · no photo · no info yet
-// (with the "Answer 1 question" micro-task) · a temporary barrier, plus the
+// (with the "Answer 1 question" micro-task) · a temporary barrier · a
+// step-free entrance at the back (Getting there I1), plus the
 // phone's bottom-sheet variant. Fictional places only.
 
 import React from 'react';
@@ -21,9 +22,11 @@ const PLACES = [
     ev: [{ n: ['mobility'], f: ['stepfree', 'bathroom'], at: ago(2) }],
     coverPhoto: { url: '/icons/icon-512.png', alt: 'Sample: wide level doorway with an automatic door' },
   } },
-  { label: 'No photo · check first (one fact unconfirmed)', place: {
+  { label: 'No photo · check first · step-free entrance at the back (Getting there)', place: {
     ...base, id: 'ds-pp-b', name: 'Harbour Kiosk (sample)', kind: 'Takeaway', mins: 7,
     works: [fact('stepfree', 'feature', 9)],
+    entrance: { id: 'ds-e1', source: 'community', kind: 'back', lat: -33.8003, lng: 151.2797, locatedBy: 'pin',
+      note: 'Ramp via the car park lane', at: ago(9), yes: 1, lastYes: ago(3), changed: 0, lastChanged: null, status: 'current' },
     check: [{ t: '', s: '', tags: ['bathroom'], src: 'osm', kind: 'hint' }],
     ev: [{ n: ['mobility'], f: ['stepfree'], at: ago(9) }],
   } },

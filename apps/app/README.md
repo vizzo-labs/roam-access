@@ -41,6 +41,7 @@ app/ds/               design-system preview (open in dev/previews; admin-only in
 app/how-it-works/     public policy page: verdicts, sources, "payment never changes a verdict", privacy
 app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved ·
                       venues/[id]/reviews · venues/[id]/confirm · venues/[id]/issues
+                      venues/[id]/entrances · entrances/[id]/answer
                       photos (POST) · photos/[id] (GET, DELETE) · photos/[id]/suggest
                       venues/[id]/photos · venues/[id]/ask
                       · gaps (places needing one quick answer) · micro-answers (POST)
@@ -136,6 +137,22 @@ and community facts, with a text-only fallback. Results can filter by "Quiet now
 times". Columns `reviews.sensory_noise|sensory_light|sensory_crowd|quiet_times`, table
 `sensory_reports`. Sensory facts describe the place and **never change a verdict**. Tests:
 `npx tsx lib/sensory/summary.test.ts`.
+
+**Getting there** (I1, `lib/arrival/`, `lib/data/entrances.ts`, `components/pilot/arrival/`): gets
+people to the **right door**. In a review, "Step-free way in? No → Yes, at the back" (or "Yes →
+Show where the step-free entrance is") opens a small map with a draggable entrance pin, "Use my
+current location", buttons that move the pin 5 m at a time, a note ("Ramp via the car park") and
+one entrance photo — the map is optional, the words work alone. The pin is only saved once moved,
+and must be within 300 m of the place. The venue page's **Getting there** section shows a
+mini-map (street address + entrance, with a key in words), the photo, note, who marked it (lived
+experience) and when, and "Still the way in? Yes / Changed" (`POST /api/entrances/[id]/answer`).
+**Directions** (venue page, map card, `/v/[id]`) go to the best community-marked entrance that
+has a point and no newer "Changed" — by default for people with the mobility need, a separate
+button for everyone else — in Apple Maps on iOS or Google Maps elsewhere (switchable, saved on
+the device). Tables `venue_entrances`, `entrance_confirmations` (cascade from the profile and the
+review). OpenStreetMap `entrance=*` nodes would be `source = 'osm'` and "unconfirmed"; none are
+imported (the pilot area had 39 entrance nodes in November 2026, the 4 with `wheelchair=*` all
+`no`, mostly private homes). Later stages plug into `components/pilot/arrival/slots.js`.
 
 **Languages and read aloud** (#21, `lib/i18n/`, `components/pilot/i18n/`): English (Australia),
 简体中文, 日本語, 한국어, Español — chosen in Me or Accessibility settings (saved on this device;
