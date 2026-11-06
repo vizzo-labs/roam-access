@@ -74,3 +74,10 @@ a.pub-btn.primary { color: #FAF9F6; }
 .pub-pill.barrier { background: #F6E2DA; color: #9C2D0E; } .pub-pill.barrier .pub-pill-ico { background: #9C2D0E; color: #F6E2DA; }
 .pub-pill.unknown { background: #E7EAEF; color: #475569; } .pub-pill.unknown .pub-pill-ico { background: #475569; color: #E7EAEF; }
 @media print { .pub-pill, .pub-ico { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+/* "Parking & transport nearby" (I4): source label + directions per listing. */
+.pub-source { display: inline-flex; align-items: center; margin: 6px 0 0; padding: 3px 10px; border-radius: 999px; font-size: 14px; font-weight: 700; background: #EDEAE2; color: #1A1A1A; }
+.pub-source.osm { background: #F6ECDD; color: #6B3D0B; }
+.pub-source a { color: inherit; display: inline-flex; align-items: center; min-height: 32px; }
+.pub-dir { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin-top: 4px; font-size: 15px; }
+.pub-dir > span { color: #5A5651; }
+.pub-dir a { display: inline-flex; align-items: center; min-height: 44px; }
