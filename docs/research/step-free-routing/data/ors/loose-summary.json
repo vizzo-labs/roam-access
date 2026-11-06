@@ -1,0 +1,113 @@
+[
+ {
+  "id": "bronze",
+  "km": 2.255,
+  "minutes": 29,
+  "climb_m": 121,
+  "ascent": 121.2,
+  "end_gap_m": 10,
+  "steps": [],
+  "crossings": [
+   {
+    "way": 1370423749,
+    "kerbs": []
+   },
+   {
+    "way": 1544785791,
+    "kerbs": []
+   },
+   {
+    "way": 1273244477,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1388516467,
+    "kerbs": [
+     "lowered"
+    ]
+   }
+  ],
+  "crossings_without_kerb_info": 2,
+  "raised": [],
+  "steep": [],
+  "max_steepness_class": 2,
+  "suitability": [
+   {
+    "value": 9,
+    "distance": 1493.7,
+    "amount": 66.25
+   },
+   {
+    "value": 6,
+    "distance": 512.8,
+    "amount": 22.75
+   },
+   {
+    "value": 5,
+    "distance": 248,
+    "amount": 11
+   }
+  ],
+  "surface": [
+   {
+    "value": 4,
+    "distance": 1024.8,
+    "amount": 45.45
+   },
+   {
+    "value": 0,
+    "distance": 920.6,
+    "amount": 40.83
+   },
+   {
+    "value": 3,
+    "distance": 276.4,
+    "amount": 12.26
+   },
+   {
+    "value": 14,
+    "distance": 32.8,
+    "amount": 1.46
+   }
+  ],
+  "warnings": [
+   {
+    "code": 4,
+    "message": "Extra info requested but not available: roadaccessrestrictions"
+   }
+  ],
+  "last": [
+   "Turn left",
+   "Arrive at your destination, on the left"
+  ],
+  "osm_ways": 34,
+  "osm_ways_unknown_to_extract": 0
+ },
+ {
+  "id": "gallery",
+  "error": {
+   "code": 2009,
+   "message": "Route could not be found - Unable to find a route between points 1 (151.2846000 -33.7997500) and 2 (151.2813000 -33.7984800)."
+  },
+  "status": 404
+ },
+ {
+  "id": "collins",
+  "error": {
+   "code": 2009,
+   "message": "Route could not be found - Unable to find a route between points 1 (151.2846000 -33.7997500) and 2 (151.2915400 -33.8082800)."
+  },
+  "status": 404
+ },
+ {
+  "id": "queenscliff",
+  "error": {
+   "code": 2009,
+   "message": "Route could not be found - Unable to find a route between points 1 (151.2846000 -33.7997500) and 2 (151.2894600 -33.7862700)."
+  },
+  "status": 404
+ }
+]
