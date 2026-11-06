@@ -25,4 +25,12 @@
 // returns null when it has nothing to say, and follows the same rules as the
 // rest of the app: design-system components, t() for every string, sources
 // and recency on every fact, never a verdict.
-export const ARRIVAL_SLOTS = [];
+import { ArrivalNearby } from './ArrivalNearby';
+import { ArrivalSteps } from './ArrivalSteps';
+
+export const ARRIVAL_SLOTS = [
+  // Getting there 2 (I2): nearest accessible parking, drop-off, stop or
+  // wharf and toilet; then the community's step-by-step arrival.
+  { id: 'nearby', Component: ArrivalNearby },
+  { id: 'steps', Component: ArrivalSteps },
+];

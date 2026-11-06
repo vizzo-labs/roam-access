@@ -9,10 +9,13 @@ import { facilitySvg } from '../PilotMap';
 import { Button, ChipGroup, FilterChip, RADIUS, SPACE, TYPE, elevation } from '../ds';
 import { useT } from '../i18n';
 import { FACILITY_ICON } from './layerUtils';
+import { arrivalName } from '../arrival/nearbyUtils';
 
 export const LAYERS = [
   { id: 'toilets', label: 'layers.toggle.toilets', icon: 'toilet' },
   { id: 'beach', label: 'layers.toggle.beach', icon: 'water' },
+  // Getting there 2 (I2): accessible parking, drop-off, accessible stops, wharves (OpenStreetMap).
+  { id: 'arrival', label: 'layers.toggle.arrival', icon: 'parking' },
 ];
 
 const pin = icon => (
@@ -74,6 +77,12 @@ function facilityAria(f, t) {
       : d.accessible ? 'layers.pin.accessible' : 'layers.pin.public';
     if (!t) return `${f.name}, ${ARIA_EN[key]}, listed on the National Public Toilet Map`;
     return t('layers.pin.toilet', { name: f.name, what: t(key) });
+  }
+  if (f.layer === 'arrival') {
+    if (!t) return `${f.name}, ${f.kind.replace('_', ' ')}, from OpenStreetMap, not yet confirmed`;
+    const what = t(`layers.kind.${f.kind}`);
+    const name = arrivalName(t, f);
+    return name === what ? t('layers.pin.arrivalUnnamed', { what }) : t('layers.pin.arrival', { name, what });
   }
   const kind = ['beach', 'liberty_swing', 'ferry', 'walk'].includes(f.kind) ? f.kind : 'unknown';
   if (!t) return `${f.name}, ${kind === 'unknown' ? 'access information' : kind.replace('_', ' ')}, listed by ${f.source}`;

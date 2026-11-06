@@ -75,11 +75,12 @@ export function NearestToilet({ app, venue }) {
 }
 
 // The venue page's block: badges, nearest toilet, report button.
-export function VenueAccessExtras({ app, venue }) {
+// `nearestToilet={false}` when Getting there already lists it (I2).
+export function VenueAccessExtras({ app, venue, nearestToilet = true }) {
   return (
     <>
       <PartnerBadges badges={app.layers.badgesFor(venue.id)}/>
-      <NearestToilet app={app} venue={venue}/>
+      {nearestToilet && <NearestToilet app={app} venue={venue}/>}
       <ReportButton app={app} target={{ type: 'venue', id: venue.id, where: 'venue', name: venue.name }} style={{ marginBottom: 10 }}/>
     </>
   );

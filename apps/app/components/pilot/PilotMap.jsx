@@ -271,6 +271,10 @@ export const PLACE_ICONS = {
   swing: 'M3 3h18M7 3v11M17 3v11M5 14h14v3H5zM9 20h6',
   ferry: 'M3 14h18l-2.5 5h-13L3 14ZM6 14V9h12v5M10 9V6h4v3M2 22c2.5 0 2.5-1.2 5-1.2s2.5 1.2 5 1.2 2.5-1.2 5-1.2 2.5 1.2 5 1.2',
   walk:  'M13.5 4.5a1.5 1.5 0 1 0 0-.01M9 21l2.5-6 3 3v3M11.5 15l-1-5.5 4 1.5 2 3M10.5 9.5 7 12v3',
+  // Getting there 2 (I2): parking & transport
+  parking: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM9.5 17V7h3.5a3 3 0 0 1 0 6H9.5',
+  car:   'M5 16V11l2-5h10l2 5v5M3.5 16h17v3h-17zM7.5 19v1.5M16.5 19v1.5M5 11h14M7.5 13.5h.01M16.5 13.5h.01',
+  bus:   'M6 3h12a2 2 0 0 1 2 2v12H4V5a2 2 0 0 1 2-2ZM4 11h16M8 20v-3M16 20v-3M8 14h.01M16 14h.01',
 };
 export const PLACE_ICON_LEGEND = [
   ['cafe', 'Cafe'], ['food', 'Food'], ['bar', 'Bar & pub'], ['park', 'Park'],

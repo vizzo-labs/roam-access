@@ -10,6 +10,8 @@ import { MattingQuestion, ReportButton, TempReportBanner } from '../layers/TempR
 import { NearestToilet } from '../layers/VenueAccessExtras';
 import { distanceLabel, facilityKindLabel, hoursLabel } from '../layers/layerUtils';
 import { useT } from '../i18n';
+import { ArrivalAttribution, ArrivalFacilityDetails } from '../arrival/ArrivalFacility';
+import { arrivalName } from '../arrival/nearbyUtils';
 
 // ─────────────────────────────────────────────────────────────
 // FACILITY — one toilet or beach access item. Listings, not verdicts.
@@ -68,7 +70,7 @@ function V2Facility({ app }) {
   const h = useV2Heading('facility-' + app.selectedId + (f ? '' : '-loading'));
   const back = () => {
     if (window.RA2_NAVIGATED && window.history.length > 1) window.history.back();
-    else app.goto(f?.layer === 'toilets' ? 'toilets' : f ? 'beach' : 'home');
+    else app.goto(f?.layer === 'toilets' ? 'toilets' : f?.layer === 'arrival' ? 'map' : f ? 'beach' : 'home');
   };
   const top = (
     <div style={{ padding: `10px ${GUTTER}px 0` }}>
@@ -91,12 +93,14 @@ function V2Facility({ app }) {
 
   const d = f.details || {};
   const isToilet = f.kind === 'toilet';
+  const isArrival = f.layer === 'arrival';
+  const name = isArrival ? arrivalName(t, f) : f.name;
   const notes = isToilet ? [d.openingHoursNote, d.accessNote, d.toiletNote, d.adultChangeNote].filter(Boolean) : [];
   const tel = f.bookingPhone ? 'tel:' + f.bookingPhone.replace(/[^+\d]/g, '') : null;
   const actions = [
     { id: 'dir', label: t('layers.facility.directions'), icon: 'directions', primary: true, external: true,
       href: `https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lng}`,
-      ariaLabel: t('layers.facility.directionsLabel', { name: f.name }) },
+      ariaLabel: t('layers.facility.directionsLabel', { name }) },
     f.bookingUrl && { id: 'book', label: t('layers.facility.book'), icon: 'external', href: f.bookingUrl, external: true, ariaLabel: t('layers.facility.bookLabel', { name: f.name }) },
     tel && { id: 'call', label: t('layers.facility.call'), icon: 'phone', href: tel, ariaLabel: t('layers.facility.callLabel', { phone: f.bookingPhone }) },
   ];
@@ -106,20 +110,20 @@ function V2Facility({ app }) {
       {top}
       <div style={{ padding: `16px ${GUTTER}px 24px` }}>
         <h1 ref={h} tabIndex={-1} style={{ ...TYPE.title1, margin: '0 0 4px' }}>
-          {f.name}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
+          {name}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
         </h1>
         <p style={{ ...TYPE.footnote, fontSize: 15, color: C2.slate, margin: `0 0 ${SPACE.md}px` }}>
-          {facilityKindLabel(t, f.kind)} · {f.address ? `${f.address}, ` : ''}{f.suburb || ''} · {distanceLabel(app.origin, f, t)}
+          {[facilityKindLabel(t, f.kind), [f.address, f.suburb].filter(Boolean).join(', '), distanceLabel(app.origin, f, t)].filter(Boolean).join(' · ')}
         </p>
 
         <TempReportBanner app={app} reports={L.reportsFor('facility', f.id)} placeName={f.name}/>
-        <ActionRow label={t('layers.facility.actions', { name: f.name })} actions={actions} style={{ marginBottom: SPACE.md }}/>
+        <ActionRow label={t('layers.facility.actions', { name })} actions={actions} style={{ marginBottom: SPACE.md }}/>
 
         <ListedNote>
-          {t('layers.facility.listed', { source: f.source })}{isToilet ? ' ' + t('layers.facility.checkHours') : ''}
+          {isArrival ? t('nearby.listedOsm') : <>{t('layers.facility.listed', { source: f.source })}{isToilet ? ' ' + t('layers.facility.checkHours') : ''}</>}
         </ListedNote>
 
-        {isToilet ? <Facts title={t('layers.facility.whatsListed')} items={toiletFacts(d, t)}/> : (
+        {isArrival ? <ArrivalFacilityDetails app={app} f={f}/> : isToilet ? <Facts title={t('layers.facility.whatsListed')} items={toiletFacts(d, t)}/> : (
           <>
             {/* Beach listings are the sources' words, in English. */}
             {f.description && <p lang="en-AU" style={{ ...TYPE.body, fontSize: 16.5, margin: `0 0 ${SPACE.sm}px` }}>{f.description}</p>}
@@ -155,9 +159,9 @@ function V2Facility({ app }) {
 
         {!isToilet && <NearestToilet app={app} venue={f}/>}
 
-        <ReportButton app={app} target={{ type: 'facility', id: f.id, where: f.layer, name: f.name }}/>
+        <ReportButton app={app} target={{ type: 'facility', id: f.id, where: f.layer, name }}/>
 
-        {isToilet ? <ToiletAttribution facilityUrl={f.sourceUrl}/> : (
+        {isArrival ? <ArrivalAttribution f={f}/> : isToilet ? <ToiletAttribution facilityUrl={f.sourceUrl}/> : (
           <div style={{ ...TYPE.footnote, color: C2.slate, lineHeight: 1.55, margin: `${SPACE.lg}px 0 0` }}>
             <p style={{ margin: '0 0 4px' }}>{t('layers.facility.sources')}</p>
             <ul style={{ margin: 0, paddingLeft: 18 }}>

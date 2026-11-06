@@ -47,6 +47,7 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
   const forced = {
     toilets: app.view === 'toilets' || facility?.layer === 'toilets',
     beach: app.view === 'beach' || facility?.layer === 'beach',
+    arrival: facility?.layer === 'arrival',
   };
   const extras = layerExtras(L, { forced, t }).sort((a, b) => metres(app.origin, a) - metres(app.origin, b));
   const fitExtras = app.view === 'toilets' ? 12 : app.view === 'beach' ? true : false;
