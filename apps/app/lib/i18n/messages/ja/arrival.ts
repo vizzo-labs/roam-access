@@ -114,5 +114,15 @@ const arrival: Translation<typeof en> = {
   'arrival.app.google': 'Google マップ',
 
   'arrival.line.changed': '入口が変わった可能性あり — 事前に確認を',
+
+  // Getting there 4 (I4): entrance kinds on the mini-map (machine-translated, not yet reviewed).
+  'arrival.kind.main.map': '正面',
+  'arrival.kind.side.map': '横',
+  'arrival.kind.back.map': '裏',
+  'arrival.kind.lift.map': 'エレベーター',
+  'arrival.kind.other.map': 'その他',
+  'arrival.map.keyItemDashed': '{door}（点線：未確認、または変わった可能性あり）',
+  'arrival.map.viewLabelMany': { other: '{name} の地図。住所と段差のない入口 {count} か所を表示。' },
+  'arrival.map.pinDesc': '{door}：{where}。',
 };
 export default arrival;

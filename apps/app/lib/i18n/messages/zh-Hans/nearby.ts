@@ -116,5 +116,15 @@ const nearby: Translation<typeof en> = {
   'nearby.form.waitPhoto': '请等照片发送完成。',
   'nearby.form.privacy': '你的步骤只显示你的无障碍需求（例如“轮椅使用者”），从不显示你的名字。',
   'nearby.form.submit': '分享我的步骤',
+
+  // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).
+  'nearby.review.title': '怎么进去',
+  'nearby.review.hint': '从街上到门口的简短步骤，能帮下一个人找到入口。步骤会单独、立即保存。没有步骤也可以提交评价。',
+  'nearby.review.add': '一步步写下怎么进去',
+  'nearby.review.saved': '谢谢，你的步骤已发布。你仍然可以在下面提交评价。',
+  'nearby.review.savedUpdated': '谢谢，你的步骤已更新。你仍然可以在下面提交评价。',
+  'nearby.public.directions': '导航：',
+  'nearby.public.walkTo': '步行前往 {name}：',
+  'nearby.public.stepsInApp': '试点参与者也会分享他们一步步怎么进去的。这些内容在 Roam Access 应用里。',
 };
 export default nearby;

@@ -114,5 +114,15 @@ const arrival: Translation<typeof en> = {
   'arrival.app.google': 'Google 지도',
 
   'arrival.line.changed': '입구가 바뀌었을 수 있어요 — 미리 확인하세요',
+
+  // Getting there 4 (I4): entrance kinds on the mini-map (machine-translated, not yet reviewed).
+  'arrival.kind.main.map': '정문',
+  'arrival.kind.side.map': '옆문',
+  'arrival.kind.back.map': '뒷문',
+  'arrival.kind.lift.map': '엘리베이터',
+  'arrival.kind.other.map': '기타',
+  'arrival.map.keyItemDashed': '{door} (점선: 확인되지 않았거나 바뀌었을 수 있음)',
+  'arrival.map.viewLabelMany': { other: '{name}의 지도. 도로명 주소와 계단 없는 입구 {count}곳이 표시돼요.' },
+  'arrival.map.pinDesc': '{door}: {where}.',
 };
 export default arrival;

@@ -114,5 +114,15 @@ const arrival: Translation<typeof en> = {
   'arrival.app.google': 'Google Maps',
 
   'arrival.line.changed': 'Puede que la entrada haya cambiado: compruébalo antes',
+
+  // Getting there 4 (I4): entrance kinds on the mini-map (machine-translated, not yet reviewed).
+  'arrival.kind.main.map': 'Principal',
+  'arrival.kind.side.map': 'Lateral',
+  'arrival.kind.back.map': 'Trasera',
+  'arrival.kind.lift.map': 'Ascensor',
+  'arrival.kind.other.map': 'Otra',
+  'arrival.map.keyItemDashed': '{door} (línea discontinua: sin confirmar o puede haber cambiado)',
+  'arrival.map.viewLabelMany': { one: 'Mapa de {name} con su dirección y {count} entrada sin escalones.', other: 'Mapa de {name} con su dirección y {count} entradas sin escalones.' },
+  'arrival.map.pinDesc': '{door}: {where}.',
 };
 export default arrival;
