@@ -14,6 +14,7 @@
     "db:describe": "dotenv -e .env.local -- tsx scripts/db-describe.ts",
     "db:seed": "dotenv -e .env.local -- tsx scripts/seed-osm.ts",
     "layers:import": "dotenv -e .env.local -- tsx scripts/import-toilets.ts",
+    "arrival:import": "dotenv -e .env.local -- tsx scripts/import-arrival.ts",
     "test-user": "dotenv -e .env.local -- tsx scripts/test-user.ts",
     "i18n:check": "tsx scripts/i18n-check.ts"
   },

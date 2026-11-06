@@ -177,7 +177,8 @@ export const facilities = pgTable('facilities', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, t => [
   index('facilities_layer_idx').on(t.layer),
-  check('facilities_layer_chk', sql`${t.layer} in ('toilets', 'beach')`),
+  // 'arrival' (I2): parking, drop-off, accessible stops, wharves (migrations/202611061730_arrival_guide.sql).
+  check('facilities_layer_chk', sql`${t.layer} in ('toilets', 'beach', 'arrival')`),
 ]);
 
 // Partner programs (the partner's claim, with a source). Never a verdict.
@@ -275,6 +276,8 @@ export * from './schema-venues';
 export * from './schema-sensory';
 // Getting there (I1) · venue_entrances, entrance_confirmations
 export * from './schema-arrival';
+// Getting there 2 (I2) · arrival_steps
+export * from './schema-arrival-steps';
 export type Facility = typeof facilities.$inferSelect;
 export type VenueBadge = typeof venueBadges.$inferSelect;
 export type TempBarrier = typeof tempBarriers.$inferSelect;

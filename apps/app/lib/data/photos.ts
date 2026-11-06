@@ -54,6 +54,10 @@ function toVM(p: typeof reviewPhotos.$inferSelect, needs: string[], viewerId: st
 
 // ── Upload (draft) ─────────────────────────────────────────────────────────
 const DRAFT_TTL_MS = 24 * 3600 * 1000;
+// A photo can also be attached to arrival steps (I2) instead of a review: it
+// is then no longer a draft (kept, and visible while those steps are).
+const notArrival = sql`not exists (select 1 from arrival_steps a where a.photo_id = ${reviewPhotos.id})`;
+const onVisibleArrival = sql<boolean>`exists (select 1 from arrival_steps a where a.photo_id = ${reviewPhotos.id} and a.hidden = false)`;
 
 export async function createDraftPhoto(userId: string, input: {
   venueId: unknown; kind: unknown; main: Uint8Array; thumb: Uint8Array;
@@ -71,7 +75,7 @@ export async function createDraftPhoto(userId: string, input: {
 
   await removeStaleDrafts(userId);
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(reviewPhotos)
-    .where(and(eq(reviewPhotos.userId, userId), eq(reviewPhotos.venueId, v.id), isNull(reviewPhotos.reviewId)));
+    .where(and(eq(reviewPhotos.userId, userId), eq(reviewPhotos.venueId, v.id), isNull(reviewPhotos.reviewId), notArrival));
   if (n >= MAX_PHOTOS_PER_REVIEW) return { error: `Up to ${MAX_PHOTOS_PER_REVIEW} photos per review` } as const;
 
   const key = randomUUID();
@@ -93,7 +97,7 @@ export async function createDraftPhoto(userId: string, input: {
 async function removeStaleDrafts(userId: string) {
   const db = getDb();
   const stale = await db.delete(reviewPhotos).where(and(
-    eq(reviewPhotos.userId, userId), isNull(reviewPhotos.reviewId),
+    eq(reviewPhotos.userId, userId), isNull(reviewPhotos.reviewId), notArrival,
     lt(reviewPhotos.createdAt, new Date(Date.now() - DRAFT_TTL_MS)),
   )).returning({ a: reviewPhotos.pathname, b: reviewPhotos.thumbPathname });
   await deleteBlobs(stale.flatMap(s => [s.a, s.b]));
@@ -139,7 +143,7 @@ export async function checkDraftsOwned(userId: string, venueId: string, ids: str
   if (!ids.length) return true;
   const rows = await getDb().select({ id: reviewPhotos.id }).from(reviewPhotos).where(and(
     inArray(reviewPhotos.id, ids), eq(reviewPhotos.userId, userId),
-    eq(reviewPhotos.venueId, venueId), isNull(reviewPhotos.reviewId),
+    eq(reviewPhotos.venueId, venueId), isNull(reviewPhotos.reviewId), notArrival,
   ));
   return rows.length === new Set(ids).size;
 }
@@ -199,11 +203,11 @@ export async function getCoverPhotos(venueId?: string): Promise<Map<string, Cove
 /** Who may see this photo: everyone signed in if it and its review are visible;
  *  the uploader always; admins always (to moderate). */
 export async function getPhotoAccess(id: string) {
-  const [row] = await getDb().select({ p: reviewPhotos, reviewHidden: reviews.hidden })
+  const [row] = await getDb().select({ p: reviewPhotos, reviewHidden: reviews.hidden, arrival: onVisibleArrival })
     .from(reviewPhotos).leftJoin(reviews, eq(reviews.id, reviewPhotos.reviewId))
     .where(eq(reviewPhotos.id, id));
   if (!row) return null;
-  const publicOk = !!row.p.reviewId && !row.p.hidden && row.reviewHidden === false;
+  const publicOk = !row.p.hidden && ((!!row.p.reviewId && row.reviewHidden === false) || (!row.p.reviewId && !!row.arrival));
   return { photo: row.p, publicOk };
 }
 
