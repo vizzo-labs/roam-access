@@ -10,10 +10,10 @@ import {
   ARRIVAL_FROM_MAX, ARRIVAL_STEP_MAX, ARRIVAL_STEP_MIN, ARRIVAL_STEPS_MAX,
 } from '@/lib/arrival/places';
 import { ALT_MAX, ALT_MIN } from '@/lib/photos/kinds';
-import { C2, F2, RA2_INPUT_FONT } from '../ui/palette';
+import { C2 } from '../ui/palette';
 import {
   Banner, Badge, Button, Card, IconButton, PhotoGrid, PhotoViewer, SectionHeader, Sheet,
-  SkeletonText, SourceBadge, SPACE, RADIUS, TYPE,
+  SkeletonText, SourceBadge, TextArea, SPACE, RADIUS, TYPE,
 } from '../ds';
 import { UserText, useFormat, useT } from '../i18n';
 import { whoText } from '../trust/text';
@@ -167,13 +167,9 @@ export function ArrivalSteps({ app, venue }) {
 }
 
 // ── Add / edit sheet ─────────────────────────────────────────────────────
-const field = {
-  width: '100%', boxSizing: 'border-box', borderRadius: RADIUS.md, border: `1.5px solid ${C2.line}`,
-  padding: '10px 12px', fontFamily: F2, fontSize: RA2_INPUT_FONT, color: C2.char, background: C2.paper,
-};
 const labelStyle = { display: 'block', ...TYPE.headline, fontSize: 15, margin: `${SPACE.sm}px 0 6px` };
 
-function StepsSheet({ venue, initial, onClose, onSaved }) {
+export function StepsSheet({ venue, initial, onClose, onSaved }) {
   const t = useT();
   const formId = React.useId();
   const [fromPlace, setFrom] = React.useState(initial?.fromPlace || '');
@@ -253,21 +249,22 @@ function StepsSheet({ venue, initial, onClose, onSaved }) {
         <label htmlFor={`${formId}-from`} style={{ ...labelStyle, marginTop: 0 }}>
           {t('nearby.form.from')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('common.optional')}</span>
         </label>
-        <input id={`${formId}-from`} value={fromPlace} onChange={e => setFrom(e.target.value)} maxLength={ARRIVAL_FROM_MAX}
-          placeholder={t('nearby.form.fromPlaceholder')} autoComplete="off" style={field}/>
+        {/* TextArea, not input: the example text wraps on phones and at large text sizes. */}
+        <TextArea singleLine id={`${formId}-from`} value={fromPlace} onChange={e => setFrom(e.target.value)} maxLength={ARRIVAL_FROM_MAX}
+          placeholder={t('nearby.form.fromPlaceholder')} autoComplete="off"/>
 
         <fieldset style={{ border: 0, padding: 0, margin: `${SPACE.md}px 0 0` }}>
           <legend style={{ ...TYPE.headline, fontSize: 15, padding: 0, marginBottom: 2 }}>{t('nearby.form.steps')}</legend>
           <p id={`${formId}-hint`} style={{ ...TYPE.footnote, color: C2.slate, margin: '0 0 6px' }}>{t('nearby.form.stepsHint')}</p>
           <ol style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {steps.map((s, i) => (
-              <li key={i} style={{ display: 'flex', alignItems: 'center', gap: SPACE.xs, marginBottom: SPACE.xs }}>
-                <span aria-hidden="true" style={{ width: 22, textAlign: 'right', fontWeight: 700, color: C2.slate, flexShrink: 0 }}>{i + 1}.</span>
-                <input ref={el => { stepRefs.current[i] = el; }} value={s} onChange={e => setStep(i, e.target.value)}
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: SPACE.xs, marginBottom: SPACE.xs }}>
+                <span aria-hidden="true" style={{ width: 22, textAlign: 'right', fontWeight: 700, color: C2.slate, flexShrink: 0, paddingTop: 12 }}>{i + 1}.</span>
+                <TextArea singleLine ref={el => { stepRefs.current[i] = el; }} value={s} onChange={e => setStep(i, e.target.value)}
                   maxLength={ARRIVAL_STEP_MAX} aria-label={t('nearby.form.stepLabel', { n: i + 1 })}
                   aria-describedby={`${formId}-hint`} autoComplete="off"
                   placeholder={i === 0 ? t('nearby.form.stepPlaceholder1') : i === 1 ? t('nearby.form.stepPlaceholder2') : ''}
-                  style={{ ...field, flex: 1, minWidth: 0 }}/>
+                  style={{ flex: 1, minWidth: 0 }}/>
                 {steps.length > 1 && (
                   <IconButton icon="close" size="sm" variant="ghost" label={t('nearby.form.removeStep', { n: i + 1 })} onClick={() => removeStep(i)}/>
                 )}
@@ -297,9 +294,9 @@ function StepsSheet({ venue, initial, onClose, onSaved }) {
                 {photo.status === 'uploading' ? <p style={{ ...TYPE.footnote, margin: 0 }}>{t('nearby.form.uploading')}</p> : (
                   <>
                     <label htmlFor={`${formId}-alt`} style={{ ...labelStyle, marginTop: 0 }}>{t('nearby.form.alt')}</label>
-                    <input id={`${formId}-alt`} value={photo.alt} maxLength={ALT_MAX} autoComplete="off"
+                    <TextArea singleLine id={`${formId}-alt`} value={photo.alt} maxLength={ALT_MAX} autoComplete="off"
                       onChange={e => setPhoto(p => ({ ...p, alt: e.target.value }))}
-                      placeholder={t('nearby.form.altPlaceholder')} style={field}/>
+                      placeholder={t('nearby.form.altPlaceholder')}/>
                   </>
                 )}
                 <Button size="sm" variant="plain" icon="close" onClick={removePhoto} style={{ marginTop: 4 }}>{t('nearby.form.removePhoto')}</Button>

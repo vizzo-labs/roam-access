@@ -15,7 +15,7 @@ import {
   Icon, ICON_NAMES, Button, IconButton, Card, Chip, FilterChip, RemovableChip, ChipGroup,
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
-  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField,
+  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea,
 } from './index';
 import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
@@ -66,6 +66,11 @@ function FauxMap() {
       ))}
     </div>
   );
+}
+
+function TextAreaSample() {
+  const [v, setV] = React.useState('');
+  return <TextArea singleLine id="ds-ta" value={v} onChange={e => setV(e.target.value)} placeholder="e.g. The ramp is on the left, past the bins"/>;
 }
 
 export function DsPreview() {
@@ -343,6 +348,13 @@ export function DsPreview() {
             <Card><EmptyState icon="search" title="No places match all your filters" body="Try removing “Quiet” — 8 more places would show." action={{ label: 'Remove “Quiet”', onClick: () => {} }} secondary={{ label: 'Clear all filters', onClick: () => {} }}/></Card>
             <Card><EmptyState icon="bookmark" title="Nothing saved yet" body="Save places that work for you and find them here, even offline." action={{ label: 'Explore places', icon: 'search', onClick: () => {} }}/></Card>
             <Card><EmptyState compact icon="users" title="No reviews yet" body="Been here? Your review is the first data point." action={{ label: 'Share your experience', onClick: () => {} }}/></Card>
+          </div>
+        </Section>
+
+        <Section id="textarea" title="TextArea" note="A text field that wraps and grows instead of cutting text off — the example text (placeholder) too — so it stays readable on phones and at 150% text. `singleLine`: Enter submits the form and line breaks are removed. Always give it a visible <label>.">
+          <div style={{ maxWidth: 300 }}>
+            <label htmlFor="ds-ta" style={{ display: 'block', ...TYPE.headline, fontSize: 15, marginBottom: 6 }}>Step 1</label>
+            <TextAreaSample/>
           </div>
         </Section>
 
