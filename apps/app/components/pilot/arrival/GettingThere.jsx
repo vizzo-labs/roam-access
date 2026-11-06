@@ -74,8 +74,13 @@ function GettingThere({ app, venue, children }) {
         {best && (
           <>
             {onMap.length > 0 && (
-              <MiniMap venue={venue} entrances={onMap} height={190} style={{ marginBottom: SPACE.sm }}
-                label={`${t('arrival.map.viewLabel', { name: venue.name })} ${pinWhere(t, venue, onMap[0])}.`}/>
+              <MiniMap venue={venue} entrances={onMap} height={onMap.length > 1 ? 240 : 190} style={{ marginBottom: SPACE.sm }}
+                label={[
+                  onMap.length > 1
+                    ? t('arrival.map.viewLabelMany', { name: venue.name, count: onMap.length })
+                    : t('arrival.map.viewLabel', { name: venue.name }),
+                  ...onMap.map(e => t('arrival.map.pinDesc', { door: entranceTitle(t, e), where: pinWhere(t, venue, e) })),
+                ].join(' ')}/>
             )}
             {entrances.map((e, i) => (
               <EntranceDetails key={e.id} app={app} venue={venue} e={e} first={i === 0} onAnswer={answer} ready={!!loaded}/>

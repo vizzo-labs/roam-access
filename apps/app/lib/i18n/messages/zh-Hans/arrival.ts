@@ -114,5 +114,15 @@ const arrival: Translation<typeof en> = {
   'arrival.app.google': 'Google 地图',
 
   'arrival.line.changed': '入口可能已变化 — 请先确认',
+
+  // Getting there 4 (I4): entrance kinds on the mini-map (machine-translated, not yet reviewed).
+  'arrival.kind.main.map': '正门',
+  'arrival.kind.side.map': '侧门',
+  'arrival.kind.back.map': '后门',
+  'arrival.kind.lift.map': '电梯',
+  'arrival.kind.other.map': '其他',
+  'arrival.map.keyItemDashed': '{door}（虚线：未确认或可能已变化）',
+  'arrival.map.viewLabelMany': { other: '{name} 的地图，显示街道地址和 {count} 个无台阶入口。' },
+  'arrival.map.pinDesc': '{door}：{where}。',
 };
 export default arrival;

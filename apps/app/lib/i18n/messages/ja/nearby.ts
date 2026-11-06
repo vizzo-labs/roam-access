@@ -116,5 +116,15 @@ const nearby: Translation<typeof en> = {
   'nearby.form.waitPhoto': '写真の送信が終わるまでお待ちください。',
   'nearby.form.privacy': '道順には名前ではなく、あなたのアクセスのニーズ（例：「車いす利用者」）だけが表示されます。',
   'nearby.form.submit': '私の道順を共有',
+
+  // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).
+  'nearby.review.title': '入り方',
+  'nearby.review.hint': '通りからドアまでの短い手順は、次の人が入口を見つける助けになります。手順はレビューとは別に、すぐ保存されます。手順がなくてもレビューは送れます。',
+  'nearby.review.add': '入り方を順番に書く',
+  'nearby.review.saved': 'ありがとうございます。手順を公開しました。下からレビューも送れます。',
+  'nearby.review.savedUpdated': 'ありがとうございます。手順を更新しました。下からレビューも送れます。',
+  'nearby.public.directions': '経路：',
+  'nearby.public.walkTo': '{name} までの徒歩ルート：',
+  'nearby.public.stepsInApp': 'パイロットの参加者は、どうやって入ったかを順番に共有しています。それは Roam Access アプリで見られます。',
 };
 export default nearby;

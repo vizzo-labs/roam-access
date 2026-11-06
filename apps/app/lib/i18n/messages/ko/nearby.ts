@@ -116,5 +116,15 @@ const nearby: Translation<typeof en> = {
   'nearby.form.waitPhoto': '사진을 다 보낼 때까지 기다려 주세요.',
   'nearby.form.privacy': '내 단계에는 이름이 아니라 접근성 필요(예: “휠체어 사용자”)만 보여요.',
   'nearby.form.submit': '내 단계 공유하기',
+
+  // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).
+  'nearby.review.title': '들어가는 방법',
+  'nearby.review.hint': '거리에서 문까지의 짧은 단계는 다음 사람이 입구를 찾는 데 도움이 돼요. 단계는 리뷰와 따로, 바로 저장돼요. 단계 없이도 리뷰를 보낼 수 있어요.',
+  'nearby.review.add': '들어가는 방법을 단계별로 추가하기',
+  'nearby.review.saved': '고마워요. 단계가 올라갔어요. 아래에서 리뷰도 보낼 수 있어요.',
+  'nearby.review.savedUpdated': '고마워요. 단계가 업데이트됐어요. 아래에서 리뷰도 보낼 수 있어요.',
+  'nearby.public.directions': '길찾기:',
+  'nearby.public.walkTo': '{name}까지 걷는 길:',
+  'nearby.public.stepsInApp': '파일럿 참여자들은 어떻게 들어갔는지 단계별로 공유해요. 그 내용은 Roam Access 앱에서 볼 수 있어요.',
 };
 export default nearby;

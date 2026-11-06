@@ -116,5 +116,15 @@ const nearby: Translation<typeof en> = {
   'nearby.form.waitPhoto': 'Espera a que la foto termine de enviarse.',
   'nearby.form.privacy': 'Tus pasos muestran tus necesidades de acceso (por ejemplo, «Usuario de silla de ruedas»), nunca tu nombre.',
   'nearby.form.submit': 'Compartir mis pasos',
+
+  // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).
+  'nearby.review.title': 'Cómo entrar',
+  'nearby.review.hint': 'Unos pasos cortos desde la calle hasta la puerta ayudan a la próxima persona a encontrar la entrada. Se guardan aparte, al momento. Puedes enviar tu reseña sin ellos.',
+  'nearby.review.add': 'Añadir cómo entrar, paso a paso',
+  'nearby.review.saved': 'Gracias: tus pasos ya están publicados. Aún puedes enviar tu reseña abajo.',
+  'nearby.review.savedUpdated': 'Gracias: tus pasos están actualizados. Aún puedes enviar tu reseña abajo.',
+  'nearby.public.directions': 'Indicaciones en',
+  'nearby.public.walkTo': 'Ruta a pie hasta {name} en',
+  'nearby.public.stepsInApp': 'Las personas del piloto también cuentan cómo entraron, paso a paso. Lo encontrarás en la app de Roam Access.',
 };
 export default nearby;

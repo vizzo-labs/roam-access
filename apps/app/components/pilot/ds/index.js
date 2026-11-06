@@ -20,3 +20,4 @@ export { Sheet, SnapSheet, SNAPS } from './Sheet';
 export { PhotoGrid, PhotoViewer } from './PhotoViewer';
 export { ScreenHeader } from './ScreenHeader';
 export { SearchField } from './SearchField';
+export { TextArea } from './TextArea';

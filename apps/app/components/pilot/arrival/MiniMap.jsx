@@ -11,36 +11,52 @@
 
 import React from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { C2 } from '../ui/palette';
+import { C2, F2 } from '../ui/palette';
+import { entranceSymbolSvg, kindOf } from './entranceSymbols';
 import { RADIUS, SPACE, TYPE, prefersReducedMotion } from '../ds';
 import { useT } from '../i18n';
 
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
-// Door: a frame with a handle (decorative; the key names it in words).
-const DOOR = 'M6 21V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21M3.5 21h17M14.5 12.5v.01';
+// Street-address pin (decorative; the key names it in words).
 const PIN = 'M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z';
 
 function svg(path, color, size) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${path}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-/** The marker elements, built outside React (MapLibre owns them). */
-function markerEl(kind, { dashed = false, drag = false } = {}) {
+/** Colours for an entrance symbol, read from C2 at call time (high contrast). */
+const symbolColors = dashed => (dashed
+  ? { fill: C2.paper, stroke: C2.slate, glyph: C2.slate, dashed: true }
+  : { fill: C2.teal, stroke: C2.paper, glyph: C2.paper });
+
+/** The marker elements, built outside React (MapLibre owns them). An
+ *  entrance is its kind's shape (./entranceSymbols.js) plus a text label. */
+function markerEl(type, { kind = 'main', label = '', dashed = false, drag = false } = {}) {
   const el = document.createElement('div');
   el.setAttribute('aria-hidden', 'true');
-  if (kind === 'venue') {
+  if (type === 'venue') {
     el.style.cssText = `width:34px;height:34px;border-radius:999px;background:${C2.paper};border:2px solid ${C2.char};display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.25)`;
     el.innerHTML = svg(PIN, C2.char, 20);
-  } else {
-    const fill = dashed ? C2.paper : C2.teal;
-    el.style.cssText = `width:40px;height:40px;border-radius:10px;background:${fill};border:2.5px ${dashed ? 'dashed' : 'solid'} ${dashed ? C2.slate : C2.paper};outline:${dashed ? 'none' : `2px solid ${C2.teal}`};display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);${drag ? 'cursor:grab;touch-action:none;' : ''}`;
-    el.innerHTML = svg(DOOR, dashed ? C2.slate : C2.paper, 24);
+    return el;
+  }
+  // No `position` here: MapLibre's marker class makes it absolute (which also
+  // anchors the label below).
+  el.style.cssText = `width:40px;height:40px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35));${drag ? 'cursor:grab;touch-action:none;' : ''}`;
+  el.innerHTML = entranceSymbolSvg(kind, { size: 40, ...symbolColors(dashed) });
+  if (label) {
+    // The kind in words, under the symbol (the anchor stays the symbol's centre).
+    const tag = document.createElement('span');
+    tag.textContent = label;
+    tag.style.cssText = `position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);white-space:nowrap;font:700 13px/1.2 ${F2};color:${C2.char};background:${C2.paper};border:1.5px solid ${dashed ? C2.slate : C2.teal};border-radius:6px;padding:1px 5px`;
+    el.appendChild(tag);
   }
   return el;
 }
 
-function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200, style }) {
+const isDashed = e => e.source !== 'community' || e.status !== 'current';
+
+function MiniMap({ venue, entrances = [], pin = null, pinKind = 'main', onPin, label, height = 200, style }) {
   const t = useT();
   const box = React.useRef(null);
   const ctx = React.useRef(null); // { map, lib, pinMk }
@@ -81,7 +97,7 @@ function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200
   }, [venue.id, editable]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Venue + entrance markers (view), then frame them all.
-  const key = entrances.map(e => `${e.id}:${e.lat},${e.lng}:${e.source}:${e.status}`).join('|') + C2.teal + C2.paper;
+  const key = entrances.map(e => `${e.id}:${e.kind}:${e.lat},${e.lng}:${e.source}:${e.status}`).join('|') + C2.teal + C2.paper + t.locale;
   React.useEffect(() => {
     if (!ready || !ctx.current) return;
     const { map, lib } = ctx.current;
@@ -89,7 +105,8 @@ function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200
     markers.current = [new lib.Marker({ element: markerEl('venue') }).setLngLat([venue.lng, venue.lat]).addTo(map)];
     const pts = entrances.filter(e => e.lat != null);
     for (const e of pts) {
-      markers.current.push(new lib.Marker({ element: markerEl('entrance', { dashed: e.source !== 'community' || e.status !== 'current' }) })
+      const el = markerEl('entrance', { kind: kindOf(e.kind), label: t(`arrival.kind.${kindOf(e.kind)}.map`), dashed: isDashed(e) });
+      markers.current.push(new lib.Marker({ element: el })
         .setLngLat([e.lng, e.lat]).addTo(map));
     }
     if (!editable && pts.length) {
@@ -103,9 +120,12 @@ function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200
   React.useEffect(() => {
     if (!ready || !ctx.current || !editable) return;
     const c = ctx.current;
-    if (!pin) { c.pinMk?.remove(); c.pinMk = null; return; }
+    // A new kind (main / side / back …) means a new symbol: rebuild the pin.
+    if (c.pinMk && (!pin || c.pinKind !== pinKind)) { c.pinMk.remove(); c.pinMk = null; }
+    if (!pin) return;
     if (!c.pinMk) {
-      c.pinMk = new c.lib.Marker({ element: markerEl('entrance', { drag: true }), draggable: true })
+      c.pinKind = pinKind;
+      c.pinMk = new c.lib.Marker({ element: markerEl('entrance', { kind: kindOf(pinKind), label: t(`arrival.kind.${kindOf(pinKind)}.map`), drag: true }), draggable: true })
         .setLngLat([pin.lng, pin.lat]).addTo(c.map);
       c.pinMk.on('dragend', () => {
         const ll = c.pinMk.getLngLat();
@@ -120,10 +140,16 @@ function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200
     if (px.x < 30 || px.y < 30 || px.x > w - 30 || px.y > h - 30) {
       c.map.easeTo({ center: [pin.lng, pin.lat], duration: prefersReducedMotion() ? 0 : 300 });
     }
-  }, [ready, editable, pin?.lat, pin?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ready, editable, pin?.lat, pin?.lng, pinKind]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const anyEntrance = editable ? !!pin : entrances.some(e => e.lat != null);
-  const dashedShown = !editable && entrances.some(e => e.lat != null && (e.source !== 'community' || e.status !== 'current'));
+  // The key: one entry per kind on the map (its symbol + what it is), so
+  // several entrances are told apart by shape and words, never colour alone.
+  const shown = editable
+    ? (pin ? [{ kind: kindOf(pinKind), dashed: false }] : [])
+    : entrances.filter(e => e.lat != null).map(e => ({ kind: kindOf(e.kind), dashed: isDashed(e) }));
+  const keyItems = [];
+  for (const k of shown) if (!keyItems.some(x => x.kind === k.kind && x.dashed === k.dashed)) keyItems.push(k);
+  const item = { display: 'inline-flex', alignItems: 'center', gap: 6 };
   return (
     <div style={style}>
       <div style={{ position: 'relative', height, borderRadius: RADIUS.md, overflow: 'hidden', border: `1.5px solid ${C2.line}`, background: C2.stone }}>
@@ -137,25 +163,23 @@ function MiniMap({ venue, entrances = [], pin = null, onPin, label, height = 200
       </div>
       {/* The key: symbol + words, so the colours never carry meaning alone. */}
       <ul aria-label={t('arrival.map.key')} style={{ listStyle: 'none', margin: `${SPACE.xs}px 0 0`, padding: 0, display: 'flex', flexWrap: 'wrap', gap: `4px ${SPACE.md}px`, ...TYPE.footnote, color: C2.char }}>
-        <li style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <span aria-hidden="true" style={{ width: 20, height: 20, borderRadius: 999, border: `2px solid ${C2.char}`, background: C2.paper, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+        <li style={item}>
+          <span aria-hidden="true" style={{ width: 20, height: 20, borderRadius: 999, border: `2px solid ${C2.char}`, background: C2.paper, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
             dangerouslySetInnerHTML={{ __html: svg(PIN, C2.char, 13) }}/>
           {t('arrival.map.keyAddress')}
         </li>
-        {anyEntrance && (
-          <li style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span aria-hidden="true" style={{ width: 20, height: 20, borderRadius: 5, background: C2.teal, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              dangerouslySetInnerHTML={{ __html: svg(DOOR, C2.paper, 14) }}/>
-            {t('arrival.map.keyEntrance')}
+        {keyItems.map(k => (
+          <li key={`${k.kind}-${k.dashed}`} style={item}>
+            <span aria-hidden="true" style={{ display: 'inline-flex', flexShrink: 0 }}
+              dangerouslySetInnerHTML={{ __html: entranceSymbolSvg(k.kind, { size: 22, ...symbolColors(k.dashed) }) }}/>
+            <span>
+              <span style={{ fontWeight: 700 }}>{t(`arrival.kind.${k.kind}.map`)}</span>
+              {' · '}{k.dashed
+                ? t('arrival.map.keyItemDashed', { door: t(`arrival.kind.${k.kind}.title`) })
+                : t(`arrival.kind.${k.kind}.title`)}
+            </span>
           </li>
-        )}
-        {dashedShown && (
-          <li style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span aria-hidden="true" style={{ width: 20, height: 20, borderRadius: 5, border: `2px dashed ${C2.slate}`, boxSizing: 'border-box', background: C2.paper, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              dangerouslySetInnerHTML={{ __html: svg(DOOR, C2.slate, 12) }}/>
-            {t('arrival.map.keyUnconfirmed')}
-          </li>
-        )}
+        ))}
       </ul>
       <p style={{ ...TYPE.caption, color: C2.slate, margin: '2px 0 0' }}>
         {t('arrival.map.credit')}{' '}

@@ -2,7 +2,7 @@
 // the arrival facility screen. No React. Pass the `t` from useT().
 
 import { NEARBY_WALK_MINS } from '@/lib/arrival/places';
-import { metres, walkMins } from '../layers/layerUtils';
+import { metres, nearestToilet, walkMins } from '../layers/layerUtils';
 
 /** The closest facility of these kinds (optionally passing `test`). */
 export function nearestOf(facilities, from, kinds, test = () => true) {
@@ -16,6 +16,35 @@ export function nearestOf(facilities, from, kinds, test = () => true) {
 }
 
 export const isNearby = n => !!n && n.mins <= NEARBY_WALK_MINS;
+
+// The nearest accessible toilet is listed when it's within this walk.
+export const TOILET_MAX_MINS = 40;
+
+/** What "Parking & transport nearby" lists for a place, in order — shared by
+ *  the venue page (ArrivalNearby) and the public page (/v/[id]) so both say
+ *  the same thing. `picks`: { kind: 'parking' | 'dropOff' | 'stop' | 'wharf'
+ *  | 'toilet', facility }; `missing`: kinds with none close by
+ *  ('parking' | 'dropOff' | 'stop'), for "None listed close by: …". */
+export function nearbyPicks(facilities, from) {
+  const picks = [];
+  const missing = [];
+  const one = (kind, kinds) => {
+    const n = nearestOf(facilities, from, kinds);
+    if (isNearby(n)) { picks.push({ kind, facility: n.facility }); return true; }
+    return false;
+  };
+  if (!one('parking', ['accessible_parking'])) missing.push('parking');
+  if (!one('dropOff', ['drop_off'])) missing.push('dropOff');
+  const stop = one('stop', ['accessible_stop']);
+  const wharf = one('wharf', ['wharf']);
+  if (!stop && !wharf) missing.push('stop');
+  const toilet = nearestToilet(facilities, from);
+  if (toilet && walkMins(from, toilet.facility) <= TOILET_MAX_MINS) picks.push({ kind: 'toilet', facility: toilet.facility });
+  return { picks, missing };
+}
+
+/** Walking from a stop or wharf; driving to parking or a drop-off. */
+export const isWalkFrom = f => f.kind === 'accessible_stop' || f.kind === 'wharf';
 
 /** "150 m" / "1.2 km" — the straight-line distance, in the reader's language. */
 export function distanceText(t, m) {

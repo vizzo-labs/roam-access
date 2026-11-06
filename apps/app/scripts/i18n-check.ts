@@ -36,7 +36,7 @@ const walk = (d: string) => {
     else if (/\.(jsx?|tsx?)$/.test(f)) files.push(p);
   }
 };
-['components/pilot', 'lib', 'app/(app)'].forEach(d => walk(join(ROOT, d)));
+['components/pilot', 'components/community', 'lib', 'app/(app)', 'app/v'].forEach(d => walk(join(ROOT, d)));
 const used = new Set<string>();
 for (const f of files) {
   // Comments may show example keys: skip them.

@@ -126,5 +126,15 @@ const arrival = {
 
   // The map card line when the door may have changed.
   'arrival.line.changed': 'Entrance may have changed — check first',
+
+  // Getting there 4 (I4): entrance kinds on the mini-map.
+  'arrival.kind.main.map': 'Main',
+  'arrival.kind.side.map': 'Side',
+  'arrival.kind.back.map': 'Back',
+  'arrival.kind.lift.map': 'Lift',
+  'arrival.kind.other.map': 'Other',
+  'arrival.map.keyItemDashed': '{door} (dashed: not confirmed or may have changed)',
+  'arrival.map.viewLabelMany': { one: 'Map of {name} with its street address and {count} step-free entrance.', other: 'Map of {name} with its street address and {count} step-free entrances.' },
+  'arrival.map.pinDesc': '{door}: {where}.',
 };
 export default arrival;

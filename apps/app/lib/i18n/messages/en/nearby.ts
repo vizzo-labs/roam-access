@@ -119,5 +119,15 @@ const nearby = {
   'nearby.form.waitPhoto': 'Wait for the photo to finish sending.',
   'nearby.form.privacy': 'Your steps show your access needs (like “Wheelchair user”), never your name.',
   'nearby.form.submit': 'Share my steps',
+
+  // Getting there 4 (I4): the review form entry and the public page.
+  'nearby.review.title': 'How to get in',
+  'nearby.review.hint': 'Short steps from the street to the door help the next person find the way in. They save on their own, straight away. You can send your review without them.',
+  'nearby.review.add': 'Add how to get in, step by step',
+  'nearby.review.saved': 'Thanks — your steps are up. You can still send your review below.',
+  'nearby.review.savedUpdated': 'Thanks — your steps are updated. You can still send your review below.',
+  'nearby.public.directions': 'Directions in',
+  'nearby.public.walkTo': 'Walking route to {name} in',
+  'nearby.public.stepsInApp': 'People in the pilot also share how they got in, step by step. You’ll find those in the Roam Access app.',
 };
 export default nearby;

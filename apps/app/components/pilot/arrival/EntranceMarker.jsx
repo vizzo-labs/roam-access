@@ -104,7 +104,7 @@ function EntranceMarker({ venue, value, onChange, showKinds = false, showNote = 
         </ChipGroup>
       </>)}
 
-      <MiniMap venue={venue} pin={shown} height={220}
+      <MiniMap venue={venue} pin={shown} pinKind={kind} height={220}
         label={t('arrival.map.editLabel', { name: venue.name })}
         onPin={p => movePin(p, 'pin')}/>
 

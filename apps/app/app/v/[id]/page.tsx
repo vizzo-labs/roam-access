@@ -6,6 +6,9 @@ import { FactList, NeedList } from '@/components/community/Summary';
 import { auDate, basisLine, getVenueSummary } from '@/lib/data/summary';
 import { getBestEntrances } from '@/lib/data/entrances';
 import { GettingTherePublic } from '@/components/community/GettingThere';
+import { NearbyPublic } from '@/components/community/NearbyPublic';
+import { getNearbyListings } from '@/lib/data/arrival-nearby';
+import { serverT } from '@/lib/i18n/server';
 
 // Public, read-only access summary of one place. No login, no personal data.
 export async function generateMetadata({ params }: PageProps<'/v/[id]'>): Promise<Metadata> {
@@ -32,6 +35,8 @@ async function Summary({ params }: { params: PageProps<'/v/[id]'>['params'] }) {
   const [s, entrances] = await Promise.all([getVenueSummary(id), getBestEntrances(id)]);
   if (!s) notFound();
   const v = s.venue;
+  const listings = await getNearbyListings(v);
+  const entrance = entrances.get(id) ?? null;
   return (
     <>
       <p className="pub-eyebrow">Access summary</p>
@@ -48,7 +53,8 @@ async function Summary({ params }: { params: PageProps<'/v/[id]'>['params'] }) {
       <h2>What people found</h2>
       <div className="pub-card"><FactList s={s}/></div>
 
-      <GettingTherePublic venue={v} entrance={entrances.get(id) ?? null}/>
+      <GettingTherePublic venue={v} entrance={entrance}/>
+      <NearbyPublic t={serverT()} venue={v} entrance={entrance} listings={listings}/>
 
       <h2>How this works</h2>
       <p>
