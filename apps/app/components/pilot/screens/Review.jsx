@@ -3,6 +3,7 @@
 import React from 'react';
 import { RA2_FEATURES } from '@/lib/pilot-data';
 import { V2BigBtn } from '../ui/Buttons';
+import { Button } from '../ds';
 import { V2Dictate } from '../ui/Dictate';
 import { V2Shell } from '../ui/Shell';
 import { V2_VERDICT_META } from '../ui/Verdict';
@@ -10,6 +11,8 @@ import { C2, F2, M2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2NeedTags } from '@/lib/pilot/match';
 import { EntranceQuestion } from '../trust/EntranceQuestion';
+import { EntranceMarker } from '../arrival/EntranceMarker';
+import { entrancePayload, entranceShown } from '../arrival/entranceForm';
 import { ReviewPhotos, useReviewPhotos, PhotoSuggestion } from '../photos/ReviewPhotos';
 import { SensoryQuestions, EMPTY_SENSORY } from '../sensory/SensoryQuestions';
 import { useT } from '../i18n';
@@ -27,6 +30,10 @@ function V2ReviewView({ app }) {
   const [note, setNote] = React.useState('');
   const [entranceAlt, setEntranceAlt] = React.useState(null);
   const [entranceNote, setEntranceNote] = React.useState('');
+  // Getting there (I1): where the step-free door is. `kind` is used only on
+  // the "Step-free way in? Yes" path (the "No" path's answer is the kind).
+  const [mark, setMark] = React.useState({ kind: 'main', pin: null, note: '' });
+  const [markOpen, setMarkOpen] = React.useState(false);
   const [sending, setSending] = React.useState(false);
   const [sensory, setSensory] = React.useState(EMPTY_SENSORY);
   const photos = useReviewPhotos(v.id);
@@ -55,7 +62,8 @@ function V2ReviewView({ app }) {
     // The entrance follow-up only counts when the main way in has steps.
     const entrance = features.stepfree === 'no' && entranceAlt
       ? { entranceAlt, entranceNote: entranceAlt === 'none' ? '' : entranceNote } : {};
-    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, photos: photos.payload, sensory });
+    const door = entrancePayload({ features, entranceAlt, entranceNote, mark, markOpen, photos: photos.photos });
+    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, entrance: door, photos: photos.payload, sensory });
     if (ok) app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
     else setSending(false);
   }
@@ -105,7 +113,7 @@ function V2ReviewView({ app }) {
           );
         })}
 
-        <ReviewPhotos venueName={v.name} state={photos}/>
+        <ReviewPhotos venueName={v.name} state={photos} hideTag={entranceShown(features, entranceAlt, markOpen) ? 'entrance' : null}/>
 
         <section aria-labelledby="rev-more" style={{ marginTop: 22 }}>
           <h2 id="rev-more" style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', fontFamily: F2 }}>
@@ -133,7 +141,20 @@ function V2ReviewView({ app }) {
               })}
             </div>
             {q.id === 'stepfree' && features.stepfree === 'no' && (
-              <EntranceQuestion value={entranceAlt} note={entranceNote} onChange={setEntranceAlt} onNote={setEntranceNote}/>
+              <EntranceQuestion value={entranceAlt} note={entranceNote} onChange={setEntranceAlt} onNote={setEntranceNote}>
+                {entranceAlt && entranceAlt !== 'none' && (
+                  <EntranceMarker venue={v} value={{ ...mark, kind: entranceAlt }} onChange={setMark} photos={photos}/>
+                )}
+              </EntranceQuestion>
+            )}
+            {q.id === 'stepfree' && features.stepfree === 'yes' && (
+              markOpen
+                ? <EntranceMarker venue={v} value={mark} onChange={setMark} showKinds showNote photos={photos}/>
+                : (
+                  <div style={{ margin: '0 0 8px' }}>
+                    <Button variant="outline" size="sm" icon="pin" full onClick={() => setMarkOpen(true)}>{t('arrival.mark.open')}</Button>
+                  </div>
+                )
             )}
             {features[q.id] === undefined && (
               <PhotoSuggestion featureId={q.id} suggestion={photos.suggestions[q.id]} onUse={setFeature}/>

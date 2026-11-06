@@ -9,6 +9,7 @@ import type { EntranceAlt, MicroAnswer, Review, Venue } from './db/schema';
 import { RA2_FEATURES, RA2_NEEDS, FEATURE_IDS, type FeatureId, type NeedId, type VerdictKind } from './pilot-data';
 import { ENTRANCE_ALTS } from './trust/entrance';
 import type { SensoryVM } from './sensory/summary';
+import type { EntranceVM } from './arrival/entrances';
 import type { I18nText } from './trust/text';
 import { optionOf, slotLabel } from './sensory/defs';
 
@@ -56,6 +57,9 @@ export type VenueVM = {
   // First visible review photo (an entrance photo if there is one), for the
   // map preview card. Built in lib/data.ts; null when nobody has added one.
   coverPhoto?: { url: string; alt: string } | null;
+  // Getting there (I1): the best step-free entrance someone marked (lib/data/
+  // entrances.ts). Directions go there; it never changes the verdict.
+  entrance?: EntranceVM | null;
 };
 
 export type ConfirmationStat = { last: Date | string; count: number };

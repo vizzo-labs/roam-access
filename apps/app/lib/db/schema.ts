@@ -273,6 +273,8 @@ export type MappingEvent = typeof mappingEvents.$inferSelect;
 export * from './schema-venues';
 // F6 · sensory content (sensory_reports)
 export * from './schema-sensory';
+// Getting there (I1) · venue_entrances, entrance_confirmations
+export * from './schema-arrival';
 export type Facility = typeof facilities.$inferSelect;
 export type VenueBadge = typeof venueBadges.$inferSelect;
 export type TempBarrier = typeof tempBarriers.$inferSelect;

@@ -11,6 +11,8 @@ import { useFormat, useT } from '../i18n';
 import { kindLabel } from '@/lib/i18n/data';
 import { verdictSourceShortT } from '@/lib/trust/labels';
 import { firstQuestion, keyFacts } from '@/lib/pilot/key-facts';
+import { EntranceLine } from '../arrival/GettingThere';
+import { useDirections } from '../arrival/directions';
 
 // PlacePreviewCard — what a map pin opens (Domain / Airbnb / Google Maps
 // style): a photo on the left, the place, its personalised verdict, the key
@@ -146,7 +148,9 @@ const PlacePreviewCard = React.forwardRef(function PlacePreviewCard({
   const [shownId, setShownId] = React.useState(v.id);
   if (shownId !== v.id) { setShownId(v.id); setAsking(false); setThanked(false); }
 
-  const dirHref = directionsHref ?? `https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lng}`;
+  // Directions: to the step-free entrance when someone marked one (I1).
+  const dir = useDirections(v, needs);
+  const dirHref = directionsHref ?? dir.href;
   const canAsk = unknown && !!onAnswer && !thanked;
   const feature = canAsk ? firstQuestion(v, needs) : null;
   const report = reports[0];
@@ -202,6 +206,7 @@ const PlacePreviewCard = React.forwardRef(function PlacePreviewCard({
               )}
             </div>
           )}
+          {!asking && <EntranceLine venue={v} style={{ marginTop: SPACE.xs }}/>}
           {thanked && <p ref={thanksRef} tabIndex={-1} role="status" style={{ ...TYPE.footnote, fontWeight: 600, color: C2.green, margin: '6px 0 0' }}>{t('preview.thanks')}</p>}
         </div>
       </div>
@@ -230,7 +235,7 @@ const PlacePreviewCard = React.forwardRef(function PlacePreviewCard({
               style={{ flex: '2 1 150px' }}>{t('explore.seeDetails')}</Button>
           )}
           <Button size="sm" variant="outline" icon="directions" href={dirHref} external
-            aria-label={t('venue.action.directionsAria', { name: v.name })} style={{ flex: '1 1 110px' }}>
+            aria-label={dir.ariaLabel} style={{ flex: '1 1 110px', whiteSpace: 'normal' }}>
             {t('venue.action.directions')}
           </Button>
         </div>

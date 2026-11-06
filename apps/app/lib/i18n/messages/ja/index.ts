@@ -18,7 +18,8 @@ import layers from './layers';
 import community from './community';
 import sensory from './sensory';
 import preview from './preview';
+import arrival from './arrival';
 export { meta } from './_meta';
 
-const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview };
+const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival };
 export default dict as Dict;

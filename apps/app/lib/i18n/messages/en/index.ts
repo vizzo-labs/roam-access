@@ -19,7 +19,8 @@ import layers from './layers';
 import community from './community';
 import sensory from './sensory';
 import preview from './preview';
+import arrival from './arrival';
 
-const en = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview };
+const en = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival };
 export type MessageKey = keyof typeof en;
 export default en as Dict;

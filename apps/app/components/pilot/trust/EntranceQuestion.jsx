@@ -8,7 +8,8 @@ import { useT } from '../i18n';
 
 // Shown right after "Step-free way in? No": is there another way in without
 // steps, and where? One answer at most; tap it again to clear it.
-function EntranceQuestion({ value, note, onChange, onNote }) {
+// `children`: shown under the answer (the entrance pin, Getting there I1).
+function EntranceQuestion({ value, note, onChange, onNote, children }) {
   const t = useT();
   return (
     <div style={{
@@ -37,6 +38,7 @@ function EntranceQuestion({ value, note, onChange, onNote }) {
             }}/>
         </div>
       )}
+      {children}
     </div>
   );
 }

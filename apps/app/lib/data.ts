@@ -9,6 +9,7 @@ import { ENTRANCE_ALTS, ENTRANCE_NOTE_MAX } from './trust/entrance';
 import { getSensoryReports, parseSensoryInput, saveReviewSensory, sensoryColumns } from './data/sensory';
 import { buildSensoryVM } from './sensory/summary';
 import { getCoverPhotos } from './data/photos';
+import { getBestEntrances } from './data/entrances';
 
 const { venues, reviews, profiles, saved, microAnswers } = schema;
 
@@ -23,13 +24,14 @@ export async function ensureProfile(userId: string) {
 
 export async function getVenueVMs(): Promise<VenueVM[]> {
   const db = getDb();
-  const [vs, rs, confirm, qs, ss, covers] = await Promise.all([
+  const [vs, rs, confirm, qs, ss, covers, entrances] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
     getConfirmationStats(),
     db.select().from(microAnswers).where(eq(microAnswers.hidden, false)),
     getSensoryReports(),
     getCoverPhotos(),
+    getBestEntrances(),
   ]);
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
@@ -40,11 +42,13 @@ export async function getVenueVMs(): Promise<VenueVM[]> {
   const now = Date.now();
   return vs.map(v => {
     const cover = covers.get(v.id);
+    const entrance = entrances.get(v.id);
     return {
       ...buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id), quickByVenue.get(v.id) || []),
       sensory: buildSensoryVM(byVenue.get(v.id) || [], sensoryByVenue.get(v.id) || [], now),
       // Only places with a photo carry one (keeps /api/bootstrap small).
       ...(cover ? { coverPhoto: cover } : {}),
+      ...(entrance ? { entrance } : {}),
     };
   });
 }
@@ -53,14 +57,18 @@ export async function getVenueVM(id: string): Promise<VenueVM | null> {
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const [rs, confirm, qs, ss, covers] = await Promise.all([
+  const [rs, confirm, qs, ss, covers, entrances] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
     getConfirmationStats(id),
     db.select().from(microAnswers).where(and(eq(microAnswers.venueId, id), eq(microAnswers.hidden, false))),
     getSensoryReports(id),
     getCoverPhotos(id),
+    getBestEntrances(id),
   ]);
-  return { ...buildVenueVM(v, rs, confirm.get(id), qs), sensory: buildSensoryVM(rs, ss), coverPhoto: covers.get(id) ?? null };
+  return {
+    ...buildVenueVM(v, rs, confirm.get(id), qs), sensory: buildSensoryVM(rs, ss),
+    coverPhoto: covers.get(id) ?? null, entrance: entrances.get(id) ?? null,
+  };
 }
 
 export async function getMyStats(userId: string) {

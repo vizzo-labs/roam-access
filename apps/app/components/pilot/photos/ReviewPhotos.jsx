@@ -70,18 +70,21 @@ function useReviewPhotos(venueId) {
     }
   }, [venueId, patch, suggest, t]);
 
-  const add = React.useCallback(async (files) => {
-    const room = MAX_PHOTOS_PER_REVIEW - photos.length;
+  // opts.kind presets the photo's kind; opts.tag marks a photo another part of
+  // the form shows and owns (the step-free entrance photo, tag 'entrance').
+  const add = React.useCallback(async (files, opts = {}) => {
+    const room = Math.min(MAX_PHOTOS_PER_REVIEW - photos.length, opts.max ?? Infinity);
     const list = Array.from(files || []).slice(0, Math.max(0, room));
+    const kind = opts.kind || 'other';
     for (const file of list) {
       const key = `p${++seq}`;
-      setPhotos(ps => [...ps, { key, status: 'preparing', id: null, preview: null, prepared: null, kind: 'other', alt: '', altSource: null, altConfirmed: false, suggestion: null, suggestStatus: 'idle' }]);
+      setPhotos(ps => [...ps, { key, status: 'preparing', id: null, preview: null, prepared: null, kind, tag: opts.tag || null, alt: '', altSource: null, altConfirmed: false, suggestion: null, suggestStatus: 'idle' }]);
       setAnnounce(t('photos.say.preparing'));
       try {
         const prepared = await preparePhoto(file);
         const preview = URL.createObjectURL(prepared.thumb);
         patch(key, { preview, prepared });
-        await upload(key, prepared, 'other');
+        await upload(key, prepared, kind);
       } catch {
         patch(key, { status: 'failed', error: 'unreadable' });
         setAnnounce(t('photos.say.unreadable'));
@@ -123,11 +126,14 @@ function useReviewPhotos(venueId) {
   return { photos, patch, add, remove, retry, suggestions, busy, needsAlt, payload, announce };
 }
 
-function ReviewPhotos({ venueName, state }) {
+// `hideTag`: photos with this tag are shown elsewhere in the form (the
+// entrance photo sits with the entrance pin), so they're left out here.
+function ReviewPhotos({ venueName, state, hideTag = null }) {
   const t = useT();
-  const { photos, patch, add, remove, retry, announce } = state;
+  const { patch, add, remove, retry, announce } = state;
+  const photos = hideTag ? state.photos.filter(p => p.tag !== hideTag) : state.photos;
   const input = React.useRef(null);
-  const full = photos.length >= MAX_PHOTOS_PER_REVIEW;
+  const full = state.photos.length >= MAX_PHOTOS_PER_REVIEW;
 
   return (
     <section aria-labelledby="rev-photos" style={{ marginTop: 22 }}>
@@ -151,21 +157,22 @@ function ReviewPhotos({ venueName, state }) {
 
 const fieldLabel = { ...TYPE.headline, fontSize: 15.5, display: 'block', margin: `${SPACE.md}px 0 6px` };
 
-function PhotoCard({ p, n, venueName, patch, remove, retry }) {
+// `fixedKind`: the kind is set by where the photo was added (no picker).
+function PhotoCard({ p, n, venueName, patch, remove, retry, fixedKind = false, title }) {
   const t = useT();
   const altId = `alt-${p.key}`, kindId = `kind-${p.key}`, hintId = `alt-hint-${p.key}`;
   const statusText = { preparing: t('photos.preparing'), uploading: t('photos.uploading') }[p.status];
   const aiPending = p.altSource === 'ai' && !p.altConfirmed;
 
   return (
-    <Card role="group" aria-label={t('photos.card', { n })} style={{ marginBottom: SPACE.sm }}>
+    <Card role="group" aria-label={title || t('photos.card', { n })} style={{ marginBottom: SPACE.sm }}>
       <div style={{ display: 'flex', gap: SPACE.sm, alignItems: 'flex-start' }}>
         <div style={{ width: 84, height: 84, borderRadius: RADIUS.md - 2, overflow: 'hidden', background: C2.stone, flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {p.preview && <img src={p.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ ...TYPE.headline, margin: '0 0 6px' }}>{t('photos.card', { n })}</p>
+          <p style={{ ...TYPE.headline, margin: '0 0 6px' }}>{title || t('photos.card', { n })}</p>
           {statusText && <p style={{ ...TYPE.footnote, color: C2.slate, margin: `0 0 ${SPACE.xs}px` }}>{statusText}</p>}
           <div style={{ display: 'flex', gap: SPACE.xs, flexWrap: 'wrap' }}>
             {p.status === 'failed' && p.prepared && <Button size="sm" variant="ghost" icon="refresh" onClick={() => retry(p.key)} aria-label={t('photos.retryAria', { n })}>{t('photos.retry')}</Button>}
@@ -180,6 +187,7 @@ function PhotoCard({ p, n, venueName, patch, remove, retry }) {
 
       {p.status !== 'failed' && (
         <>
+          {!fixedKind && <>
           <label htmlFor={kindId} style={fieldLabel}>{t('photos.whatShows')}</label>
           <select id={kindId} value={p.kind} onChange={e => patch(p.key, { kind: e.target.value })} style={{
             ...TYPE.input, width: '100%', minHeight: 48, borderRadius: RADIUS.md - 2, border: edge(), padding: '0 12px',
@@ -187,6 +195,7 @@ function PhotoCard({ p, n, venueName, patch, remove, retry }) {
           }}>
             {PHOTO_KINDS.map(k => <option key={k.id} value={k.id}>{t(`photos.kind.${k.id}`)}</option>)}
           </select>
+          </>}
 
           <label htmlFor={altId} style={{ ...fieldLabel, marginBottom: 2 }}>
             {t('photos.describe')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('photos.required')}</span>
@@ -242,4 +251,4 @@ function PhotoSuggestion({ featureId, suggestion, onUse }) {
   );
 }
 
-export { ReviewPhotos, useReviewPhotos, PhotoSuggestion };
+export { ReviewPhotos, useReviewPhotos, PhotoSuggestion, PhotoCard };
