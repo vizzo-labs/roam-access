@@ -11,8 +11,8 @@ const SHOWN_KEY = 'ra2-layers';
 function readShown() {
   try {
     const s = JSON.parse(localStorage.getItem(SHOWN_KEY) || 'null');
-    return { toilets: !!s?.toilets, beach: !!s?.beach };
-  } catch { return { toilets: false, beach: false }; }
+    return { toilets: !!s?.toilets, beach: !!s?.beach, arrival: !!s?.arrival };
+  } catch { return { toilets: false, beach: false, arrival: false }; }
 }
 
 async function call(path, body) {

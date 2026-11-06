@@ -154,6 +154,10 @@ another branch added. It is removed. Instead:
   `$tag$`) quotes is not treated as transaction control, so write guarded constraints as a
   normal `DO $$ BEGIN … END $$;` block. Rules: `apps/app/scripts/lib/migration-rules.ts`
   (tests: `npx tsx scripts/lib/migration-rules.test.ts`).
+  One named exemption: `ALTER TABLE facilities DROP CONSTRAINT IF EXISTS facilities_layer_chk;`
+  is allowed only when the same file re-adds `facilities_layer_chk` afterwards with a list that
+  still holds `'toilets'` and `'beach'` — a CHECK can't be widened in place, and new map layers
+  (e.g. `'arrival'`) need a wider one. No other DROP CONSTRAINT is allowed.
 - **Never edit a migration after it merges.** Need a change? Add a new file.
   Note that preview and local builds apply your migration to the shared dev DB *before*
   merge — if you change an unmerged migration that already ran there, rename it (new

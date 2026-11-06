@@ -58,7 +58,8 @@ export const toiletTagLabels = (d, t, skip = []) => toiletTags(d).filter(x => !s
 // Translated labels for layer data (pass the `t` from useT()).
 export const reportLabel = (t, id) => t(`layers.report.${reportType(id) ? id : 'other'}.label`);
 export const reportBanner = (t, id) => t(`layers.report.${reportType(id) ? id : 'other'}.banner`);
-export const facilityKindLabel = (t, kind) => t(`layers.kind.${['toilet', 'beach', 'liberty_swing', 'ferry', 'walk'].includes(kind) ? kind : 'unknown'}`);
+export const FACILITY_KIND_IDS = ['toilet', 'beach', 'liberty_swing', 'ferry', 'walk', 'accessible_parking', 'drop_off', 'accessible_stop', 'wharf'];
+export const facilityKindLabel = (t, kind) => t(`layers.kind.${FACILITY_KIND_IDS.includes(kind) ? kind : 'unknown'}`);
 export const badgeText = (t, id, field) => t(`layers.badge.${id}.${field}`);
 
 export function hoursLabel(d) {
@@ -81,4 +82,8 @@ export const badgeDef = id => BADGES.find(b => b.id === id);
 export { BADGES };
 
 // ── Map pins for facilities ──────────────────────────────────────────────
-export const FACILITY_ICON = { toilet: 'toilet', beach: 'water', liberty_swing: 'swing', ferry: 'ferry', walk: 'walk' };
+export const FACILITY_ICON = {
+  toilet: 'toilet', beach: 'water', liberty_swing: 'swing', ferry: 'ferry', walk: 'walk',
+  // Getting there 2 (I2)
+  accessible_parking: 'parking', drop_off: 'car', accessible_stop: 'bus', wharf: 'ferry',
+};

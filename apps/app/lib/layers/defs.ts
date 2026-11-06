@@ -29,7 +29,7 @@ export const BADGE_IDS = BADGES.map(b => b.id);
 // ── Temporary reports ────────────────────────────────────────────────────
 // `hours` = default life of a report; "Still there?" pushes the expiry to at
 // least now + hours. `on` = where the type can be reported.
-export type ReportTarget = 'venue' | 'toilets' | 'beach';
+export type ReportTarget = 'venue' | 'toilets' | 'beach' | 'arrival';
 export type ReportTypeId =
   | 'lift_out' | 'ramp_blocked' | 'roadworks' | 'event_noise' | 'toilet_closed'
   | 'low_tide' | 'matting_missing' | 'matting_down' | 'other';
@@ -38,8 +38,8 @@ export const REPORT_TYPES: {
   id: ReportTypeId; label: string; banner: string; hours: number; on: ReportTarget[]; positive?: boolean;
 }[] = [
   { id: 'lift_out',        label: 'Lift out of order',                  banner: 'Lift out of order',                       hours: 72, on: ['venue'] },
-  { id: 'ramp_blocked',    label: 'Ramp or step-free way blocked',      banner: 'Ramp or step-free way blocked',           hours: 48, on: ['venue', 'toilets', 'beach'] },
-  { id: 'roadworks',       label: 'Roadworks or footpath closed',       banner: 'Roadworks or footpath closed nearby',     hours: 72, on: ['venue', 'toilets', 'beach'] },
+  { id: 'ramp_blocked',    label: 'Ramp or step-free way blocked',      banner: 'Ramp or step-free way blocked',           hours: 48, on: ['venue', 'toilets', 'beach', 'arrival'] },
+  { id: 'roadworks',       label: 'Roadworks or footpath closed',       banner: 'Roadworks or footpath closed nearby',     hours: 72, on: ['venue', 'toilets', 'beach', 'arrival'] },
   { id: 'event_noise',     label: 'Event or loud noise',                banner: 'Event on — expect noise and crowds',      hours: 24, on: ['venue', 'beach'] },
   { id: 'toilet_closed',   label: 'Accessible toilet closed or locked', banner: 'Accessible toilet closed or locked',      hours: 48, on: ['venue', 'toilets', 'beach'] },
   // Tides turn about every 6 hours, so a low-tide report goes stale fast.
@@ -47,7 +47,7 @@ export const REPORT_TYPES: {
   // "Is there matting today?" — the two answers are reports too.
   { id: 'matting_missing', label: 'No beach matting today',             banner: 'No beach matting today',                  hours: 12, on: ['beach'] },
   { id: 'matting_down',    label: 'Beach matting is down',              banner: 'Beach matting is down today',             hours: 12, on: ['beach'], positive: true },
-  { id: 'other',           label: 'Something else',                     banner: 'Temporary problem reported',              hours: 48, on: ['venue', 'toilets', 'beach'] },
+  { id: 'other',           label: 'Something else',                     banner: 'Temporary problem reported',              hours: 48, on: ['venue', 'toilets', 'beach', 'arrival'] },
 ];
 export const REPORT_TYPE_IDS = REPORT_TYPES.map(t => t.id);
 export const reportType = (id: string) => REPORT_TYPES.find(t => t.id === id);
@@ -58,8 +58,10 @@ export const REPORT_OPPOSITE: Partial<Record<ReportTypeId, ReportTypeId>> = {
 export const REPORT_NOTE_MAX = 280;
 
 // ── Facilities ───────────────────────────────────────────────────────────
-export type FacilityLayer = 'toilets' | 'beach';
-export type FacilityKind = 'toilet' | 'beach' | 'liberty_swing' | 'ferry' | 'walk';
+// 'arrival' (I2): parking, drop-off, accessible stops, wharves — see lib/arrival/places.ts.
+export type FacilityLayer = 'toilets' | 'beach' | 'arrival';
+export type FacilityKind = 'toilet' | 'beach' | 'liberty_swing' | 'ferry' | 'walk'
+  | 'accessible_parking' | 'drop_off' | 'accessible_stop' | 'wharf';
 
 export const FACILITY_KINDS: { id: FacilityKind; label: string; layer: FacilityLayer }[] = [
   { id: 'toilet', label: 'Public toilet', layer: 'toilets' },
@@ -67,6 +69,10 @@ export const FACILITY_KINDS: { id: FacilityKind; label: string; layer: FacilityL
   { id: 'liberty_swing', label: 'Liberty Swing', layer: 'beach' },
   { id: 'ferry', label: 'Ferry wharf', layer: 'beach' },
   { id: 'walk', label: 'Accessible walk', layer: 'beach' },
+  { id: 'accessible_parking', label: 'Accessible parking', layer: 'arrival' },
+  { id: 'drop_off', label: 'Drop-off point', layer: 'arrival' },
+  { id: 'accessible_stop', label: 'Accessible stop', layer: 'arrival' },
+  { id: 'wharf', label: 'Ferry wharf', layer: 'arrival' },
 ];
 
 export const NPTM = {

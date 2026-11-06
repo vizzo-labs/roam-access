@@ -22,9 +22,30 @@ export const stripSqlComments = (sql: string) => sql.replace(/\/\*[\s\S]*?\*\//g
 /** Replace every $tag$ … $tag$ body with an empty one. */
 export const stripDollarQuoted = (sql: string) => sql.replace(/\$([A-Za-z_][A-Za-z0-9_]*)?\$[\s\S]*?\$\1\$/g, '$$$$');
 
+// The ONE allowed DROP: swapping the `facilities.layer` check for a wider one
+// (I2 added the 'arrival' layer). A CHECK can't be widened in place, so the
+// file may drop `facilities_layer_chk` only if it re-adds it, after the drop,
+// with a list that still holds 'toilets' and 'beach'. The file runs in one
+// transaction, so the table is never left without a check. Nothing else.
+const FACILITIES_LAYER_DROP = /alter\s+table\s+(?:public\.)?facilities\s+drop\s+constraint\s+if\s+exists\s+facilities_layer_chk\s*;/gi;
+const FACILITIES_LAYER_ADD = /alter\s+table\s+(?:public\.)?facilities\s+add\s+constraint\s+facilities_layer_chk\s+check\s*\(\s*layer\s+in\s*\(([^)]*)\)\s*\)\s*;/i;
+
+/** Remove the facilities layer-check swap when it's well-formed (see above). */
+export function allowFacilitiesLayerSwap(code: string): string {
+  const drops = [...code.matchAll(FACILITIES_LAYER_DROP)];
+  if (drops.length !== 1) return code;
+  const drop = drops[0];
+  const after = code.slice(drop.index! + drop[0].length);
+  const add = FACILITIES_LAYER_ADD.exec(after);
+  if (!add) return code;
+  const values = add[1].split(',').map(x => x.trim().toLowerCase());
+  if (!values.includes("'toilets'") || !values.includes("'beach'")) return code;
+  return code.slice(0, drop.index!) + code.slice(drop.index! + drop[0].length);
+}
+
 /** The first rule a migration breaks, or null if it's allowed. */
 export function migrationViolation(sql: string): string | null {
-  const code = stripSqlComments(sql);
+  const code = allowFacilitiesLayerSwap(stripSqlComments(sql));
   for (const [re, what] of DESTRUCTIVE) if (re.test(code)) return what;
   if (TRANSACTION.test(stripDollarQuoted(code))) return 'transaction control (the runner wraps each file in a transaction)';
   return null;

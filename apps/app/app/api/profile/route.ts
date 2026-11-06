@@ -3,6 +3,7 @@ import { badRequest, getUserId, unauthorized } from '@/lib/auth';
 import { deleteProfile, updateProfile } from '@/lib/data';
 import { deleteUserPhotoBlobs } from '@/lib/data/photos';
 import { forgetUserInReports } from '@/lib/data/layers';
+import { forgetUserInArrivalSteps } from '@/lib/data/arrival-steps';
 
 export async function PUT(req: Request) {
   const userId = await getUserId();
@@ -19,6 +20,7 @@ export async function DELETE() {
   if (!userId) return unauthorized();
   await deleteUserPhotoBlobs(userId);
   await forgetUserInReports(userId);
+  await forgetUserInArrivalSteps(userId);
   await deleteProfile(userId);
   const client = await clerkClient();
   await client.users.deleteUser(userId);

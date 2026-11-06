@@ -183,7 +183,7 @@ function V2VenueView({ app }) {
         <VenueSays app={app} venue={v} says={says}/>
 
         {/* partner programs, nearest accessible toilet, report a problem (F3) */}
-        <VenueAccessExtras app={app} venue={v}/>
+        <VenueAccessExtras app={app} venue={v} nearestToilet={false}/>
 
         <VenueFooterLinks venue={v} says={says}/>
         <p style={{ ...TYPE.footnote, textAlign: 'center', margin: '8px 0 0' }}>

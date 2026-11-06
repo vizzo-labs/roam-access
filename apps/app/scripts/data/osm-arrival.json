@@ -1,0 +1,610 @@
+{
+ "source": "OpenStreetMap contributors, via the Overpass API (maps.mail.ru mirror)",
+ "licence": "ODbL 1.0",
+ "licenceUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+ "copyright": "https://www.openstreetmap.org/copyright",
+ "osmBase": "2026-11-06T07:22:38Z",
+ "fetched": "2026-11-06",
+ "bbox": {
+  "south": -33.83,
+  "west": 151.245,
+  "north": -33.77,
+  "east": 151.31
+ },
+ "query": "amenity=parking_space with parking_space=disabled / disabled=designated / wheelchair=designated / capacity:disabled; amenity=parking with capacity:disabled or wheelchair=designated; parking[_space]=drop_off; bus stops, platforms and bus stations with wheelchair=*; ferry terminals; taxi ranks",
+ "elements": [
+  {
+   "type": "node",
+   "id": 514335233,
+   "lat": -33.7967423,
+   "lon": 151.2649121,
+   "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "bus": "yes",
+    "covered": "yes",
+    "departures_board": "timetable",
+    "gtfs:stop_id": "2093140",
+    "highway": "bus_stop",
+    "name": "White St before Orchard St",
+    "network": "Transport Buses",
+    "network:wikidata": "Q5001345",
+    "public_transport": "platform",
+    "ref": "2093140",
+    "shelter": "yes",
+    "source": "survey",
+    "tactile_paving": "no",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 2254696807,
+   "lat": -33.7875262,
+   "lon": 151.2734887,
+   "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "bus": "yes",
+    "gtfs:stop_id": "2093147",
+    "highway": "bus_stop",
+    "lit": "no",
+    "name": "Kenneth Rd before Burchmore Rd",
+    "network": "Transport Buses",
+    "network:wikidata": "Q5001345",
+    "public_transport": "platform",
+    "ref": "2093147",
+    "shelter": "no",
+    "tactile_paving": "no",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4146795594,
+   "lat": -33.8005639,
+   "lon": 151.2841043,
+   "tags": {
+    "amenity": "ferry_terminal",
+    "ferry": "yes",
+    "local_ref": "2",
+    "name": "Manly Fast Ferry terminal (Circular Quay)",
+    "public_transport": "stop_position",
+    "ref": "209525"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4272342421,
+   "lat": -33.8007193,
+   "lon": 151.284696,
+   "tags": {
+    "amenity": "ferry_terminal",
+    "ferry": "yes",
+    "local_ref": "3",
+    "name": "Manly Wharf 3",
+    "operator": "Matilda Cruises",
+    "public_transport": "station",
+    "ref": "209593"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5822671894,
+   "lat": -33.8004511,
+   "lon": 151.2837119,
+   "tags": {
+    "amenity": "ferry_terminal",
+    "ferry": "yes",
+    "local_ref": "1",
+    "name": "Manly Wharf",
+    "public_transport": "stop_position",
+    "ref": "20951",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 7110922890,
+   "lat": -33.7959962,
+   "lon": 151.2876921,
+   "tags": {
+    "amenity": "taxi"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11542616883,
+   "lat": -33.7970331,
+   "lon": 151.267832,
+   "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "bus": "yes",
+    "covered": "no",
+    "departures_board": "timetable",
+    "gtfs:stop_id": "209424",
+    "highway": "bus_stop",
+    "name": "Lauderdale Av opp King Av",
+    "network": "Transport Buses",
+    "network:wikidata": "Q5001345",
+    "public_transport": "platform",
+    "ref": "209424",
+    "shelter": "no",
+    "tactile_paving": "no",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11542616884,
+   "lat": -33.7971378,
+   "lon": 151.267857,
+   "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "bus": "yes",
+    "covered": "no",
+    "departures_board": "timetable",
+    "gtfs:stop_id": "209373",
+    "highway": "bus_stop",
+    "name": "Lauderdale Av at King Av",
+    "network": "Transport Buses",
+    "network:wikidata": "Q5001345",
+    "public_transport": "platform",
+    "ref": "209373",
+    "shelter": "no",
+    "tactile_paving": "no",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13565368786,
+   "lat": -33.7987934,
+   "lon": 151.2847184,
+   "tags": {
+    "amenity": "taxi"
+   }
+  },
+  {
+   "type": "way",
+   "id": 237058244,
+   "center": {
+    "lat": -33.8284759,
+    "lon": 151.2611481
+   },
+   "tags": {
+    "access": "yes",
+    "amenity": "parking",
+    "capacity": "11",
+    "capacity:disabled": "no",
+    "fee": "yes",
+    "operator": "NSW National Parks and Wildlife Service",
+    "operator:type": "government",
+    "operator:wikidata": "Q108872274",
+    "orientation": "perpendicular",
+    "parking": "street_side"
+   }
+  },
+  {
+   "type": "way",
+   "id": 488797713,
+   "center": {
+    "lat": -33.7748487,
+    "lon": 151.2931972
+   },
+   "tags": {
+    "access": "yes",
+    "amenity": "parking",
+    "capacity": "18",
+    "capacity:disabled": "1",
+    "charge:conditional": "8 AUD/hour @ (May 1 - Sep 30); 35 AUD/day @ (May 1 - Sep 30); 10 AUD/hour @ (Oct 1 - Apr 30); 40 AUD/day @ (Oct 1 - Apr 30)",
+    "fee": "no",
+    "fee:conditional": "yes @ (07:00-19:00); no @ (\"Northern Beaches Beach Parking Permit Holders\")",
+    "maxstay": "12 hours",
+    "name": "South Curl Curl Beach Parking Area 2",
+    "opening_hours": "24/7",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "parking": "surface",
+    "payment:cash": "no",
+    "payment:easypark": "yes",
+    "payment:mastercard": "yes",
+    "payment:visa": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 518726068,
+   "center": {
+    "lat": -33.8208663,
+    "lon": 151.2997564
+   },
+   "tags": {
+    "access": "yes",
+    "amenity": "parking",
+    "capacity:disabled": "2",
+    "charge": "5 AUD/day",
+    "fee": "yes",
+    "operator": "NSW National Parks and Wildlife Service",
+    "operator:wikidata": "Q108872274",
+    "parking": "surface",
+    "payment:cards": "yes",
+    "payment:parknpay": "yes",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 655264368,
+   "center": {
+    "lat": -33.7862713,
+    "lon": 151.2668755
+   },
+   "tags": {
+    "amenity": "bus_station",
+    "building": "yes",
+    "bus": "yes",
+    "layer": "1",
+    "network": "B-Line",
+    "operator": "Transport for NSW",
+    "operator:wikidata": "Q7834923",
+    "public_transport": "station",
+    "wheelchair": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 736703573,
+   "center": {
+    "lat": -33.7771533,
+    "lon": 151.2474683
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity:disabled": "1",
+    "check_date": "2023-07-30",
+    "fee": "yes",
+    "maxstay": "12 hours",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "parking": "surface",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 758689238,
+   "center": {
+    "lat": -33.8175617,
+    "lon": 151.2963323
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity": "2",
+    "capacity:disabled": "2",
+    "check_date": "2024-02-10",
+    "parking": "surface",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 758689242,
+   "center": {
+    "lat": -33.817139,
+    "lon": 151.2965018
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity:disabled": "1",
+    "check_date": "2025-10-06",
+    "parking": "surface",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 825156687,
+   "center": {
+    "lat": -33.7813673,
+    "lon": 151.2724425
+   },
+   "tags": {
+    "access": "yes",
+    "amenity": "parking",
+    "capacity:disabled": "2",
+    "parking": "surface",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1083761640,
+   "center": {
+    "lat": -33.7823961,
+    "lon": 151.2742169
+   },
+   "tags": {
+    "access": "private",
+    "amenity": "parking",
+    "capacity:disabled": "0",
+    "operator": "Private",
+    "operator:type": "private",
+    "parking": "surface",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1311661750,
+   "center": {
+    "lat": -33.8065386,
+    "lon": 151.2535603
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1311661754,
+   "center": {
+    "lat": -33.8061968,
+    "lon": 151.2526969
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1368005286,
+   "center": {
+    "lat": -33.8009191,
+    "lon": 151.298585
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157002,
+   "center": {
+    "lat": -33.797928,
+    "lon": 151.2855586
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity": "3",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "parking": "street_side",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157003,
+   "center": {
+    "lat": -33.7979547,
+    "lon": 151.2855548
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157004,
+   "center": {
+    "lat": -33.7979277,
+    "lon": 151.2855594
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157005,
+   "center": {
+    "lat": -33.7979007,
+    "lon": 151.2855641
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157006,
+   "center": {
+    "lat": -33.7978994,
+    "lon": 151.2854271
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity": "6",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "parking": "street_side",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157007,
+   "center": {
+    "lat": -33.7978215,
+    "lon": 151.2854456
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157008,
+   "center": {
+    "lat": -33.7978526,
+    "lon": 151.2854385
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157009,
+   "center": {
+    "lat": -33.7978835,
+    "lon": 151.2854313
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157010,
+   "center": {
+    "lat": -33.7979145,
+    "lon": 151.2854243
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157011,
+   "center": {
+    "lat": -33.7979455,
+    "lon": 151.2854171
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1382157012,
+   "center": {
+    "lat": -33.7979765,
+    "lon": 151.28541
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "wheelchair": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1466919550,
+   "center": {
+    "lat": -33.7992938,
+    "lon": 151.2647764
+   },
+   "tags": {
+    "amenity": "parking",
+    "capacity": "9",
+    "capacity:disabled": "1",
+    "orientation": "perpendicular",
+    "parking": "street_side"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1557589780,
+   "center": {
+    "lat": -33.8078275,
+    "lon": 151.2461675
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1557589781,
+   "center": {
+    "lat": -33.8077455,
+    "lon": 151.2461924
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1557589783,
+   "center": {
+    "lat": -33.806737,
+    "lon": 151.2464263
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1557592670,
+   "center": {
+    "lat": -33.8036163,
+    "lon": 151.2458453
+   },
+   "tags": {
+    "amenity": "parking_space",
+    "disabled": "designated"
+   }
+  }
+ ]
+}
