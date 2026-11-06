@@ -9,3 +9,11 @@ Thumbs.db
 node_modules/
 .vercel
 .env*
+
+# Step-free routing (Getting there 6): OSM extracts, Valhalla tiles and
+# elevation data live outside the repo (~/Vizzo/valhalla-data). Never commit them.
+*.osm.pbf
+valhalla_tiles/
+valhalla_tiles.tar
+elevation_data/
+valhalla-data/
