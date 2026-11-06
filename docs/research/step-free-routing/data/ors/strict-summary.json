@@ -1,0 +1,458 @@
+[
+ {
+  "id": "collins",
+  "error": {
+   "code": 2009,
+   "message": "Route could not be found - Unable to find a route between points 1 (151.2846000 -33.7997500) and 2 (151.2915400 -33.8082800)."
+  },
+  "status": 404
+ },
+ {
+  "id": "bronze",
+  "km": 2.255,
+  "minutes": 29,
+  "climb_m": 121,
+  "ascent": 121.2,
+  "end_gap_m": 10,
+  "steps": [],
+  "crossings": [
+   {
+    "way": 1370423749,
+    "kerbs": []
+   },
+   {
+    "way": 1544785791,
+    "kerbs": []
+   },
+   {
+    "way": 1273244477,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1388516467,
+    "kerbs": [
+     "lowered"
+    ]
+   }
+  ],
+  "crossings_without_kerb_info": 2,
+  "raised": [],
+  "steep": [],
+  "max_steepness_class": 2,
+  "suitability": [
+   {
+    "value": 9,
+    "distance": 1493.7,
+    "amount": 66.25
+   },
+   {
+    "value": 6,
+    "distance": 512.8,
+    "amount": 22.75
+   },
+   {
+    "value": 5,
+    "distance": 248,
+    "amount": 11
+   }
+  ],
+  "surface": [
+   {
+    "value": 4,
+    "distance": 1024.8,
+    "amount": 45.45
+   },
+   {
+    "value": 0,
+    "distance": 920.6,
+    "amount": 40.83
+   },
+   {
+    "value": 3,
+    "distance": 276.4,
+    "amount": 12.26
+   },
+   {
+    "value": 14,
+    "distance": 32.8,
+    "amount": 1.46
+   }
+  ],
+  "warnings": [
+   {
+    "code": 4,
+    "message": "Extra info requested but not available: roadaccessrestrictions"
+   }
+  ],
+  "last": [
+   "Turn left",
+   "Arrive at your destination, on the left"
+  ],
+  "osm_ways": 34,
+  "osm_ways_unknown_to_extract": 0
+ },
+ {
+  "id": "balgowlah",
+  "km": 2.214,
+  "minutes": 25,
+  "climb_m": 80,
+  "ascent": 80.1,
+  "end_gap_m": 2,
+  "steps": [],
+  "crossings": [
+   {
+    "way": 1222456949,
+    "kerbs": []
+   },
+   {
+    "way": 1228124487,
+    "kerbs": []
+   },
+   {
+    "way": 1265764177,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1265764175,
+    "kerbs": []
+   },
+   {
+    "way": 1265764174,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1467939413,
+    "kerbs": []
+   },
+   {
+    "way": 1247123813,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863681,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863670,
+    "kerbs": []
+   },
+   {
+    "way": 1234863683,
+    "kerbs": []
+   },
+   {
+    "way": 1234863685,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863687,
+    "kerbs": []
+   },
+   {
+    "way": 1234863689,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863694,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863693,
+    "kerbs": []
+   },
+   {
+    "way": 1234863696,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1244546158,
+    "kerbs": []
+   },
+   {
+    "way": 1244546157,
+    "kerbs": []
+   },
+   {
+    "way": 1246819155,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   }
+  ],
+  "crossings_without_kerb_info": 10,
+  "raised": [],
+  "steep": [
+   {
+    "cls": -3,
+    "m": 311
+   }
+  ],
+  "max_steepness_class": 3,
+  "suitability": [
+   {
+    "value": 9,
+    "distance": 2213.6,
+    "amount": 100
+   }
+  ],
+  "surface": [
+   {
+    "value": 0,
+    "distance": 927.2,
+    "amount": 41.88
+   },
+   {
+    "value": 4,
+    "distance": 795.8,
+    "amount": 35.95
+   },
+   {
+    "value": 14,
+    "distance": 432.6,
+    "amount": 19.54
+   },
+   {
+    "value": 3,
+    "distance": 58,
+    "amount": 2.62
+   }
+  ],
+  "warnings": [
+   {
+    "code": 4,
+    "message": "Extra info requested but not available: roadaccessrestrictions"
+   }
+  ],
+  "last": [
+   "Turn right",
+   "Arrive at your destination, on the left"
+  ],
+  "osm_ways": 45,
+  "osm_ways_unknown_to_extract": 0
+ },
+ {
+  "id": "fairlightpool",
+  "km": 1.409,
+  "minutes": 17,
+  "climb_m": 57,
+  "ascent": 57.1,
+  "end_gap_m": 16,
+  "steps": [],
+  "crossings": [
+   {
+    "way": 1222456949,
+    "kerbs": []
+   },
+   {
+    "way": 1228124487,
+    "kerbs": []
+   },
+   {
+    "way": 1265764177,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1265764175,
+    "kerbs": []
+   },
+   {
+    "way": 1265764174,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1326239902,
+    "kerbs": []
+   }
+  ],
+  "crossings_without_kerb_info": 4,
+  "raised": [],
+  "steep": [
+   {
+    "cls": -3,
+    "m": 190
+   }
+  ],
+  "max_steepness_class": 3,
+  "suitability": [
+   {
+    "value": 9,
+    "distance": 1224.3,
+    "amount": 86.91
+   },
+   {
+    "value": 5,
+    "distance": 184.5,
+    "amount": 13.09
+   }
+  ],
+  "surface": [
+   {
+    "value": 4,
+    "distance": 627.2,
+    "amount": 44.52
+   },
+   {
+    "value": 14,
+    "distance": 432.6,
+    "amount": 30.71
+   },
+   {
+    "value": 3,
+    "distance": 235.8,
+    "amount": 16.74
+   },
+   {
+    "value": 0,
+    "distance": 108.2,
+    "amount": 7.68
+   },
+   {
+    "value": 1,
+    "distance": 5,
+    "amount": 0.36
+   }
+  ],
+  "warnings": [
+   {
+    "code": 4,
+    "message": "Extra info requested but not available: roadaccessrestrictions"
+   }
+  ],
+  "last": [
+   "Turn right",
+   "Arrive at your destination, on the right"
+  ],
+  "osm_ways": 23,
+  "osm_ways_unknown_to_extract": 0
+ },
+ {
+  "id": "fairlightshops",
+  "km": 1.098,
+  "minutes": 12,
+  "climb_m": 63,
+  "ascent": 63,
+  "end_gap_m": 1,
+  "steps": [],
+  "crossings": [
+   {
+    "way": 1222456949,
+    "kerbs": []
+   },
+   {
+    "way": 1228124487,
+    "kerbs": []
+   },
+   {
+    "way": 1265764177,
+    "kerbs": [
+     "lowered",
+     "lowered"
+    ]
+   },
+   {
+    "way": 1265764175,
+    "kerbs": []
+   },
+   {
+    "way": 1265764174,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1467939413,
+    "kerbs": []
+   },
+   {
+    "way": 1247123813,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863681,
+    "kerbs": [
+     "lowered"
+    ]
+   },
+   {
+    "way": 1234863670,
+    "kerbs": []
+   }
+  ],
+  "crossings_without_kerb_info": 5,
+  "raised": [],
+  "steep": [],
+  "max_steepness_class": 2,
+  "suitability": [
+   {
+    "value": 9,
+    "distance": 1097.7,
+    "amount": 100
+   }
+  ],
+  "surface": [
+   {
+    "value": 0,
+    "distance": 511.4,
+    "amount": 46.59
+   },
+   {
+    "value": 14,
+    "distance": 432.6,
+    "amount": 39.41
+   },
+   {
+    "value": 4,
+    "distance": 95.6,
+    "amount": 8.71
+   },
+   {
+    "value": 3,
+    "distance": 58,
+    "amount": 5.29
+   }
+  ],
+  "warnings": [
+   {
+    "code": 4,
+    "message": "Extra info requested but not available: roadaccessrestrictions"
+   }
+  ],
+  "last": [
+   "Turn left",
+   "Arrive at your destination, straight ahead"
+  ],
+  "osm_ways": 26,
+  "osm_ways_unknown_to_extract": 0
+ }
+]

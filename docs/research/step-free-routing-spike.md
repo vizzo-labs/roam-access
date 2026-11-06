@@ -10,8 +10,12 @@ entrance for **16%** of venues. Valhalla also routes across a crossing mapped wi
 **raised kerbs on both sides**. So we can show a route labelled as a draft, built on
 OpenStreetMap, with "check first" points. We cannot call it a confirmed step-free route
 until the town centre has been mapped (about one community mapping day) and we add our own
-checks on top of the engine. Google's "Wheelchair accessible" walking option is not a usable
-alternative (details below).
+checks on top of the engine. **OpenRouteService** (tested later the same day with a free key) avoided that
+raised-kerb crossing. But its slope limit only acts on the rare `incline` tags, it treats
+unmapped kerbs as fine, its tighter kerb setting *prefers* unmapped crossings over ones mapped as
+lowered, and it found no route at all to 3 of 12 places, one of them a flat 350 m walk on the
+harbour front. It doesn't replace Valhalla. Google's "Wheelchair accessible" walking option is not
+a usable alternative either (details below).
 
 Date: 6 November 2026. OSM data as of `2026-11-06T07:23:48Z`. Research and a throwaway
 prototype only: nothing here is in the app, and nothing touched production.
@@ -156,24 +160,105 @@ requests in total, sent 1.5 s apart.
    schedule for `valhalla1.openstreetmap.de`. It is a volunteer-run server, so treat it as
    suitable for research only.
 
-### 2b. OpenRouteService `wheelchair`: **not tested (no key)**
+### 2b. OpenRouteService (hosted API, `wheelchair` profile)
 
-The free API key needs a sign-up, which I didn't do. The parent thread asked Romy for a
-key and the request timed out. From the documentation only (**not tested**):
+Tested on 6 November 2026 with a free HeiGIT Standard key. The key is kept server-side, in
+`.env.local` only; it is not in the repo. **28 requests** in total: the 12 destinations with
+default settings, the 3 OSM entrances, and restriction variants on the problem routes.
+Script: [`ors-routes.mjs`](step-free-routing/scripts/ors-routes.mjs). Every response is cached
+in `data/ors/<pass>/<id>.json` with a summary in `data/ors/<pass>-summary.json`, so re-running
+uses no quota.
 
-- The wheelchair profile has restrictions that target exactly the gaps found above:
-  `maximum_sloped_kerb` (0.03 / **0.06 default** / 0.1 m), `maximum_incline` (3 / **6
-  default** / 10 / 15%), `minimum_width`, `smoothness_type` (default `good`),
-  `surface_type`, and `avoid_features: ["steps"]`.
-- The free tier allows 2,000 directions requests a day and 40 a minute. The key must stay
-  server-side.
-- OSM changes take "two to three weeks" to reach ORS. Australian coverage is not confirmed
-  in its documentation.
-- **To check when a key arrives:** with 82% of crossings missing kerb data, does
-  `maximum_sloped_kerb` *exclude* unknown kerbs (no route) or *ignore* them (same as
-  Valhalla)? Does it avoid the raised-kerb crossing? Does `maximum_incline: 6` find any
-  route to Fairlight or Balgowlah? Run the same 12 destinations; the script structure can
-  be reused.
+Each request asked for `extra_info` steepness, suitability, surface, waytype and `osmid`. The
+`osmid` way ids let me cross-check every route against our OSM extract in one call, the same
+way as Valhalla's `trace_attributes`. The hosted graph reports `osm_date 2026-10-11` and
+`graph_date 2026-10-16`, about 4 weeks behind our extract. Steepness classes in the table are
+ORS's own: 1 = 1–3%, 2 = 4–6%, 3 = 7–9%, 4 = 10–15%.
+
+**Passes**
+
+- **default:** no `profile_params`.
+- **strict:** the documented defaults written out (`maximum_incline` 6, `maximum_sloped_kerb`
+  0.06, `surface_type` `cobblestone:flattened`, `smoothness_type` `good`) plus
+  `minimum_width` 0.9.
+- **tight:** incline 3%, kerb 0.03 m.
+- **loose:** incline 15%, kerb 0.1 m, `smoothness_type` `very_horrible`, `surface_type` `any`,
+  `track_type` `grade5`.
+
+| Destination | ORS default | Climb | Max steepness class | Crossings: no kerb info / total | Ends | vs Valhalla |
+|---|---|---:|---|---|---|---|
+| Manly Library | 0.33 km, 4 min | 10 m | 1 | 2 / 2 | 19 m (6 m to the OSM entrance) | same |
+| New Brighton Hotel | 0.43 km, 5 min | 10 m | 1 | 1 / 2 | 10 m | same |
+| **Manly Art Gallery & Museum** | **no route** (also to the OSM entrance, to the promenade 13 m away, and with the loosest settings) | | | | | Valhalla: 0.36 km, ends 5 m from the entrance |
+| Fairy Bower Rock Pool | 1.26 km, 15 min | 45 m | 2 | 2 / 4 | 6 m | same corridor |
+| Shelly Beach | 1.58 km, 19 min | 52 m | 1 | 2 / 4 | 7 m | same corridor |
+| Fairlight Beach Pool | 1.41 km, 17 min | 57 m | **3** (190 m at 7–9%) | 4 / 6 | 16 m | 150 m longer |
+| Fairlight shops | 1.10 km, 12 min | 63 m | 2 | 5 / 9 | 1 m | similar |
+| Little Manly | 1.05 km, 12 min | 26 m | 2 | 0 / 1 | 2 m | similar |
+| **Collins Flat Beach** | **no route** (all settings) | | | | | Valhalla stopped 78 m short without saying so |
+| Bronze Sculpture House | 2.26 km, 29 min | 121 m | 2 | 2 / 4, **no raised kerbs** | 10 m (10 m to the OSM entrance) | **avoids the raised-kerb crossing** Valhalla used |
+| **Queenscliff Rock Pool** | **no route** (all settings) | | | | | Valhalla: no route either |
+| Balgowlah shops | 2.21 km, 25 min | 80 m | **3** (311 m at 7–9%) | 10 / 19 | 2 m | 130 m longer |
+
+**Findings**
+
+1. **Steps: avoided.** None of the 9 routes contains a `highway=steps` way, in any pass.
+2. **Raised kerbs: avoided here, cause not proven.** The Bronze Sculpture House route never
+   used OSM way 1273244492, the crossing with raised kerbs on both sides. It never came
+   within 34 m of it under default, strict, tight or even *loose* (0.1 m) settings, and took
+   another path. We can't tell whether ORS excludes that crossing because of its kerbs or
+   simply prefers another path.
+3. **Unknown kerbs count as fine.** Every route used crossings with no kerb information:
+   10 of 19 on the Balgowlah route.
+4. **Tightening the kerb limit makes things worse.** With `maximum_sloped_kerb: 0.03`, ORS
+   avoided *every* crossing mapped `kerb=lowered` and used *only* crossings with no kerb
+   information: Balgowlah 9 of 9, Fairlight shops 4 of 4, Bronze 3 of 3. Balgowlah got 360 m
+   longer. Apparently ORS reads `kerb=lowered` as higher than 3 cm and a missing kerb as
+   0 cm. So stricter settings push people towards the crossings nobody has checked.
+5. **The slope limit doesn't act on elevation.** The strict pass returned exactly the same
+   routes as the default pass, so the documented defaults are applied implicitly. Both
+   include class-3 (7–9%) stretches, above the 6% limit. With `maximum_incline: 3`, Balgowlah
+   and Fairlight shops *still* had class-3 stretches, and Bronze still climbs 121 m. My
+   inference: `maximum_incline` only filters ways tagged `incline=*`, which is 0.5–1% of the
+   network here. ORS's elevation-based steepness is smoother than Valhalla's: it puts the
+   Bronze route at 4–6% at most, where Valhalla said 12%. Neither has been checked on the
+   ground.
+6. **It finds no route more often.**
+   - Collins Flat and Queenscliff: "Route could not be found" (code 2009). That is honest,
+     and better than Valhalla's silent 78 m short stop.
+   - Manly Art Gallery & Museum: no route even to the promenade 13 m from the entrance, and
+     even with the loosest settings. Valhalla reaches it along the harbour-front shared path,
+     which has one 10% stretch. The cause is not established; it may be a gap in the
+     4-week-old graph, or a way ORS's wheelchair profile excludes. It is a **false
+     negative** for a flat town-centre venue 350 m from the wharf.
+7. **Where routes end.** Like Valhalla, ORS ends at the coordinate it is given, snapped to
+   the network: 1–19 m from it. With an OSM entrance node it reached the Library (6 m) and
+   the Bronze Sculpture House (10 m), but not the Gallery.
+8. **No route warnings.** The only warning returned was an unrelated one ("Extra info
+   requested but not available: roadaccessrestrictions"); the last instruction is "Arrive
+   at your destination". The `extra_info` (steepness, surface, suitability, `osmId`) is good
+   input for our own warnings. On the longer routes, 0–47% of the distance had surface
+   "unknown", and it still counted as suitable.
+9. **Time.** Durations work out at about 4.4–5.3 km/h, against Valhalla's 4 km/h.
+
+**Hosted terms and self-hosting**
+
+- **Quotas:** 2,000 directions requests a day and 40 a minute (sliding window). Going over
+  returns 403 or 429.
+- **Keys:** the ORS FAQ says a key "must not be used client-side" and that "every HeiGIT API
+  key belongs to one person", so it would have to sit behind our server, under one person's
+  account.
+- **Unverified:** commercial-use terms, attribution, caching rules and paid plans. The plans
+  and terms pages (openrouteservice.org/plans, /terms-of-service) return 404, and
+  account.heigit.org didn't render.
+- **Freshness:** the hosted data is weeks old (graph built 2026-10-16 from 2026-10-11 OSM;
+  the FAQ says "two to three weeks"). Mapping-day fixes wouldn't show up for weeks.
+- **Self-hosting:** GPL-3.0 (with an LGPL part), Docker image `heigit/openrouteservice`, Java.
+  The docs' rule of thumb is about 2–4 GB RAM for a 450 MB extract, and elevation adds more.
+  A Greater Sydney extract should fit in about 4 GB, roughly **A$30–60 a month** on a
+  Sydney-region VM (estimate, not built). That is similar to Valhalla but heavier, and GPL.
+  Kerbs only count on crossings (`KerbsOnCrossings`), and the incline limit would still need
+  `incline` tags.
 
 ### 2c. Google Maps walking with "Wheelchair accessible" ticked
 
@@ -199,14 +284,17 @@ parameters. The Routes API has no wheelchair option for `WALK`.
 
 | | Valhalla wheelchair | ORS wheelchair | Google "Wheelchair accessible" |
 |---|---|---|---|
-| Avoids mapped steps | Yes, in all 11 routes | Documented (`avoid_features`); not tested | Only sometimes (2 of 3 step cases) |
-| Avoids raised kerbs | **No** | Documented (`maximum_sloped_kerb`); not tested | No information |
-| Avoids steep slopes | **No** (uses 12–14%) | Documented (`maximum_incline`); not tested | No |
+| Avoids mapped steps | Yes, in all 11 routes | Yes, in all 9 routes | Only sometimes (2 of 3 step cases) |
+| Avoids raised kerbs | **No** | Avoided the one raised-kerb crossing (cause not proven) | No information |
+| Avoids steep slopes | **No** (uses 12–14%) | **No** (7–9% even with a 3% limit; the limit seems to act only on `incline` tags) | No |
+| Unknown kerbs | Treated as fine | Treated as fine; the stricter kerb setting *prefers* them | No information |
 | Ends at an entrance | If we pass the entrance coordinate | If we pass the entrance coordinate | No (place, address or plus code) |
-| Says when it can't reach the place | Yes ("no path"), **except** a silent 78 m short stop | Not tested | No |
-| Warnings | None (we compute them) | Extra info (steepness, surface, kerbs) per the docs; not tested | Generic only |
+| Says when it can't reach the place | Yes ("no path"), **except** a silent 78 m short stop | Yes, for 3 of 12, including a **false "no route"** to a flat town-centre venue | No |
+| Warnings | None (we compute them) | None; `extra_info` gives steepness, surface and OSM ids | Generic only |
+| Data freshness | Self-hosted: as fresh as we rebuild | Hosted: about 4 weeks old | Unknown |
+| Licence and hosting | MIT; C++; 2–4 GB | GPL-3.0; Java; about 4 GB; hosted free tier 2,000 a day, one person's key, server-side | Proprietary; link out only |
 | Can draw it on our map | Yes (MIT licence, OSM data under ODbL) | Yes (OSM data under ODbL) | No (link out only) |
-| Can feed in our community reports | Yes (`exclude_polygons` / `exclude_locations`) | `avoid_polygons` per the docs; not tested | No |
+| Can feed in our community reports | Yes (`exclude_polygons` / `exclude_locations`), tested | `avoid_polygons` per the docs; not tested | No |
 
 ---
 
@@ -266,8 +354,18 @@ and a text-first route description.
     with a `kerb=raised` node becomes `wheelchair=no`. Valhalla honours `wheelchair=no` on
     ways through its access mask (**to confirm in testing**). Steep-grade avoidance would
     need either a patched Valhalla or the same pre-processing using `incline`.
-- **Re-test ORS** once a key exists. If it really enforces kerb and incline limits, it might
-  do better than Valhalla here, but only where those tags exist, and they mostly don't.
+- **Don't use ORS as the engine** (tested; see 2b). Its kerb and slope settings act only on
+  the tags that are mostly missing, and when kerbs are unknown it does the wrong thing: the
+  stricter kerb setting prefers unmapped crossings. It also gave a false "no route" for a
+  flat town-centre venue. On top of that, the hosted data is weeks old, a key belongs to one
+  person, the commercial terms are unverified, and self-hosting means GPL and Java.
+- **What we take from ORS:**
+  - Its raised-kerb result confirms that our checking layer should exclude crossings mapped
+    as raised (Valhalla doesn't).
+  - Our checks must treat an *unknown* kerb as "check first", never as fine, and never rank
+    an unknown crossing above one mapped as lowered.
+  - Asking for OSM way ids per route segment (`osmid`, or Valhalla's `trace_attributes`) is
+    how the checking layer should work.
 
 **Data first: a town-centre mapping day before launch.** Rough estimate, not measured:
 
@@ -320,13 +418,12 @@ the route with a stronger "check first" label, or only as far as the town-centre
 
 **Next steps if Romy says go**
 
-1. Test ORS with a key (½ day).
-2. A Valhalla Docker build with a Sydney extract and the raised-kerb pre-processing; check
+1. A Valhalla Docker build with a Sydney extract and the raised-kerb pre-processing; check
    that `wheelchair=no` is honoured (1–2 days).
-3. A server-side `/api/route` with the checking layer and `temp_barriers` exclusions (2–3
+2. A server-side `/api/route` with the checking layer and `temp_barriers` exclusions (2–3
    days).
-4. A "Getting there" UI with the `ds/` components and a text-first route (3–5 days).
-5. A town-centre mapping day (one Saturday, 5–6 people).
+3. A "Getting there" UI with the `ds/` components and a text-first route (3–5 days).
+4. A town-centre mapping day (one Saturday, 5–6 people).
 
 ---
 
@@ -335,7 +432,10 @@ the route with a stronger "check first" label, or only as far as the town-centre
 - Whether Valhalla bans steps outright or penalises them, and that the grade check is
   disabled. Both are inferred from behaviour plus a partly readable source file.
 - Whether Google's data has the Collins Flat steps; Google's licence terms (from memory).
-- ORS behaviour: **not tested (no key)**.
+- ORS: why it found no route to the Gallery and the promenade, and whether it avoids the
+  raised-kerb crossing *because of* the kerb. Both are inferred, not proven. That
+  `maximum_incline` acts only on `incline` tags is inferred from behaviour. ORS's commercial
+  terms, attribution and caching rules are unverified (the pages return 404).
 - How accurate the elevation model is on short ramps and driveways. No ground truth was
   measured.
 - The mapping-hours estimate is an assumption, not a measurement.
@@ -345,5 +445,6 @@ the route with a stronger "check first" label, or only as far as the town-centre
 - The Valhalla origin snapped to the wharf walkway. All Google routes started from
   "LOT/7010 E Esplanade" (the same forecourt).
 
-Data © OpenStreetMap contributors (ODbL). Routes by Valhalla on the FOSSGIS server.
+Data © OpenStreetMap contributors (ODbL). Routes by Valhalla on the FOSSGIS server and by
+openrouteservice.org (HeiGIT).
 Basemap © OpenFreeMap / OpenMapTiles.
