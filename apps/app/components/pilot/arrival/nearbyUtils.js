@@ -49,11 +49,15 @@ export function arrivalDetails(t, f) {
   return out;
 }
 
-const gmaps = p => `${p.lat},${p.lng}`;
-/** Directions: drive to the parking / drop-off; walk from a stop or wharf to the place. */
-export function directionsHref(f, to) {
-  if (f.kind === 'accessible_stop' || f.kind === 'wharf') {
-    return `https://www.google.com/maps/dir/?api=1&origin=${gmaps(f)}&destination=${gmaps(to)}&travelmode=walking`;
+const ll = p => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`;
+/** Directions in the person's maps app ('apple' | 'google', see ./directions.js):
+ *  drive to the parking / drop-off; walk from a stop or wharf to the place. */
+export function directionsHref(f, to, app = 'google') {
+  const walking = f.kind === 'accessible_stop' || f.kind === 'wharf';
+  if (app === 'apple') {
+    return walking ? `https://maps.apple.com/?saddr=${ll(f)}&daddr=${ll(to)}&dirflg=w` : `https://maps.apple.com/?daddr=${ll(f)}`;
   }
-  return `https://www.google.com/maps/dir/?api=1&destination=${gmaps(f)}`;
+  return walking
+    ? `https://www.google.com/maps/dir/?api=1&origin=${ll(f)}&destination=${ll(to)}&travelmode=walking`
+    : `https://www.google.com/maps/dir/?api=1&destination=${ll(f)}`;
 }

@@ -12,12 +12,15 @@ import { Badge, IconButton, List, ListRow, SectionHeader, SkeletonList, SourceBa
 import { useT } from '../i18n';
 import { ExtLink, FacilityPin, withParts } from '../layers/bits';
 import { metres, nearestToilet, toiletTagLabels, walkMins } from '../layers/layerUtils';
+import { mapsAppName, useMapsApp } from './directions';
 import { arrivalDetails, arrivalName, directionsHref, distanceText, isNearby, nearestOf } from './nearbyUtils';
 
 const TOILET_MAX_MINS = 40;
 
 function Row({ app, venueName, f, from, to, label, title, details, source, alert }) {
   const t = useT();
+  const [mapsApp] = useMapsApp();
+  const appName = mapsAppName(t, mapsApp);
   const mins = walkMins(from, f);
   const walk = mins <= TOILET_MAX_MINS ? t('common.minWalk', { mins }) : null;
   const sub = [walk, distanceText(t, metres(from, f)), ...details].filter(Boolean).join(' · ');
@@ -28,8 +31,8 @@ function Row({ app, venueName, f, from, to, label, title, details, source, alert
       subtitle={sub}
       meta={<span style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{alert}{source}</span>}
       after={
-        <IconButton icon="directions" external href={directionsHref(f, to)}
-          label={walking ? t('nearby.walkFromLabel', { from: title, to: venueName }) : t('nearby.directionsLabel', { name: title })}/>
+        <IconButton icon="directions" external href={directionsHref(f, to, mapsApp)}
+          label={walking ? t('nearby.walkFromLabel', { from: title, to: venueName, app: appName }) : t('nearby.directionsLabel', { name: title, app: appName })}/>
       }/>
   );
 }
