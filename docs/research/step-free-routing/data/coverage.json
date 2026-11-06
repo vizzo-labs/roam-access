@@ -1,0 +1,117 @@
+{
+  "centre": {
+    "pedestrian_network_km": 20.8,
+    "separate_sidewalk_km": 11.0,
+    "road_km": 8.8,
+    "roads_with_sidewalk_tag_pct": 41.4,
+    "surface_pct": 68.7,
+    "smoothness_pct": 0.0,
+    "incline_pct": 0.5,
+    "width_pct": 10.9,
+    "wheelchair_tag_pct": 1.2,
+    "steps": 26,
+    "steps_m": 362,
+    "steps_with_ramp_info": 9,
+    "steps_with_handrail": 12,
+    "steps_with_step_count": 5,
+    "steps_with_incline": 12,
+    "crossing_ways": 61,
+    "crossing_nodes": 94,
+    "crossing_ways_kerbs_both_pct": 14.8,
+    "crossing_ways_kerb_height_both_pct": 13.1,
+    "crossing_ways_kerbs_one_pct": 3.3,
+    "crossing_ways_kerbs_none_pct": 82.0,
+    "crossing_ways_tactile_pct": 18.0,
+    "crossing_nodes_tactile_pct": 61.7,
+    "kerb_nodes": 32,
+    "kerbs": {
+      "lowered": 21,
+      "raised": 1,
+      "height?": 5,
+      "flush": 5
+    },
+    "tactile_nodes": 90,
+    "entrances": 17,
+    "entrances_with_wheelchair": 1,
+    "venues_buildings": 107,
+    "venues_open_space": 7,
+    "venues_with_wheelchair_tag": 26,
+    "venues_with_entrance_within_20m": 17,
+    "barriers": {
+      "cycle_barrier": 1,
+      "bollard": 2,
+      "kerb": 25,
+      "turnstile": 3,
+      "gate": 7
+    }
+  },
+  "rest": {
+    "pedestrian_network_km": 141.0,
+    "separate_sidewalk_km": 77.2,
+    "road_km": 95.0,
+    "roads_with_sidewalk_tag_pct": 17.8,
+    "surface_pct": 44.6,
+    "smoothness_pct": 2.8,
+    "incline_pct": 1.0,
+    "width_pct": 8.1,
+    "wheelchair_tag_pct": 1.0,
+    "steps": 159,
+    "steps_m": 3384,
+    "steps_with_ramp_info": 34,
+    "steps_with_handrail": 73,
+    "steps_with_step_count": 29,
+    "steps_with_incline": 67,
+    "crossing_ways": 327,
+    "crossing_nodes": 500,
+    "crossing_ways_kerbs_both_pct": 9.2,
+    "crossing_ways_kerb_height_both_pct": 6.4,
+    "crossing_ways_kerbs_one_pct": 5.5,
+    "crossing_ways_kerbs_none_pct": 85.3,
+    "crossing_ways_tactile_pct": 11.6,
+    "crossing_nodes_tactile_pct": 26.4,
+    "kerb_nodes": 82,
+    "kerbs": {
+      "lowered": 59,
+      "height?": 19,
+      "raised": 3,
+      "flush": 1
+    },
+    "tactile_nodes": 242,
+    "entrances": 22,
+    "entrances_with_wheelchair": 4,
+    "venues_buildings": 60,
+    "venues_open_space": 54,
+    "venues_with_wheelchair_tag": 4,
+    "venues_with_entrance_within_20m": 1,
+    "barriers": {
+      "gate": 38,
+      "bollard": 9,
+      "cycle_barrier": 1,
+      "kerb": 78
+    }
+  },
+  "_meta": {
+    "osm_base": "2026-11-06T07:23:48Z",
+    "bbox": {
+      "south": -33.815,
+      "west": 151.258,
+      "north": -33.78,
+      "east": 151.302
+    },
+    "centre": {
+      "south": -33.802,
+      "west": 151.2805,
+      "north": -33.7935,
+      "east": 151.2905
+    },
+    "pedestrian_highways": [
+      "corridor",
+      "cycleway",
+      "footway",
+      "living_street",
+      "path",
+      "pedestrian",
+      "steps"
+    ]
+  }
+}

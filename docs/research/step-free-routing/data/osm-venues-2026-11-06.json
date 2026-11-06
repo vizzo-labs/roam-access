@@ -1,0 +1,3508 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-11-06T07:24:50Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 458715841,
+  "lat": -33.7998099,
+  "lon": 151.2838725,
+  "tags": {
+    "amenity": "restaurant",
+    "check_date": "2025-10-06",
+    "cuisine": "pizza",
+    "name": "Hugos",
+    "name:ja": "ヒューゴス マンリー",
+    "website": "https://hugosmanly.com.au/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 765088637,
+  "lat": -33.8009768,
+  "lon": 151.2981915,
+  "tags": {
+    "amenity": "restaurant",
+    "bottle": "yes",
+    "breakfast": "07:00-11:30",
+    "check_date": "2026-07-16",
+    "cuisine": "burger;seafood;coffee_shop",
+    "dinner": "no",
+    "indoor_seating": "yes",
+    "lunch": "12:00-15:00",
+    "name": "The Boathouse",
+    "opening_hours": "07:00-15:00",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "reservation": "no",
+    "takeaway": "yes",
+    "toilets:wheelchair": "yes",
+    "website": "https://theboathousesb.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 997685723,
+  "lat": -33.8008680,
+  "lon": 151.2934329,
+  "tags": {
+    "addr:housenumber": "7",
+    "addr:street": "Marine Parade",
+    "amenity": "cafe",
+    "breakfast": "yes",
+    "check_date": "2025-05-31",
+    "contact:instagram": "thebowermanly",
+    "cuisine": "coffee_shop;burger;breakfast",
+    "diet:vegan": "yes",
+    "diet:vegetarian": "yes",
+    "dinner": "no",
+    "indoor_seating": "yes",
+    "lunch": "yes",
+    "name": "The Bower Manly",
+    "opening_hours": "Mo-Fr 08:00-15:00; Sa-Su 08:00-sunset",
+    "outdoor_seating": "yes",
+    "payment:cards:surcharge": "1.9%",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "payment:surcharge:conditional": "10% @ (Su 00:00-24:00); 15% @ (PH 00:00-24:00)",
+    "phone": "+61 451 343 339",
+    "reservation": "yes",
+    "short_name": "The Bower",
+    "toilets": "yes",
+    "website": "https://www.thebowermanly.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 1332235355,
+  "lat": -33.7984816,
+  "lon": 151.2813039,
+  "tags": {
+    "fee": "no",
+    "name": "Manly Art Gallery & Museum",
+    "opening_hours": "Tu-Su 10:00-17:00",
+    "short_name": "MAG&M",
+    "tourism": "gallery",
+    "website": "https://www.northernbeaches.nsw.gov.au/things-to-do/arts-and-culture/manly-art-gallery-museum",
+    "wikidata": "Q6750607"
+  }
+},
+{
+  "type": "node",
+  "id": 1333296030,
+  "lat": -33.8001738,
+  "lon": 151.2852189,
+  "tags": {
+    "addr:postcode": "2095",
+    "addr:street": "East Esplanade",
+    "amenity": "pub",
+    "check_date": "2023-11-04",
+    "name": "Manly Wharf Hotel",
+    "smoking": "outside",
+    "toilets:wheelchair": "yes",
+    "website": "http://manlywharfhotel.com.au/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1343184727,
+  "lat": -33.7999450,
+  "lon": 151.2858528,
+  "tags": {
+    "addr:housenumber": "39",
+    "addr:postcode": "2095",
+    "addr:suburb": "Manly",
+    "addr:unit": "1",
+    "alt_name": "Garfish Manly",
+    "amenity": "restaurant",
+    "cuisine": "fish",
+    "name": "Garfish",
+    "website": "https://garfish.com.au"
+  }
+},
+{
+  "type": "node",
+  "id": 1343189843,
+  "lat": -33.7961981,
+  "lon": 151.2873843,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "spanish",
+    "name": "El Toro Loco"
+  }
+},
+{
+  "type": "node",
+  "id": 1343204076,
+  "lat": -33.7993231,
+  "lon": 151.2809435,
+  "tags": {
+    "amenity": "restaurant",
+    "bar": "yes",
+    "check_date": "2025-01-03",
+    "name": "Manly Pavilion",
+    "website": "https://www.manly-pavilion.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 1343208874,
+  "lat": -33.7902752,
+  "lon": 151.2668624,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "italian",
+    "name": "Ray's Pizza"
+  }
+},
+{
+  "type": "node",
+  "id": 1346609886,
+  "lat": -33.7909903,
+  "lon": 151.2868044,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Ash's Table"
+  }
+},
+{
+  "type": "node",
+  "id": 1348733126,
+  "lat": -33.7997665,
+  "lon": 151.2843460,
+  "tags": {
+    "amenity": "fast_food",
+    "brand": "Guzman y Gomez",
+    "brand:wikidata": "Q23019759",
+    "cuisine": "mexican",
+    "name": "Guzman y Gomez",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1348733156,
+  "lat": -33.7997013,
+  "lon": 151.2840226,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "sushi",
+    "name": "Sushi Hub"
+  }
+},
+{
+  "type": "node",
+  "id": 1348733974,
+  "lat": -33.7989418,
+  "lon": 151.2843030,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "italian",
+    "indoor_seating": "yes",
+    "name": "Fratelli Fresh",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1348733976,
+  "lat": -33.7988081,
+  "lon": 151.2844157,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Silo West"
+  }
+},
+{
+  "type": "node",
+  "id": 1349091873,
+  "lat": -33.8004218,
+  "lon": 151.2849078,
+  "tags": {
+    "amenity": "bar",
+    "name": "Wharf Bar"
+  }
+},
+{
+  "type": "node",
+  "id": 1641724301,
+  "lat": -33.7992046,
+  "lon": 151.2893140,
+  "tags": {
+    "addr:housenumber": "14",
+    "addr:street": "South Steyne",
+    "amenity": "restaurant",
+    "changing_table": "no",
+    "check_date": "2026-10-14",
+    "description": "Moved to new location",
+    "diet:vegetarian": "yes",
+    "indoor_seating": "yes",
+    "name": "The Pantry Manly",
+    "outdoor_seating": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "source": "survey",
+    "website": "https://www.thepantrymanly.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 1692568755,
+  "lat": -33.7948677,
+  "lon": 151.2851097,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "coffee_shop",
+    "name": "Cafe La Bas"
+  }
+},
+{
+  "type": "node",
+  "id": 1692570044,
+  "lat": -33.7884835,
+  "lon": 151.2849275,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "pizza",
+    "name": "Garage Pizza"
+  }
+},
+{
+  "type": "node",
+  "id": 1692572424,
+  "lat": -33.7885784,
+  "lon": 151.2848038,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "coffee_shop",
+    "name": "The Troubadour Manly"
+  }
+},
+{
+  "type": "node",
+  "id": 1693104935,
+  "lat": -33.7982059,
+  "lon": 151.2882415,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "fish_and_chips",
+    "name": "Manly Fish Market"
+  }
+},
+{
+  "type": "node",
+  "id": 1693986551,
+  "lat": -33.7964342,
+  "lon": 151.2876246,
+  "tags": {
+    "amenity": "pub",
+    "name": "Hemingway's Manly"
+  }
+},
+{
+  "type": "node",
+  "id": 1693986554,
+  "lat": -33.7962559,
+  "lon": 151.2853286,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "asian",
+    "name": "The Wockbar",
+    "website": "https://wockbar.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 1693986555,
+  "lat": -33.7972355,
+  "lon": 151.2867046,
+  "tags": {
+    "amenity": "fast_food",
+    "check_date:opening_hours": "2024-12-15",
+    "cuisine": "burger",
+    "name": "Benbry Burgers",
+    "opening_hours:signed": "no",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1693986599,
+  "lat": -33.7960645,
+  "lon": 151.2853665,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "international",
+    "name": "Miss Marley's"
+  }
+},
+{
+  "type": "node",
+  "id": 1694224318,
+  "lat": -33.7980922,
+  "lon": 151.2861440,
+  "tags": {
+    "amenity": "pub",
+    "check_date": "2025-03-09",
+    "indoor_seating": "yes",
+    "name": "The Ivanhoe Hotel",
+    "outdoor_seating": "balcony",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1694224321,
+  "lat": -33.7980764,
+  "lon": 151.2884915,
+  "tags": {
+    "amenity": "ice_cream",
+    "brand": "Ben & Jerry's",
+    "brand:wikidata": "Q816412",
+    "check_date": "2025-04-15",
+    "cuisine": "ice_cream",
+    "diet:vegan": "yes",
+    "indoor_seating": "no",
+    "name": "Ben & Jerry's",
+    "outdoor_seating": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1694224325,
+  "lat": -33.7992958,
+  "lon": 151.2894056,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Manly Wine"
+  }
+},
+{
+  "type": "node",
+  "id": 2108375840,
+  "lat": -33.7998163,
+  "lon": 151.2839775,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "vietnamese",
+    "name": "Saigon Supper Inn",
+    "website": "https://www.saigonsupperinn.com.au/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2118644170,
+  "lat": -33.7996189,
+  "lon": 151.2853646,
+  "tags": {
+    "addr:housenumber": "43-45",
+    "addr:postcode": "2095",
+    "addr:street": "East Esplanade",
+    "addr:suburb": "Manly",
+    "addr:unit": "29",
+    "amenity": "pub",
+    "brand": "4 Pines Brewing Company",
+    "brand:wikidata": "Q20312697",
+    "brewery": "4 Pines",
+    "building": "brewery",
+    "check_date": "2023-03-16",
+    "diet:vegetarian": "yes",
+    "email": "brewpub@4pinesbeer.com.au",
+    "food": "yes",
+    "microbrewery": "yes",
+    "name": "4 Pines Brewing Company",
+    "opening_hours": "Mo-Sa 11:00-00:00; Su 11:00-22:00",
+    "outdoor_seating": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 491 970 731",
+    "smoking": "no",
+    "website": "https://4pinesbeer.com.au/venues/brewpub-manly",
+    "wifi": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2118658963,
+  "lat": -33.7958388,
+  "lon": 151.2765545,
+  "tags": {
+    "addr:housenumber": "152-154",
+    "addr:postcode": "2094",
+    "addr:street": "Sydney Road",
+    "amenity": "cafe",
+    "cuisine": "coffee_shop",
+    "name": "The Butchers Cafe",
+    "wifi": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2629617430,
+  "lat": -33.7958621,
+  "lon": 151.2769372,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "pizza",
+    "name": "Pizza at yours"
+  }
+},
+{
+  "type": "node",
+  "id": 2629655646,
+  "lat": -33.7961293,
+  "lon": 151.2770902,
+  "tags": {
+    "addr:housenumber": "145",
+    "addr:postcode": "2094",
+    "addr:state": "NSW",
+    "addr:street": "Sydney Road",
+    "addr:suburb": "Fairlight",
+    "amenity": "cafe",
+    "check_date": "2024-08-22",
+    "contact:facebook": "https://m.facebook.com/inkandpresscafe/",
+    "currency:XBT": "no",
+    "name": "Ink & Press Cafe",
+    "opening_hours": "Mo-Fr 06:00-15:00; Sa-Su 07:30-15:30",
+    "payment:lightning": "no",
+    "payment:lightning_contactless": "no",
+    "payment:onchain": "no",
+    "phone": "+61 426 957 688"
+  }
+},
+{
+  "type": "node",
+  "id": 4627793539,
+  "lat": -33.7808662,
+  "lon": 151.2897571,
+  "tags": {
+    "amenity": "cafe",
+    "indoor_seating": "no",
+    "name": "The Pocket Freshwater",
+    "opening_hours": "Mo-Su 07:00-14:00",
+    "outdoor_seating": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4742507241,
+  "lat": -33.7973449,
+  "lon": 151.2880276,
+  "tags": {
+    "amenity": "cafe",
+    "brand": "Starbucks",
+    "brand:wikidata": "Q37158",
+    "brand:wikipedia": "en:Starbucks",
+    "check_date": "2023-11-16",
+    "cuisine": "coffee_shop",
+    "indoor_seating": "yes",
+    "name": "Starbucks",
+    "name:en": "Starbucks",
+    "official_name": "Starbucks Coffee",
+    "outdoor_seating": "no",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4742507242,
+  "lat": -33.7974571,
+  "lon": 151.2878129,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "kebab",
+    "name": "Manly Seaside Kebabs",
+    "name:en": "Manly Seaside Kebabs"
+  }
+},
+{
+  "type": "node",
+  "id": 4742555325,
+  "lat": -33.7960861,
+  "lon": 151.2875846,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "pizza",
+    "name": "Pizza Capana",
+    "name:en": "Pizza Capana"
+  }
+},
+{
+  "type": "node",
+  "id": 4742555327,
+  "lat": -33.7966372,
+  "lon": 151.2877058,
+  "tags": {
+    "amenity": "bar",
+    "name": "Sugar Lounge",
+    "name:en": "Sugar Lounge"
+  }
+},
+{
+  "type": "node",
+  "id": 4742562321,
+  "lat": -33.7986235,
+  "lon": 151.2875014,
+  "tags": {
+    "amenity": "restaurant",
+    "check_date": "2025-09-20",
+    "cuisine": "thai",
+    "name": "Yok",
+    "name:en": "Yok"
+  }
+},
+{
+  "type": "node",
+  "id": 4742562427,
+  "lat": -33.7971102,
+  "lon": 151.2859317,
+  "tags": {
+    "addr:housenumber": "41",
+    "addr:street": "Sydney Road",
+    "amenity": "fast_food",
+    "name": "Deli Manly",
+    "opening_hours": "Mo-Sa 07:00-17:00; PH 08:00-16:00"
+  }
+},
+{
+  "type": "node",
+  "id": 4954873394,
+  "lat": -33.7958558,
+  "lon": 151.2768036,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "chinese",
+    "name": "Fairlight Kitchen"
+  }
+},
+{
+  "type": "node",
+  "id": 5251732422,
+  "lat": -33.7884128,
+  "lon": 151.2848200,
+  "tags": {
+    "addr:housenumber": "200",
+    "addr:street": "Pittwater Road",
+    "amenity": "cafe",
+    "name": "Ruby Lane"
+  }
+},
+{
+  "type": "node",
+  "id": 5358441621,
+  "lat": -33.7825841,
+  "lon": 151.2774663,
+  "tags": {
+    "amenity": "fast_food",
+    "name": "chicken Burgers",
+    "name:cs": "Kureci burgery",
+    "opening_hours": "Tu-Su 09:30-04:30"
+  }
+},
+{
+  "type": "node",
+  "id": 5573327221,
+  "lat": -33.7967602,
+  "lon": 151.2877795,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "coffee_shop;jaffle;toasted_sandwich;wraps;rolls;juice;smoothie",
+    "name": "Little Belgrave Cartel",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5573355821,
+  "lat": -33.7984301,
+  "lon": 151.2852251,
+  "tags": {
+    "addr:housenumber": "9",
+    "addr:street": "The Corso",
+    "amenity": "restaurant",
+    "check_date": "2025-09-21",
+    "cuisine": "mexican",
+    "name": "Chica Bonita Manly",
+    "opening_hours": "Tu-Th 11:30-15:00,18:00-22:00; Fr 11:30-15:30,17:00-22:00; Sa 11:30-22:00; Su 11:30-21:00",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 2 9976 5255",
+    "website": "https://goodgoodcompany.com/venue/chica-bonita-manly/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5742351423,
+  "lat": -33.7882259,
+  "lon": 151.2640079,
+  "tags": {
+    "leisure": "park",
+    "name": "Swaine Reserve"
+  }
+},
+{
+  "type": "node",
+  "id": 5774453654,
+  "lat": -33.7834828,
+  "lon": 151.2672591,
+  "tags": {
+    "amenity": "fast_food",
+    "brand": "Domino's",
+    "brand:wikidata": "Q839466",
+    "brand:wikipedia": "en:Domino's Pizza",
+    "cuisine": "pizza",
+    "name": "Domino's",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5821741045,
+  "lat": -33.7970698,
+  "lon": 151.2866850,
+  "tags": {
+    "addr:housenumber": "24",
+    "addr:postcode": "2095",
+    "addr:state": "NSW",
+    "addr:street": "Sydney Road",
+    "addr:suburb": "Manly",
+    "amenity": "restaurant",
+    "check_date": "2024-12-15",
+    "check_date:opening_hours": "2024-12-15",
+    "cuisine": "burger",
+    "name": "The Hold",
+    "opening_hours:signed": "no",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6086591580,
+  "lat": -33.7944748,
+  "lon": 151.2645260,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "indian",
+    "facebook": "https://www.facebook.com/ajmersindian",
+    "name": "Ajmer's Indian Restaurant",
+    "opening_hours": "Tu-Su 17:30-22:00",
+    "phone": "+61 2 9948 5297",
+    "website": "https://www.ajmers.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 6086591581,
+  "lat": -33.7944945,
+  "lon": 151.2646853,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "thai",
+    "name": "Khao Thai Restaurant"
+  }
+},
+{
+  "type": "node",
+  "id": 6086592692,
+  "lat": -33.7945706,
+  "lon": 151.2652052,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Roasted Grape"
+  }
+},
+{
+  "type": "node",
+  "id": 6086592696,
+  "lat": -33.7943507,
+  "lon": 151.2652690,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Balgowlah Gourmet Chicken & Salad"
+  }
+},
+{
+  "type": "node",
+  "id": 6086592698,
+  "lat": -33.7943373,
+  "lon": 151.2650920,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "nepalese",
+    "name": "hamro aangan"
+  }
+},
+{
+  "type": "node",
+  "id": 6086592700,
+  "lat": -33.7944454,
+  "lon": 151.2657250,
+  "tags": {
+    "amenity": "restaurant",
+    "brand": "Pizza Hut",
+    "brand:wikidata": "Q191615",
+    "brand:wikipedia": "en:Pizza Hut",
+    "cuisine": "pizza",
+    "name": "Pizza Hut"
+  }
+},
+{
+  "type": "node",
+  "id": 6139558497,
+  "lat": -33.7902094,
+  "lon": 151.2671150,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Roseberry St Cafe"
+  }
+},
+{
+  "type": "node",
+  "id": 6190613513,
+  "lat": -33.7964093,
+  "lon": 151.2876186,
+  "tags": {
+    "addr:housenumber": "47",
+    "addr:street": "North Steyne",
+    "amenity": "cafe",
+    "indoor_seating": "yes",
+    "name": "WOLFies",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6515090093,
+  "lat": -33.7974044,
+  "lon": 151.2879035,
+  "tags": {
+    "amenity": "ice_cream",
+    "check_date": "2023-11-16",
+    "name": "Royal Copenhagen"
+  }
+},
+{
+  "type": "node",
+  "id": 6515091718,
+  "lat": -33.7973954,
+  "lon": 151.2879335,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "fish_and_chips",
+    "name": "Manly Ocean Foods",
+    "start_date": "1959",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6852954285,
+  "lat": -33.7976278,
+  "lon": 151.2863605,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Palmo",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6897260149,
+  "lat": -33.7996467,
+  "lon": 151.2902569,
+  "tags": {
+    "amenity": "cafe",
+    "check_date": "2025-08-17",
+    "contact:instagram": "manlypointcafe",
+    "cuisine": "breakfast;coffee_shop;sandwich",
+    "indoor_seating": "no",
+    "internet_access": "no",
+    "name": "Manly Point Cafe",
+    "outdoor_seating": "no",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "takeaway": "only",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602987,
+  "lat": -33.7977059,
+  "lon": 151.2862591,
+  "tags": {
+    "amenity": "cafe",
+    "indoor_seating": "yes",
+    "name": "Market Lane Cafe",
+    "outdoor_seating": "pedestrian_zone",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602988,
+  "lat": -33.7973832,
+  "lon": 151.2859913,
+  "tags": {
+    "addr:housenumber": "5B",
+    "addr:postcode": "2095",
+    "addr:street": "Market Lane",
+    "amenity": "cafe",
+    "check_date": "2026-09-17",
+    "contact:instagram": "https://www.instagram.com/fika.australia/?hl=en",
+    "cuisine": "swedish",
+    "name": "Fika - Swedish Kitchen",
+    "opening_hours": "Mo-Su 07:00-14:00",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "start_date": "2013",
+    "toilets": "no",
+    "website": "https://fika.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602989,
+  "lat": -33.7972984,
+  "lon": 151.2855579,
+  "tags": {
+    "amenity": "cafe",
+    "check_date:opening_hours": "2024-12-15",
+    "indoor_seating": "yes",
+    "name": "Barefoot Coffee Traders",
+    "opening_hours:signed": "no",
+    "outdoor_seating": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602990,
+  "lat": -33.7975907,
+  "lon": 151.2850187,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Belgrave Cartel"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602991,
+  "lat": -33.7955276,
+  "lon": 151.2857565,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Deus Ex Machina"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602992,
+  "lat": -33.7970984,
+  "lon": 151.2868919,
+  "tags": {
+    "amenity": "bar",
+    "check_date:opening_hours": "2024-12-15",
+    "name": "Insitu",
+    "opening_hours:signed": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6957602993,
+  "lat": -33.7973970,
+  "lon": 151.2860768,
+  "tags": {
+    "amenity": "bar",
+    "check_date": "2025-10-06",
+    "name": "Donny's",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7092023481,
+  "lat": -33.7979148,
+  "lon": 151.2883648,
+  "tags": {
+    "addr:housenumber": "28-29",
+    "addr:street": "South Steyne",
+    "amenity": "restaurant",
+    "breakfast": "yes",
+    "changing_table": "yes",
+    "check_date": "2023-03-15",
+    "diet:vegetarian": "yes",
+    "indoor_seating": "yes",
+    "name": "Bluewater",
+    "outdoor_seating": "yes",
+    "payment:american_express": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "toilets:wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7092069174,
+  "lat": -33.7978342,
+  "lon": 151.2883244,
+  "tags": {
+    "addr:housenumber": "30-32",
+    "addr:street": "South Steyne",
+    "amenity": "restaurant",
+    "check_date": "2025-08-10",
+    "contact:facebook": "manly grill",
+    "cuisine": "steak;seafood",
+    "name": "Manly Grill",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 2 9977 0997",
+    "reservation": "yes",
+    "toilets": "yes",
+    "website": "https://www.manlygrill.com.au",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 7092105383,
+  "lat": -33.7975221,
+  "lon": 151.2881271,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Manly Greenhouse"
+  }
+},
+{
+  "type": "node",
+  "id": 7092113792,
+  "lat": -33.7976636,
+  "lon": 151.2881812,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Whitewater"
+  }
+},
+{
+  "type": "node",
+  "id": 7147736771,
+  "lat": -33.7929650,
+  "lon": 151.2808859,
+  "tags": {
+    "addr:floor": "G",
+    "addr:housenumber": "59",
+    "addr:postcode": "2095",
+    "addr:state": "NSW",
+    "addr:street": "Birkley Road",
+    "addr:suburb": "Manly",
+    "amenity": "cafe",
+    "check_date": "2024-04-13",
+    "cuisine": "coffee_shop",
+    "internet_access": "no",
+    "name": "Paolo's Cafe",
+    "opening_hours": "Mo-Su 07:00-13:30",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 7500415974,
+  "lat": -33.7961395,
+  "lon": 151.2770181,
+  "tags": {
+    "amenity": "cafe",
+    "indoor_seating": "yes",
+    "name": "Two Siisters Pantry",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7704878000,
+  "lat": -33.7819201,
+  "lon": 151.2741309,
+  "tags": {
+    "addr:housenumber": "1",
+    "addr:postcode": "2093",
+    "addr:street": "Campbell Parade",
+    "addr:suburb": "Manly Vale",
+    "addr:unit": "Factory C1",
+    "amenity": "cafe",
+    "cuisine": "coffee_shop",
+    "name": "Soprano Coffee",
+    "operator": "Soprano Coffee",
+    "outdoor_seating": "yes",
+    "phone": "+61 2 9907 6775",
+    "takeaway": "yes",
+    "website": "https://www.sopranocoffee.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 7704878004,
+  "lat": -33.7805101,
+  "lon": 151.2731136,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Manly Vale - Calabria Bowling Sports and Social Club"
+  }
+},
+{
+  "type": "node",
+  "id": 8456142517,
+  "lat": -33.7980850,
+  "lon": 151.2883996,
+  "tags": {
+    "amenity": "bar",
+    "name": "The Blind Barrel"
+  }
+},
+{
+  "type": "node",
+  "id": 9067463636,
+  "lat": -33.7808758,
+  "lon": 151.2883538,
+  "tags": {
+    "amenity": "cafe",
+    "drink:beer": "yes",
+    "drink:coffee": "yes",
+    "indoor_seating": "yes",
+    "name": "Shaka",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9521319257,
+  "lat": -33.7904495,
+  "lon": 151.2852600,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "fish_and_chips",
+    "name": "North Steyne Snack Shack",
+    "opening_hours": "Mo-Su 10:30-20:00"
+  }
+},
+{
+  "type": "node",
+  "id": 9559192953,
+  "lat": -33.7975993,
+  "lon": 151.2859789,
+  "tags": {
+    "air_conditioning": "yes",
+    "amenity": "library",
+    "name": "Manly Library",
+    "network": "Northern Beaches Libraries",
+    "network:wikidata": "Q87158365",
+    "opening_hours": "Mo-Th 09:00-18:00; Fr 09:00-17:00; Sa 10:00-16:00; Su 11:00-16:00; PH off",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "website": "https://www.northernbeaches.nsw.gov.au/library/your-library/locations-facilities/manly-library",
+    "wheelchair": "yes",
+    "wikidata": "Q83210584"
+  }
+},
+{
+  "type": "node",
+  "id": 9609700608,
+  "lat": -33.7985447,
+  "lon": 151.2874460,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "chicken",
+    "name": "Bird chicken shop"
+  }
+},
+{
+  "type": "node",
+  "id": 9930368526,
+  "lat": -33.7828612,
+  "lon": 151.2736427,
+  "tags": {
+    "addr:housenumber": "1",
+    "addr:postcode": "2093",
+    "addr:state": "NSW",
+    "addr:street": "Campbell Parade",
+    "addr:suburb": "Manly Vale",
+    "addr:unit": "B14",
+    "amenity": "pub",
+    "microbrewery": "yes",
+    "name": "Quakers Hat Brewing",
+    "smoking": "no",
+    "website": "https://www.quakershatbrewing.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 9994375650,
+  "lat": -33.7983211,
+  "lon": 151.2852891,
+  "tags": {
+    "addr:street": "Whistler Street",
+    "amenity": "restaurant",
+    "cuisine": "pizza",
+    "name": "Little Italy Pizza",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10003721094,
+  "lat": -33.7927524,
+  "lon": 151.2858063,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "The Herring Room"
+  }
+},
+{
+  "type": "node",
+  "id": 10100636263,
+  "lat": -33.7912950,
+  "lon": 151.2868242,
+  "tags": {
+    "addr:housenumber": "93-95",
+    "addr:street": "North Steyne",
+    "amenity": "restaurant",
+    "cuisine": "lebanese",
+    "name": "Tarboosh Lebanese Kitchen",
+    "outdoor_seating": "yes",
+    "phone": "+61 2 9185 0999",
+    "takeaway": "yes",
+    "website": "https://www.tarboosh.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 10722729305,
+  "lat": -33.7975427,
+  "lon": 151.2881330,
+  "tags": {
+    "addr:housenumber": "36-38",
+    "addr:street": "South Steyne",
+    "amenity": "restaurant",
+    "branch": "Manly Beach",
+    "brand": "Wahlburgers",
+    "brand:wikidata": "Q17032457",
+    "brewery": "yes",
+    "check_date": "2025-06-20",
+    "cuisine": "burger;bar_and_grill",
+    "name": "Wahlburgers",
+    "opening_hours": "Mo-Th 10:00-21:00; Fr 10:00-22:00; Sa-Su 08:00-22:00",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "reservation": "yes",
+    "smoking": "no",
+    "takeaway": "yes",
+    "toilets": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 10727060205,
+  "lat": -33.7827618,
+  "lon": 151.2884697,
+  "tags": {
+    "amenity": "cafe",
+    "name": "La Loca",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10736262083,
+  "lat": -33.8009354,
+  "lon": 151.2935693,
+  "tags": {
+    "amenity": "fast_food",
+    "check_date": "2025-10-06",
+    "cuisine": "acai",
+    "indoor_seating": "no",
+    "name": "Acai Syd",
+    "outdoor_seating": "yes",
+    "website": "https://acaisyd.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 10738318508,
+  "lat": -33.7984836,
+  "lon": 151.2874002,
+  "tags": {
+    "amenity": "cafe",
+    "check_date": "2023-03-16",
+    "cuisine": "coffee_shop",
+    "name": "Bluebottle",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10742602514,
+  "lat": -33.7961728,
+  "lon": 151.2862772,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Girdlers"
+  }
+},
+{
+  "type": "node",
+  "id": 10783295816,
+  "lat": -33.7912431,
+  "lon": 151.2868247,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "greek",
+    "indoor_seating": "yes",
+    "name": "Kazzi Beach Greek",
+    "outdoor_seating": "yes",
+    "toilets": "yes",
+    "website": "https://kazzibeachgreek.com.au/manly/"
+  }
+},
+{
+  "type": "node",
+  "id": 11089169414,
+  "lat": -33.7992487,
+  "lon": 151.2847270,
+  "tags": {
+    "amenity": "ice_cream",
+    "brand": "Baskin-Robbins",
+    "brand:wikidata": "Q584601",
+    "check_date": "2025-10-06",
+    "cuisine": "ice_cream",
+    "name": "Baskin-Robbins"
+  }
+},
+{
+  "type": "node",
+  "id": 11151792955,
+  "lat": -33.7836838,
+  "lon": 151.2671764,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "thai",
+    "name": "Take a seat"
+  }
+},
+{
+  "type": "node",
+  "id": 11332272671,
+  "lat": -33.7957973,
+  "lon": 151.2861766,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Dolce Terra"
+  }
+},
+{
+  "type": "node",
+  "id": 11352894586,
+  "lat": -33.7972264,
+  "lon": 151.2866371,
+  "tags": {
+    "amenity": "cafe",
+    "check_date:opening_hours": "2024-12-15",
+    "name": "Zerda’s Cafe",
+    "opening_hours:signed": "no",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11353386167,
+  "lat": -33.7977295,
+  "lon": 151.2882681,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Fins & Ribs"
+  }
+},
+{
+  "type": "node",
+  "id": 11353441969,
+  "lat": -33.7982478,
+  "lon": 151.2864542,
+  "tags": {
+    "addr:housenumber": "46-48",
+    "addr:street": "The Corso",
+    "amenity": "ice_cream",
+    "check_date": "2025-03-09",
+    "indoor_seating": "yes",
+    "name": "Anita Gelato",
+    "opening_hours": "Mo-Su,PH 09:00-23:00",
+    "outdoor_seating": "pedestrian_zone",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 2 9957 4248",
+    "toilets": "yes",
+    "website": "https://www.anita-gelato.com/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11353441972,
+  "lat": -33.7977759,
+  "lon": 151.2882924,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "mexican",
+    "name": "Mex & Co"
+  }
+},
+{
+  "type": "node",
+  "id": 11464776285,
+  "lat": -33.7942617,
+  "lon": 151.2645122,
+  "tags": {
+    "addr:housenumber": "348",
+    "addr:postcode": "2093",
+    "addr:state": "NSW",
+    "addr:street": "Sydney Road",
+    "addr:suburb": "Balgowlah",
+    "amenity": "fast_food",
+    "brand": "I Love Pizza",
+    "cuisine": "pizza;salad;dessert",
+    "diet:gluten_free": "yes",
+    "diet:vegan": "yes",
+    "diet:vegetarian": "yes",
+    "drive_through": "no",
+    "email": "balgowlah@i-love-pizza.com.au",
+    "name": "I Love Pizza",
+    "opening_hours": "Mo-Th,Su 11:00-24:00; Fr-Sa 11:00-25:00",
+    "phone": "+61 2 9949 3003",
+    "website": "https://i-love-pizza.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 11478933365,
+  "lat": -33.7936044,
+  "lon": 151.2647854,
+  "tags": {
+    "addr:housenumber": "197-215",
+    "addr:postcode": "2093",
+    "addr:state": "NSW",
+    "addr:street": "Condamine Street",
+    "addr:suburb": "Balgowlah",
+    "addr:unit": "Shop 68",
+    "amenity": "restaurant",
+    "cuisine": "thai",
+    "delivery": "yes",
+    "diet:gluten_free": "yes",
+    "diet:halal": "yes",
+    "diet:vegetarian": "yes",
+    "name": "Monkey King Thai",
+    "opening_hours": "11:30-15:00,17:00-22:00",
+    "operator": "Monkey King Thai",
+    "outdoor_seating": "yes",
+    "phone": "+61 2 8084 8287",
+    "source:opening_hours": "entrance",
+    "takeaway": "yes",
+    "website": "https://www.monkeykingthai.com.au/thai-restaurants/balgowlah/"
+  }
+},
+{
+  "type": "node",
+  "id": 11527663465,
+  "lat": -33.7882243,
+  "lon": 151.2674208,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Three Beans",
+    "opening_hours": "We-Su 07:30-14:00",
+    "operator": "Three Beans"
+  }
+},
+{
+  "type": "node",
+  "id": 11607142207,
+  "lat": -33.8120703,
+  "lon": 151.2974681,
+  "tags": {
+    "amenity": "arts_centre",
+    "fixme": "Unsure if arts centre is best?",
+    "name": "Australian Bronze Sculpture House",
+    "website": "https://www.australianbronze.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 12141169698,
+  "lat": -33.8068689,
+  "lon": 151.2627721,
+  "tags": {
+    "addr:housenumber": "31",
+    "addr:street": "Dobroyd Road",
+    "amenity": "cafe",
+    "charge:conditional": "15% @ (PH); 10% @ (Sa,Su)",
+    "charge:credit_cards": "yes",
+    "indoor_seating": "yes",
+    "name": "Ball Boy",
+    "opening_hours": "Mo-Th 07:00-14:00; Fr-Su 07:00-16:00",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12234232418,
+  "lat": -33.7905127,
+  "lon": 151.2613610,
+  "tags": {
+    "addr:housenumber": "94",
+    "addr:street": "West Street",
+    "amenity": "cafe",
+    "facebook": "https://www.facebook.com/aggyscornercoffeeshop/",
+    "name": "Aggy’s Corner",
+    "opening_hours": "Mo-Fr 06:00-13:00; Sa-Su 07:00-13:00",
+    "phone": "+61 450 661 330"
+  }
+},
+{
+  "type": "node",
+  "id": 12373276601,
+  "lat": -33.7979024,
+  "lon": 151.2864269,
+  "tags": {
+    "amenity": "fast_food",
+    "brand": "Fishbowl",
+    "brand:wikidata": "Q110785465",
+    "cuisine": "salad",
+    "drive_through": "no",
+    "indoor_seating": "yes",
+    "name": "Fishbowl",
+    "outdoor_seating": "no",
+    "takeaway": "yes",
+    "website": "https://fishbowl.com.au"
+  }
+},
+{
+  "type": "node",
+  "id": 12470576711,
+  "lat": -33.7993515,
+  "lon": 151.2641909,
+  "tags": {
+    "amenity": "cafe",
+    "indoor_seating": "yes",
+    "name": "Forty Beans",
+    "opening_hours": "Mo-Su 07:00-14:30",
+    "outdoor_seating": "yes",
+    "website": "https://hellomanly.com.au/listing/forty-beans-cafe/"
+  }
+},
+{
+  "type": "node",
+  "id": 12470586629,
+  "lat": -33.7991207,
+  "lon": 151.2812812,
+  "tags": {
+    "amenity": "bar",
+    "name": "The Espy",
+    "outdoor_seating": "yes",
+    "website": "https://www.manly-pavilion.com.au/the-espy"
+  }
+},
+{
+  "type": "node",
+  "id": 12476624973,
+  "lat": -33.7882097,
+  "lon": 151.2844859,
+  "tags": {
+    "addr:street": "Pittwater Road",
+    "amenity": "cafe",
+    "name": "Emporio",
+    "phone": "+61 2 9977 1676",
+    "website": "https://www.northsteyneemporio.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 12560165095,
+  "lat": -33.8065506,
+  "lon": 151.2873099,
+  "tags": {
+    "addr:street": "Stuart Street",
+    "amenity": "cafe",
+    "cuisine": "coffee_shop;sandwich;breakfast",
+    "indoor_seating": "yes",
+    "name": "Ripples Little Manly",
+    "operator": "Sydney Restaurant Group",
+    "outdoor_seating": "no",
+    "phone": "+61 2 9337 7300",
+    "website": "https://rippleslittlemanly.com.au"
+  }
+},
+{
+  "type": "node",
+  "id": 12644857884,
+  "lat": -33.7981066,
+  "lon": 151.2884319,
+  "tags": {
+    "addr:housenumber": "25-27",
+    "addr:street": "South Steyne",
+    "addr:unit": "4",
+    "amenity": "fast_food",
+    "check_date": "2025-04-15",
+    "cuisine": "vietnamese",
+    "drive_through": "no",
+    "indoor_seating": "yes",
+    "name": "An Viet",
+    "outdoor_seating": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "toilets": "yes",
+    "website": "https://anviet.orderup.com.au/menu"
+  }
+},
+{
+  "type": "node",
+  "id": 12785551866,
+  "lat": -33.7978575,
+  "lon": 151.2872464,
+  "tags": {
+    "amenity": "cafe",
+    "indoor_seating": "yes",
+    "name": "Norma's Deli",
+    "outdoor_seating": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 12785558258,
+  "lat": -33.7975265,
+  "lon": 151.2876861,
+  "tags": {
+    "amenity": "ice_cream",
+    "cuisine": "frozen_yogurt",
+    "name": "Youghurberry"
+  }
+},
+{
+  "type": "node",
+  "id": 12785564692,
+  "lat": -33.7979376,
+  "lon": 151.2869650,
+  "tags": {
+    "amenity": "ice_cream",
+    "cuisine": "frozen_yogurt",
+    "indoor_seating": "yes",
+    "name": "Yochi",
+    "outdoor_seating": "pedestrian_zone"
+  }
+},
+{
+  "type": "node",
+  "id": 12785616977,
+  "lat": -33.7980815,
+  "lon": 151.2855884,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "acai",
+    "name": "Blessed Bowls"
+  }
+},
+{
+  "type": "node",
+  "id": 12790944778,
+  "lat": -33.7985537,
+  "lon": 151.2859071,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "sushi",
+    "indoor_seating": "yes",
+    "name": "Rice&Nori",
+    "outdoor_seating": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 12790973660,
+  "lat": -33.7981069,
+  "lon": 151.2855449,
+  "tags": {
+    "amenity": "fast_food",
+    "name": "Banana Blossom"
+  }
+},
+{
+  "type": "node",
+  "id": 12801214622,
+  "lat": -33.7974231,
+  "lon": 151.2862573,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "acai",
+    "name": "Oakberry Acai"
+  }
+},
+{
+  "type": "node",
+  "id": 12813421856,
+  "lat": -33.7982083,
+  "lon": 151.2865277,
+  "tags": {
+    "amenity": "fast_food",
+    "check_date": "2026-03-04",
+    "cuisine": "crepe",
+    "indoor_seating": "yes",
+    "level": "0",
+    "name": "Crêpes Aubras",
+    "outdoor_seating": "pedestrian_zone",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12813444233,
+  "lat": -33.7976712,
+  "lon": 151.2863172,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "japanese",
+    "indoor_seating": "yes",
+    "name": "Jipang",
+    "opening_hours": "11:30-20:00",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12813449689,
+  "lat": -33.7957140,
+  "lon": 151.2873439,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "italian",
+    "indoor_seating": "yes",
+    "name": "Cibaria",
+    "opening_hours": "Mo-Su 07:00-15:00",
+    "outdoor_seating": "sidewalk"
+  }
+},
+{
+  "type": "node",
+  "id": 12813476821,
+  "lat": -33.7958807,
+  "lon": 151.2866186,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "swedish;bakery",
+    "drink:coffee": "yes",
+    "indoor_seating": "yes",
+    "name": "Fika",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12829269331,
+  "lat": -33.7980429,
+  "lon": 151.2872032,
+  "tags": {
+    "amenity": "cafe",
+    "check_date": "2025-09-20",
+    "cuisine": "coffee_shop",
+    "name": "Little Legends",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12829294925,
+  "lat": -33.7984785,
+  "lon": 151.2877507,
+  "tags": {
+    "addr:housenumber": "1-21",
+    "addr:street": "Wentworth Street",
+    "addr:unit": "12",
+    "amenity": "restaurant",
+    "indoor_seating": "yes",
+    "name": "Fusion Point",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12843198926,
+  "lat": -33.7998467,
+  "lon": 151.2841513,
+  "tags": {
+    "amenity": "ice_cream",
+    "brand": "Gelatissimo",
+    "brand:wikidata": "Q105270111",
+    "cuisine": "ice_cream",
+    "name": "Gelatissimo",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12860386920,
+  "lat": -33.7973879,
+  "lon": 151.2853422,
+  "tags": {
+    "amenity": "cafe",
+    "charge:conditional": "10% @ (Sa,Su); 15% @ (PH)",
+    "charge:credit_cards": "1.1%",
+    "contact:instagram": "calibrate_coffee_manly",
+    "indoor_seating": "yes",
+    "name": "Calibrate Coffee",
+    "outdoor_seating": "sidewalk",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12861964522,
+  "lat": -33.7987721,
+  "lon": 151.2861834,
+  "tags": {
+    "addr:housenumber": "2D",
+    "addr:street": "Darley Road",
+    "amenity": "cafe",
+    "cuisine": "japanese",
+    "drink:coffee": "yes",
+    "highchair": "yes",
+    "indoor_seating": "yes",
+    "name": "Tokyo Cloud",
+    "note": "1.8% cards, 10% sunday",
+    "outdoor_seating": "sidewalk",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "website": "https://www.tokyocloud.au/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12869816944,
+  "lat": -33.7985978,
+  "lon": 151.2860559,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Three Beans"
+  }
+},
+{
+  "type": "node",
+  "id": 12993503897,
+  "lat": -33.7965653,
+  "lon": 151.2877072,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Aikkita"
+  }
+},
+{
+  "type": "node",
+  "id": 12993572180,
+  "lat": -33.7964919,
+  "lon": 151.2876687,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Alice"
+  }
+},
+{
+  "type": "node",
+  "id": 13108127304,
+  "lat": -33.8000442,
+  "lon": 151.2872581,
+  "tags": {
+    "addr:housenumber": "13",
+    "addr:street": "Victoria Parade",
+    "addr:unit": "1A",
+    "amenity": "cafe",
+    "check_date": "2025-08-30",
+    "cuisine": "coffee_shop;burger;breakfast",
+    "name": "Vini's",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 13157364080,
+  "lat": -33.7984591,
+  "lon": 151.2873871,
+  "tags": {
+    "amenity": "fast_food",
+    "check_date": "2025-09-20",
+    "cuisine": "fish_and_chips",
+    "drive_through": "no",
+    "name": "Mongers",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13157467448,
+  "lat": -33.7988981,
+  "lon": 151.2862884,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "italian",
+    "name": "deVita",
+    "opening_hours": "Mo-Su 12:00-22:00; PH closed",
+    "outdoor_seating": "yes",
+    "takeaway": "yes",
+    "toilets": "yes",
+    "toilets:access": "yes",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 13190228671,
+  "lat": -33.7971792,
+  "lon": 151.2851418,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "italian",
+    "indoor_seating": "yes",
+    "name": "Whistler Pizza",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13194841521,
+  "lat": -33.8014876,
+  "lon": 151.2887914,
+  "tags": {
+    "addr:housenumber": "37",
+    "addr:street": "Darley Road",
+    "amenity": "cafe",
+    "check_date": "2026-01-11",
+    "name": "The Roast Office Cafe",
+    "name:en": "The Roast Office Cafe",
+    "opening_hours": "07:00-13:00",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13196660859,
+  "lat": -33.7972817,
+  "lon": 151.2853719,
+  "tags": {
+    "amenity": "cafe",
+    "cuisine": "coffee_shop",
+    "name": "Berkelo",
+    "website": "https://berkelo.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 13196739660,
+  "lat": -33.7974277,
+  "lon": 151.2867268,
+  "tags": {
+    "addr:housenumber": "42",
+    "addr:street": "Market Lane",
+    "addr:unit": "2",
+    "amenity": "cafe",
+    "brand": "The Coffee",
+    "changing_table": "no",
+    "contact:email": "hello@thecoffee.jp",
+    "contact:instagram": "thecoffee_australia",
+    "contact:website": "https://thecoffee.jp/shortcut/australia/sydney/the-coffee-manly",
+    "cuisine": "coffee_shop",
+    "indoor_seating": "yes",
+    "name": "The Coffee",
+    "name:en": "The Coffee",
+    "name:ja": "ザコーヒ一",
+    "opening_hours": "Mo-Sa 06:00-16:00",
+    "outdoor_seating": "pedestrian_zone",
+    "takeaway": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13196987125,
+  "lat": -33.7998507,
+  "lon": 151.2871006,
+  "tags": {
+    "addr:housenumber": "22",
+    "addr:street": "Darley Road",
+    "amenity": "restaurant",
+    "check_date": "2025-12-04",
+    "cuisine": "pizza",
+    "name": "Beaches Pizza Bar",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13288117469,
+  "lat": -33.7858642,
+  "lon": 151.2873146,
+  "tags": {
+    "addr:housenumber": "77",
+    "addr:street": "Collingwood Street",
+    "amenity": "cafe",
+    "check_date": "2025-11-08",
+    "cuisine": "coffee_shop",
+    "email": "team@thecorneratqueensie.com.au",
+    "name": "The Corner at Queensie",
+    "opening_hours": "07:00-14:00",
+    "organic": "yes",
+    "outdoor_seating": "no",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 2 9977 4395",
+    "takeaway": "yes",
+    "website": "https://www.thecorneratqueensie.com.au/"
+  }
+},
+{
+  "type": "node",
+  "id": 13312124407,
+  "lat": -33.7945624,
+  "lon": 151.2651276,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "pizza",
+    "name": "Johny Gio"
+  }
+},
+{
+  "type": "node",
+  "id": 13312127779,
+  "lat": -33.7971371,
+  "lon": 151.2872431,
+  "tags": {
+    "amenity": "fast_food",
+    "cuisine": "kebab",
+    "name": "Ser-Bar Kebab"
+  }
+},
+{
+  "type": "node",
+  "id": 13315316385,
+  "lat": -33.7991100,
+  "lon": 151.2710036,
+  "tags": {
+    "amenity": "cafe",
+    "name": "boté",
+    "opening_hours": "07:00-13:00",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13323300268,
+  "lat": -33.7860124,
+  "lon": 151.2872487,
+  "tags": {
+    "addr:housenumber": "73",
+    "addr:street": "Collingwood Street",
+    "amenity": "fast_food",
+    "check_date": "2025-11-08",
+    "cuisine": "chicken;burger",
+    "drive_through": "no",
+    "name": "Salty Rooster",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+61 2 9977 7373",
+    "website": "http://www.saltyroosterburgers.com/",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 13368418768,
+  "lat": -33.7962015,
+  "lon": 151.2856264,
+  "tags": {
+    "addr:door": "Shop 5",
+    "addr:housenumber": "19",
+    "addr:street": "Whistler Street",
+    "amenity": "cafe",
+    "check_date": "2026-10-17",
+    "contact:instagram": "https://www.instagram.com/showboxcoffee/",
+    "cuisine": "coffee_shop;cake;burger",
+    "name": "Showbox Coffee",
+    "name:en": "Showbox Coffee",
+    "opening_hours": "06:00-14:00",
+    "outdoor_seating": "yes",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13565429446,
+  "lat": -33.7988451,
+  "lon": 151.2844076,
+  "tags": {
+    "addr:housenumber": "54-68",
+    "addr:street": "Belgrave Street",
+    "addr:unit": "Shop 5",
+    "amenity": "restaurant",
+    "brewery": "Asahi;Tiger",
+    "cuisine": "vietnamese",
+    "indoor_seating": "yes",
+    "name": "Vietnam Why Not",
+    "opening_hours": "Mo-Su 11:30-21:00",
+    "outdoor_seating": "yes",
+    "payment:surcharge": "10% @ (Su,PH)",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13932656184,
+  "lat": -33.7999642,
+  "lon": 151.2680580,
+  "tags": {
+    "amenity": "cafe",
+    "name": "Buoy Kiosk"
+  }
+},
+{
+  "type": "node",
+  "id": 13933673953,
+  "lat": -33.7976036,
+  "lon": 151.2864045,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "nepalese",
+    "name": "Momo Bar",
+    "outdoor_seating": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14176096529,
+  "lat": -33.7995794,
+  "lon": 151.2847102,
+  "tags": {
+    "air_conditioning": "no",
+    "amenity": "cafe",
+    "check_date": "2026-09-13",
+    "contact:facebook": "coveespresso",
+    "name": "Cove Espresso Co by Schibella",
+    "outdoor_seating": "no",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14196480182,
+  "lat": -33.7994699,
+  "lon": 151.2850906,
+  "tags": {
+    "addr:housenumber": "47",
+    "addr:street": "East Esplanade",
+    "amenity": "restaurant",
+    "check_date": "2026-09-19",
+    "cuisine": "italian",
+    "name": "Fioretta",
+    "opening_hours": "We-Fr 17:00-22:30",
+    "website": "https://www.fiorettaosteria.com.au/",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 14286855437,
+  "lat": -33.7983788,
+  "lon": 151.2862775,
+  "tags": {
+    "addr:housenumber": "40",
+    "addr:postcode": "2095",
+    "addr:state": "NSW",
+    "addr:street": "The Corso",
+    "addr:suburb": "Manly",
+    "amenity": "bar",
+    "cuisine": "irish",
+    "level": "-1",
+    "name": "The Gopher",
+    "website": "https://gophermanly.com.au"
+  }
+},
+{
+  "type": "way",
+  "id": 4042219,
+  "center": {
+    "lat": -33.7820562,
+    "lon": 151.2911721
+  },
+  "tags": {
+    "name": "Freshwater Beach",
+    "natural": "beach",
+    "old_name": "Harbord Beach",
+    "source:old_name": "historical",
+    "source_ref:old_name": "http://parishmaps.lands.nsw.gov.au/mrsid/image_sid.pl?client=pmap&image=PMapMN04/14041902.sid",
+    "supervised": "yes",
+    "surface": "sand"
+  }
+},
+{
+  "type": "way",
+  "id": 4645339,
+  "center": {
+    "lat": -33.7851311,
+    "lon": 151.2796832
+  },
+  "tags": {
+    "layer": "-1",
+    "leisure": "park",
+    "name": "Keirle Park",
+    "wikidata": "Q21928898"
+  }
+},
+{
+  "type": "way",
+  "id": 22952433,
+  "center": {
+    "lat": -33.7958728,
+    "lon": 151.2830043
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Ivanhoe Park",
+    "wikidata": "Q21929994"
+  }
+},
+{
+  "type": "way",
+  "id": 22952482,
+  "center": {
+    "lat": -33.7794253,
+    "lon": 151.2659127
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Miller Reserve",
+    "website": "http://www.warringah.nsw.gov.au/play/miller-reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 23051471,
+  "center": {
+    "lat": -33.7787804,
+    "lon": 151.2629509
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "David Thomas Playing Fields"
+  }
+},
+{
+  "type": "way",
+  "id": 23051586,
+  "center": {
+    "lat": -33.7784395,
+    "lon": 151.2723982
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Nolan Reserve",
+    "website": "https://www.northernbeaches.nsw.gov.au/things-to-do/recreation-area/nolan-reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 23051651,
+  "center": {
+    "lat": -33.7897570,
+    "lon": 151.2782410
+  },
+  "tags": {
+    "layer": "-1",
+    "leisure": "park",
+    "name": "Graham Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 23051658,
+  "center": {
+    "lat": -33.7886566,
+    "lon": 151.2691883
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Manly West Park",
+    "wikidata": "Q21983935"
+  }
+},
+{
+  "type": "way",
+  "id": 23240559,
+  "center": {
+    "lat": -33.7999200,
+    "lon": 151.2750987
+  },
+  "tags": {
+    "name": "Fairlight Beach",
+    "natural": "beach",
+    "source:name": "local_knowledge",
+    "surface": "sand",
+    "wikidata": "Q21957122"
+  }
+},
+{
+  "type": "way",
+  "id": 23240560,
+  "center": {
+    "lat": -33.7995013,
+    "lon": 151.2782354
+  },
+  "tags": {
+    "name": "Delwood Beach",
+    "natural": "beach"
+  }
+},
+{
+  "type": "way",
+  "id": 23240573,
+  "center": {
+    "lat": -33.8035048,
+    "lon": 151.2701944
+  },
+  "tags": {
+    "name": "Forty Baskets Beach",
+    "natural": "beach",
+    "surface": "sand"
+  }
+},
+{
+  "type": "way",
+  "id": 23240574,
+  "center": {
+    "lat": -33.8151891,
+    "lon": 151.2633703
+  },
+  "tags": {
+    "lifeguard": "no",
+    "name": "Washaway Beach",
+    "natural": "beach",
+    "nudism": "permissive",
+    "source:name": "local_knowledge",
+    "supervised": "no",
+    "surface": "sand"
+  }
+},
+{
+  "type": "way",
+  "id": 32304591,
+  "center": {
+    "lat": -33.8008032,
+    "lon": 151.2943695
+  },
+  "tags": {
+    "access": "yes",
+    "alcohol": "no",
+    "alt_name": "Fairy Bower Tidal Pool;Fairy Bower Pool;Fairy Bower Sea Pool",
+    "covered": "no",
+    "dog": "no",
+    "fee": "no",
+    "leisure": "swimming_pool",
+    "lifeguard": "no",
+    "location": "outdoor",
+    "name": "Fairy Bower Rock Pool",
+    "note:name": "based on signage",
+    "opening_hours": "24/7; We off",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "salt": "yes",
+    "smoking": "no",
+    "source:geometry": "LPI Imagery",
+    "sport": "swimming",
+    "start_date": "1929",
+    "supervised": "no",
+    "tidal": "yes",
+    "website": "https://www.northernbeaches.nsw.gov.au/things-to-do/recreation-area/fairy-bower-rockpool",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "way",
+  "id": 39453135,
+  "center": {
+    "lat": -33.7838823,
+    "lon": 151.2817035
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Hinkler Park",
+    "wikidata": "Q21928947"
+  }
+},
+{
+  "type": "way",
+  "id": 40936212,
+  "center": {
+    "lat": -33.8002120,
+    "lon": 151.2754819
+  },
+  "tags": {
+    "access": "yes",
+    "fee": "no",
+    "leisure": "swimming_pool",
+    "location": "outdoor",
+    "name": "Fairlight Beach Pool",
+    "salt": "yes",
+    "sport": "swimming"
+  }
+},
+{
+  "type": "way",
+  "id": 41694616,
+  "center": {
+    "lat": -33.7861948,
+    "lon": 151.2662906
+  },
+  "tags": {
+    "addr:housenumber": "273",
+    "addr:postcode": "2093",
+    "addr:state": "NSW",
+    "addr:street": "Condamine Street",
+    "air_conditioning": "yes",
+    "alt_name": "Kentucky Fried Chicken",
+    "amenity": "fast_food",
+    "brand": "KFC",
+    "brand:wikidata": "Q524757",
+    "brand:wikipedia": "en:KFC",
+    "building": "yes",
+    "cuisine": "chicken",
+    "diet:vegetarian": "no",
+    "drive_through": "yes",
+    "name": "KFC",
+    "opening_hours": "Mo-Su 10:00-22:00",
+    "phone": "+61 2 9948 4898",
+    "source": "knowledge",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 45896043,
+  "center": {
+    "lat": -33.7816794,
+    "lon": 151.2837162
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Crown Road Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 48224209,
+  "center": {
+    "lat": -33.7815551,
+    "lon": 151.2945098
+  },
+  "tags": {
+    "access": "yes",
+    "alt_name": "Harbord Baths;Harbord Pool;Freshwater Pool",
+    "covered": "no",
+    "fee": "no",
+    "heated": "no",
+    "leisure": "swimming_pool",
+    "location": "outdoor",
+    "name": "Freshwater Rock Pool",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "sport": "swimming",
+    "swimming_lanes": "8",
+    "swimming_pool": "swimming"
+  }
+},
+{
+  "type": "way",
+  "id": 157073349,
+  "center": {
+    "lat": -33.7862682,
+    "lon": 151.2894576
+  },
+  "tags": {
+    "access": "yes",
+    "covered": "no",
+    "leisure": "swimming_pool",
+    "location": "outdoor",
+    "name": "Queenscliff Rock Pool",
+    "salt": "yes",
+    "sport": "swimming"
+  }
+},
+{
+  "type": "way",
+  "id": 176767535,
+  "center": {
+    "lat": -33.7984806,
+    "lon": 151.2651154
+  },
+  "tags": {
+    "check_date": "2023-07-01",
+    "dog": "unleashed",
+    "leisure": "park",
+    "name": "North Harbour Reserve",
+    "operator": "Northern Beaches Council",
+    "source": "bing"
+  }
+},
+{
+  "type": "way",
+  "id": 179541460,
+  "center": {
+    "lat": -33.8076278,
+    "lon": 151.2741541
+  },
+  "tags": {
+    "name": "Reef Beach",
+    "natural": "beach",
+    "source": "bing",
+    "surface": "sand",
+    "wikidata": "Q21956826"
+  }
+},
+{
+  "type": "way",
+  "id": 179948425,
+  "center": {
+    "lat": -33.8005227,
+    "lon": 151.2979356
+  },
+  "tags": {
+    "access": "yes",
+    "alcohol": "no",
+    "alt_name": "Shelley Beach",
+    "dog": "no",
+    "lifeguard": "no",
+    "name": "Shelly Beach",
+    "natural": "beach",
+    "nudism": "no",
+    "smoking": "no",
+    "supervised": "no",
+    "surface": "sand",
+    "wikidata": "Q7493888"
+  }
+},
+{
+  "type": "way",
+  "id": 180522305,
+  "center": {
+    "lat": -33.8116661,
+    "lon": 151.2590211
+  },
+  "tags": {
+    "name": "Castle Rock Beach",
+    "natural": "beach",
+    "source": "bing",
+    "surface": "sand",
+    "wikidata": "Q21957160"
+  }
+},
+{
+  "type": "way",
+  "id": 222427241,
+  "center": {
+    "lat": -33.7975938,
+    "lon": 151.2845043
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Gilbert Park",
+    "source": "Bing",
+    "source:name": "LPI Base Map May 2018",
+    "wikidata": "Q21929105"
+  }
+},
+{
+  "type": "way",
+  "id": 223784751,
+  "center": {
+    "lat": -33.7973821,
+    "lon": 151.2871969
+  },
+  "tags": {
+    "addr:housenumber": "69-71",
+    "addr:street": "The Corso",
+    "amenity": "pub",
+    "building": "retail",
+    "building:colour": "beige",
+    "building:levels": "3",
+    "building:levels:rooftop": "1",
+    "indoor_seating": "yes",
+    "name": "New Brighton Hotel",
+    "opening_hours": "Su 09:00-24:00, Mo-Fr 10:00-03:00, Sa 09:00-03:00",
+    "outdoor_seating": "balcony",
+    "roof:levels": "0",
+    "roof:shape": "flat",
+    "source:addr": "LPI Base Map May 2018"
+  }
+},
+{
+  "type": "way",
+  "id": 223789521,
+  "center": {
+    "lat": -33.7976829,
+    "lon": 151.2894717
+  },
+  "tags": {
+    "alt_name": "Cabbage Tree Beach",
+    "name": "Manly Beach",
+    "name:en": "Manly Beach",
+    "name:ja": "マンリービーチ",
+    "natural": "beach",
+    "old_name": "South Steyne Beach",
+    "surface": "sand",
+    "tourism": "attraction",
+    "wikidata": "Q3271969",
+    "wikipedia": "en:Manly Beach"
+  }
+},
+{
+  "type": "way",
+  "id": 223791335,
+  "center": {
+    "lat": -33.8066012,
+    "lon": 151.2866272
+  },
+  "tags": {
+    "area": "yes",
+    "name": "Little Manly Cove",
+    "natural": "beach",
+    "source": "Bing",
+    "surface": "sand",
+    "wikidata": "Q6650828"
+  }
+},
+{
+  "type": "way",
+  "id": 223791501,
+  "center": {
+    "lat": -33.8082827,
+    "lon": 151.2915410
+  },
+  "tags": {
+    "area": "yes",
+    "name": "Collins Flat Beach",
+    "natural": "beach",
+    "opening_hours": "sunrise-sunset",
+    "surface": "sand"
+  }
+},
+{
+  "type": "way",
+  "id": 256955265,
+  "center": {
+    "lat": -33.7851066,
+    "lon": 151.2843871
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Lagoon Park",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644"
+  }
+},
+{
+  "type": "way",
+  "id": 303323398,
+  "center": {
+    "lat": -33.7798133,
+    "lon": 151.2938593
+  },
+  "tags": {
+    "leisure": "nature_reserve",
+    "name": "Duke Kahanamoku Park",
+    "natural": "wood"
+  }
+},
+{
+  "type": "way",
+  "id": 316257472,
+  "center": {
+    "lat": -33.7802241,
+    "lon": 151.2716528
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Passmore Reserve",
+    "website": "http://www.warringah.nsw.gov.au/play/passmore-reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 355236220,
+  "center": {
+    "lat": -33.8019250,
+    "lon": 151.2977080
+  },
+  "tags": {
+    "check_date": "2023-11-16",
+    "leisure": "park",
+    "name": "Bower Street Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 388149665,
+  "center": {
+    "lat": -33.8092578,
+    "lon": 151.2656930
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Tania Park",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "source": "NSW LPI Base Map",
+    "source:date": "2015-12",
+    "website": "https://www.northernbeaches.nsw.gov.au/things-to-do/recreation-area/tania-park",
+    "wikidata": "Q7683255"
+  }
+},
+{
+  "type": "way",
+  "id": 392414820,
+  "center": {
+    "lat": -33.8151729,
+    "lon": 151.2865013
+  },
+  "tags": {
+    "dog": "no",
+    "lifeguard": "no",
+    "name": "Quarantine Beach",
+    "natural": "beach",
+    "surface": "sand",
+    "wikidata": "Q21956839"
+  }
+},
+{
+  "type": "way",
+  "id": 392508281,
+  "center": {
+    "lat": -33.7928462,
+    "lon": 151.2839009
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Kangaroo Park",
+    "wikidata": "Q21929944"
+  }
+},
+{
+  "type": "way",
+  "id": 392508491,
+  "center": {
+    "lat": -33.7972319,
+    "lon": 151.2825584
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Dalley Park",
+    "wikidata": "Q21928295"
+  }
+},
+{
+  "type": "way",
+  "id": 393218277,
+  "center": {
+    "lat": -33.7924446,
+    "lon": 151.2725260
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Weerona Park",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644"
+  }
+},
+{
+  "type": "way",
+  "id": 468219924,
+  "center": {
+    "lat": -33.7810253,
+    "lon": 151.2893019
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Freshwater Beach Reserve",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644"
+  }
+},
+{
+  "type": "way",
+  "id": 468606674,
+  "center": {
+    "lat": -33.7839614,
+    "lon": 151.2895651
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Freshwater View Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 469318737,
+  "center": {
+    "lat": -33.8077027,
+    "lon": 151.2877484
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Little Manly Point"
+  }
+},
+{
+  "type": "way",
+  "id": 487648283,
+  "center": {
+    "lat": -33.7815912,
+    "lon": 151.2885661
+  },
+  "tags": {
+    "amenity": "restaurant",
+    "building": "retail",
+    "name": "Pilu at Freshwater"
+  }
+},
+{
+  "type": "way",
+  "id": 489037963,
+  "center": {
+    "lat": -33.7839501,
+    "lon": 151.2842619
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Aitken Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 543401890,
+  "center": {
+    "lat": -33.7814731,
+    "lon": 151.2886424
+  },
+  "tags": {
+    "amenity": "cafe",
+    "building": "retail",
+    "name": "Pilu Baretto"
+  }
+},
+{
+  "type": "way",
+  "id": 552029266,
+  "center": {
+    "lat": -33.7963807,
+    "lon": 151.2875459
+  },
+  "tags": {
+    "addr:housenumber": "48",
+    "addr:street": "North Steyne",
+    "amenity": "cafe",
+    "building": "yes",
+    "cuisine": "coffee_shop",
+    "name": "hemingway's",
+    "opening_hours": "Mo,We 18:00-23:00; Th-Sa 08:00-14:00,18:00-23:00; Su,PH 08:00-14:00",
+    "phone": "+61 2 9976 3030",
+    "source:addr": "LPI Base Map May 2018",
+    "website": "https://hemingwaysmanly.com.au/"
+  }
+},
+{
+  "type": "way",
+  "id": 552029268,
+  "center": {
+    "lat": -33.7954118,
+    "lon": 151.2870142
+  },
+  "tags": {
+    "addr:housenumber": "58",
+    "addr:street": "North Steyne",
+    "branch": "Manly Pacific",
+    "brand": "MGallery",
+    "brand:wikidata": "Q25419207",
+    "building": "hotel",
+    "building:levels": "8",
+    "name": "Manly Pacific",
+    "roof:levels": "0",
+    "source:addr": "LPI Base Map May 2018",
+    "tourism": "hotel",
+    "website": "https://manlypacific.com.au/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 552506132,
+  "center": {
+    "lat": -33.7994304,
+    "lon": 151.2893477
+  },
+  "tags": {
+    "addr:housenumber": "8",
+    "addr:street": "South Steyne",
+    "brand": "The Sebel",
+    "brand:wikidata": "Q110888248",
+    "building": "hotel",
+    "building:levels": "7",
+    "internet_access": "wlan",
+    "name": "The Sebel",
+    "phone": "+61 2 9977 8866",
+    "tourism": "hotel",
+    "website": "https://www.thesebel.com/new-south-wales/the-sebel-sydney-manly-beach/",
+    "wikidata": "Q111407764"
+  }
+},
+{
+  "type": "way",
+  "id": 558680188,
+  "center": {
+    "lat": -33.7826710,
+    "lon": 151.2796657
+  },
+  "tags": {
+    "landuse": "grass",
+    "leisure": "park",
+    "name": "Mill Park"
+  }
+},
+{
+  "type": "way",
+  "id": 561377761,
+  "center": {
+    "lat": -33.7978062,
+    "lon": 151.2682774
+  },
+  "tags": {
+    "name": "Dirty Haul Beach",
+    "natural": "beach",
+    "surface": "sand"
+  }
+},
+{
+  "type": "way",
+  "id": 561382317,
+  "center": {
+    "lat": -33.8032027,
+    "lon": 151.2699193
+  },
+  "tags": {
+    "alt_name": "Gledhill Park",
+    "check_date": "2024-07-07",
+    "leisure": "park",
+    "name": "Gledhill Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 567195532,
+  "center": {
+    "lat": -33.7999471,
+    "lon": 151.2894369
+  },
+  "tags": {
+    "addr:street": "Ashburner Street",
+    "brand": "Club Wyndham",
+    "brand:wikidata": "Q112144845",
+    "building": "apartments",
+    "building:levels": "5",
+    "building:material": "plaster",
+    "name": "Club Wyndham",
+    "roof:levels": "0",
+    "roof:shape": "flat",
+    "tourism": "hotel"
+  }
+},
+{
+  "type": "way",
+  "id": 590884726,
+  "center": {
+    "lat": -33.7960049,
+    "lon": 151.2873361
+  },
+  "tags": {
+    "addr:housenumber": "54",
+    "addr:street": "North Steyne",
+    "building": "hotel",
+    "building:levels": "4",
+    "name": "Manly Paradise",
+    "roof:levels": "0",
+    "roof:shape": "flat",
+    "source:addr": "LPI Base Map May 2018",
+    "swimming_pool": "outdoor",
+    "swimming_pool:location": "rooftop",
+    "tourism": "hotel"
+  }
+},
+{
+  "type": "way",
+  "id": 605419676,
+  "center": {
+    "lat": -33.7803349,
+    "lon": 151.2799524
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Palomar Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 605419690,
+  "center": {
+    "lat": -33.7829843,
+    "lon": 151.2634096
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "King Reserve South"
+  }
+},
+{
+  "type": "way",
+  "id": 605419693,
+  "center": {
+    "lat": -33.7819523,
+    "lon": 151.2637299
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "King Reserve",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644"
+  }
+},
+{
+  "type": "way",
+  "id": 605419705,
+  "center": {
+    "lat": -33.7997670,
+    "lon": 151.2604317
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Brimebecon Park"
+  }
+},
+{
+  "type": "way",
+  "id": 605419707,
+  "center": {
+    "lat": -33.8026083,
+    "lon": 151.2642992
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Nanbaree Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 605419732,
+  "center": {
+    "lat": -33.8061703,
+    "lon": 151.2614775
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Bareena Park"
+  }
+},
+{
+  "type": "way",
+  "id": 605419745,
+  "center": {
+    "lat": -33.8087104,
+    "lon": 151.2835078
+  },
+  "tags": {
+    "addr:street": "Addison Road",
+    "leisure": "park",
+    "name": "Peace Park",
+    "note": "the Peace Park doe stretch around the Kilburn tower according to the council: https://files-preprod-d9.northernbeaches.nsw.gov.au/nbc-prod-files/test-gab/MANLY%20PEACE%20PARK%20-%20POM.pdf?1740552745",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644"
+  }
+},
+{
+  "type": "way",
+  "id": 641139193,
+  "center": {
+    "lat": -33.7833389,
+    "lon": 151.2887228
+  },
+  "tags": {
+    "check_date": "2023-11-16",
+    "leisure": "nature_reserve",
+    "name": "Pavilion Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 642940425,
+  "center": {
+    "lat": -33.7901815,
+    "lon": 151.2668681
+  },
+  "tags": {
+    "amenity": "restaurant",
+    "building": "yes",
+    "cuisine": "mediterranean",
+    "name": "Tru Blu",
+    "outdoor_seating": "yes",
+    "smoking": "no",
+    "website": "https://www.trublumediterranean.com.au/"
+  }
+},
+{
+  "type": "way",
+  "id": 648281705,
+  "center": {
+    "lat": -33.7945889,
+    "lon": 151.2639482
+  },
+  "tags": {
+    "addr:housenumber": "385",
+    "addr:street": "Sydney Road",
+    "amenity": "fast_food",
+    "building": "yes",
+    "cuisine": "greek",
+    "indoor_seating": "yes",
+    "name": "Zeus Street Greek",
+    "outdoor_seating": "yes",
+    "toilet": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 652184596,
+  "center": {
+    "lat": -33.7899390,
+    "lon": 151.2675181
+  },
+  "tags": {
+    "amenity": "cafe",
+    "building": "yes",
+    "name": "Roseberry Sandwich Bar"
+  }
+},
+{
+  "type": "way",
+  "id": 655265190,
+  "center": {
+    "lat": -33.8000164,
+    "lon": 151.2848570
+  },
+  "tags": {
+    "amenity": "bar",
+    "building:levels": "2",
+    "building:part": "yes",
+    "name": "El Camino cantina Manly"
+  }
+},
+{
+  "type": "way",
+  "id": 724653634,
+  "center": {
+    "lat": -33.7717665,
+    "lon": 151.2459523
+  },
+  "tags": {
+    "alt_name": "Manly Dam",
+    "leisure": "nature_reserve",
+    "name": "Manly Warringah War Memorial State Park",
+    "operator": "Northern Beaches Council",
+    "operator:type": "government",
+    "operator:wikidata": "Q56477644",
+    "website": "https://www.northernbeaches.nsw.gov.au/things-to-do/parks-and-trails/parks/manly-dam",
+    "wikidata": "Q6750610",
+    "wikipedia": "en:Manly Dam Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 745166359,
+  "center": {
+    "lat": -33.8014633,
+    "lon": 151.2862536
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "East Esplanade Park"
+  }
+},
+{
+  "type": "way",
+  "id": 745540646,
+  "center": {
+    "lat": -33.7987559,
+    "lon": 151.2827679
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "West Esplanade Park"
+  }
+},
+{
+  "type": "way",
+  "id": 904632352,
+  "center": {
+    "lat": -33.7855455,
+    "lon": 151.2575018
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Condover Street Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 1177937915,
+  "center": {
+    "lat": -33.8078664,
+    "lon": 151.2890950
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Skinner's Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 1206521670,
+  "center": {
+    "lat": -33.7872914,
+    "lon": 151.2743536
+  },
+  "tags": {
+    "leisure": "park",
+    "name": "Fairway Reserve"
+  }
+},
+{
+  "type": "way",
+  "id": 1354132488,
+  "center": {
+    "lat": -33.7972897,
+    "lon": 151.2867685
+  },
+  "tags": {
+    "amenity": "ice_cream",
+    "brand": "Messina",
+    "brand:wikidata": "Q120668671",
+    "cuisine": "ice_cream",
+    "indoor_seating": "yes",
+    "name": "Messina",
+    "opening_hours": "Su-Th 12:00-22:30; Fr,Sa 12:00-23:00",
+    "outdoor_seating": "pedestrian_zone",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1396131939,
+  "center": {
+    "lat": -33.8032588,
+    "lon": 151.2848743
+  },
+  "tags": {
+    "addr:street": "East Esplanade",
+    "addr:street:corner": "Stuart Street",
+    "amenity": "restaurant",
+    "changing_table": "yes",
+    "club": "sailing",
+    "cuisine": "fish;regional;seafood",
+    "indoor_seating": "yes",
+    "name": "Manly 16ft Skiff Sailing Club",
+    "nohousenumber": "yes",
+    "opening_hours": "Mo-We 12:00-22:00, Th 11:00-23:00, Fr,Sa 11:00-24:00, Su 11:00-22:00",
+    "outdoor_seating": "wharf",
+    "phone": "+61 2 9977 3322",
+    "toilets": "yes",
+    "toilets:wheelchair": "yes",
+    "website": "https://www.manlyskiff.com.au"
+  }
+},
+{
+  "type": "relation",
+  "id": 296933,
+  "center": {
+    "lat": -33.8329616,
+    "lon": 151.2300153
+  },
+  "tags": {
+    "boundary": "protected_area",
+    "communication:amateur_radio:pota": "AU-1716",
+    "iucn_level": "II",
+    "leisure": "nature_reserve",
+    "name": "Sydney Harbour National Park",
+    "nswdcs:cadid": "108020985",
+    "opening_hours": "sunrise-sunset",
+    "operator": "NSW National Parks and Wildlife Service",
+    "operator:short": "NPWS",
+    "operator:type": "government",
+    "operator:wikidata": "Q108872274",
+    "protect_class": "2",
+    "protection_title": "National Park",
+    "ref:capad:pa_id": "NSW_N0039",
+    "ref:npws:res_no": "N0039",
+    "source": "NPWS Estate",
+    "source:location": "LPI Admin Boundaries Feb 2016. Simplified ways JOSM 3m.",
+    "source:name": "survey",
+    "source:opening_hours": "http://www.nationalparks.nsw.gov.au/visit-a-park/parks/Sydney-Harbour-National-Park was survey 5am to 10pm.",
+    "start_date": "1975-04-04",
+    "type": "boundary",
+    "website": "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/Sydney-Harbour-National-Park",
+    "wikidata": "Q746452"
+  }
+},
+{
+  "type": "relation",
+  "id": 2927697,
+  "center": {
+    "lat": -33.8120318,
+    "lon": 151.2891174
+  },
+  "tags": {
+    "name": "Store Beach",
+    "natural": "beach",
+    "surface": "sand",
+    "type": "multipolygon"
+  }
+},
+{
+  "type": "relation",
+  "id": 2970109,
+  "center": {
+    "lat": -33.7932242,
+    "lon": 151.2877063
+  },
+  "tags": {
+    "name": "North Steyne Beach",
+    "natural": "beach",
+    "source": "local knowledge",
+    "surface": "sand",
+    "tourism": "attraction",
+    "type": "multipolygon",
+    "wikidata": "Q21956875"
+  }
+},
+{
+  "type": "relation",
+  "id": 7889573,
+  "center": {
+    "lat": -33.7969638,
+    "lon": 151.2876414
+  },
+  "tags": {
+    "addr:housenumber": "75",
+    "addr:street": "South Steyne",
+    "amenity": "pub",
+    "building": "yes",
+    "building:colour": "tan",
+    "building:material": "brick",
+    "name": "Hotel Steyne",
+    "outdoor_seating": "rooftop",
+    "source:addr": "LPI Base Map May 2018",
+    "type": "multipolygon"
+  }
+},
+{
+  "type": "relation",
+  "id": 7891609,
+  "center": {
+    "lat": -33.7805862,
+    "lon": 151.2876950
+  },
+  "tags": {
+    "addr:housenumber": "29",
+    "addr:street": "Moore Road",
+    "amenity": "pub",
+    "building": "yes",
+    "diet:vegetarian": "yes",
+    "food": "yes",
+    "name": "Harbord Beach Hotel",
+    "outdoor_seating": "yes",
+    "phone": "+61 2 9905 3434",
+    "type": "multipolygon",
+    "website": "https://harbordhotel.com.au/"
+  }
+},
+{
+  "type": "relation",
+  "id": 8238628,
+  "center": {
+    "lat": -33.7879311,
+    "lon": 151.2882824
+  },
+  "tags": {
+    "name": "Queenscliff Beach",
+    "natural": "beach",
+    "surface": "sand",
+    "tourism": "attraction",
+    "type": "multipolygon",
+    "wikidata": "Q21956838"
+  }
+},
+{
+  "type": "relation",
+  "id": 9465507,
+  "center": {
+    "lat": -33.7996083,
+    "lon": 151.2954491
+  },
+  "tags": {
+    "boundary": "protected_area",
+    "communication:amateur_radio:pota": "AU-3223",
+    "fixme": "geometry rough approximation from signage",
+    "leisure": "nature_reserve",
+    "maritime": "yes",
+    "name": "Cabbage Tree Bay Aquatic Reserve",
+    "operator": "NSW Department of Primary Industries",
+    "operator:wikidata": "Q5260456",
+    "protect_class": "4",
+    "protection_title": "Aquatic Reserve",
+    "ref:capad:pa_id": "200",
+    "source": "survey/sign",
+    "start_date": "2002-03-31",
+    "type": "boundary",
+    "website": "https://www.dpi.nsw.gov.au/fishing/marine-protected-areas/aquatic-reserves/cabbage-tree-bay-aquatic-reserve",
+    "wikidata": "Q106693201"
+  }
+},
+{
+  "type": "relation",
+  "id": 13953441,
+  "center": {
+    "lat": -33.8142531,
+    "lon": 151.2808385
+  },
+  "tags": {
+    "boundary": "protected_area",
+    "communication:amateur_radio:pota": "AU-3228",
+    "leisure": "nature_reserve",
+    "maritime": "yes",
+    "name": "North Harbour Aquatic Reserve",
+    "operator": "NSW Department of Primary Industries",
+    "operator:wikidata": "Q5260456",
+    "protect_class": "4",
+    "protection_title": "Aquatic Reserve",
+    "ref:capad:pa_id": "107",
+    "start_date": "1982-03-26",
+    "type": "boundary",
+    "website": "https://www.dpi.nsw.gov.au/fishing/marine-protected-areas/aquatic-reserves/north-harbour-aquatic-reserve"
+  }
+},
+{
+  "type": "relation",
+  "id": 16327967,
+  "center": {
+    "lat": -33.8128217,
+    "lon": 151.2971235
+  },
+  "tags": {
+    "boundary": "protected_area",
+    "iucn_level": "IV",
+    "leisure": "nature_reserve",
+    "name": "North Head Private Nature Reserve",
+    "operator": "Sydney Harbour Federation Trust",
+    "operator:wikidata": "Q2373699",
+    "protect_class": "4",
+    "protection_title": "Private Nature Reserve",
+    "ref:capad:pa_id": "AWC_15",
+    "source": "CAPAD2022",
+    "type": "boundary"
+  }
+},
+{
+  "type": "relation",
+  "id": 18183670,
+  "center": {
+    "lat": -33.8013749,
+    "lon": 151.2859734
+  },
+  "tags": {
+    "lifeguard": "no",
+    "name": "East Manly Cove Beach",
+    "natural": "beach",
+    "supervised": "no",
+    "surface": "sand",
+    "type": "multipolygon"
+  }
+}
+
+  ]
+}

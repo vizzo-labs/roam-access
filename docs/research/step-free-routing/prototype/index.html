@@ -1,0 +1,196 @@
+<!doctype html>
+<!--
+  THROWAWAY PROTOTYPE for the step-free routing spike. Not part of the app.
+  Draws cached Valhalla wheelchair routes (../data/valhalla-routes.json) on a
+  MapLibre map with the app's basemap, plus warnings for steep stretches,
+  kerbs and steps from the cached OSM extract (../data/coverage.geojson).
+  Serve docs/research/step-free-routing/ over HTTP and open /prototype/.
+-->
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step-free route prototype · Roam Access spike</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+<style>
+  :root { --ink:#1A1A1A; --muted:#4A4A4A; --paper:#FFFDF8; --line:#8A8A8A; --ok:#1E6B3E; --warn:#8A4B00; --bad:#A1251B; --brand:#2F3E8F; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); }
+  .app { display:grid; grid-template-columns: 400px 1fr; height:100%; }
+  aside { overflow:auto; padding: 20px 22px; border-right: 1px solid #D8D3C8; }
+  #map { height:100%; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  label { font-weight: 600; display:block; margin-bottom: 6px; }
+  select { font-size:16px; width:100%; min-height:48px; padding: 8px 10px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); }
+  select:focus-visible, button:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+  .honest { margin: 16px 0; padding: 12px 14px; border-radius: 12px; background: #FFF4E0; border: 1.5px solid #B57A1E; font-size: 14px; }
+  .honest strong { display:block; font-size:15px; }
+  .summary { display:flex; gap: 16px; margin: 14px 0 6px; font-size: 15px; }
+  .summary b { display:block; font-size: 20px; }
+  ul.warn { list-style:none; padding:0; margin: 8px 0; }
+  ul.warn li { display:flex; gap:10px; padding: 10px 0; border-top: 1px solid #E5E0D5; font-size: 15px; }
+  ul.warn li:first-child { border-top: 0; }
+  .ic { flex: 0 0 26px; height:26px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:14px; }
+  .ic.bad { background: var(--bad); } .ic.warn { background: var(--warn); } .ic.ok { background: var(--ok); } .ic.info { background: var(--brand); }
+  h2 { font-size: 17px; margin: 18px 0 4px; }
+  .legend { font-size: 14px; color: var(--muted); }
+  .legend span { display:inline-flex; align-items:center; gap:6px; margin-right: 12px; }
+  .sw { width: 22px; height: 6px; border-radius: 3px; display:inline-block; }
+  .proto { position: absolute; top: 12px; right: 12px; background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 13px; z-index: 2; }
+  @media (max-width: 959px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 45vh 1fr; }
+    #map { grid-row: 1; } aside { grid-row: 2; border-right: 0; border-top: 1px solid #D8D3C8; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>Step-free route</h1>
+    <p class="sub">Prototype · from Manly Wharf · Valhalla wheelchair routing</p>
+    <label for="dest">Where to?</label>
+    <select id="dest"></select>
+    <div id="out" aria-live="polite"></div>
+    <h2>On the map</h2>
+    <p class="legend">
+      <span><i class="sw" style="background:#1E6B3E"></i>gentle (&lt; 5%)</span>
+      <span><i class="sw" style="background:#C77700"></i>5–8%</span>
+      <span><i class="sw" style="background:#A1251B"></i>steep (8%+)</span>
+      <span><i class="sw" style="background:repeating-linear-gradient(90deg,#555 0 6px,transparent 6px 10px)"></i>walking route (may use steps)</span>
+      <span><i class="sw" style="background:#7A1FA2"></i>steps (OSM)</span>
+    </p>
+  </aside>
+  <div style="position:relative"><div id="map" role="region" aria-label="Map of the route"></div><div class="proto">Prototype · not real data checks</div></div>
+</div>
+<script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<script>
+const STYLE = 'https://tiles.openfreemap.org/styles/positron';
+const GRADE_COL = g => g >= 8 ? '#A1251B' : g >= 5 ? '#C77700' : '#1E6B3E';
+
+function hav([lon1, lat1], [lon2, lat2]) {
+  const p = Math.PI / 180;
+  const x = Math.sin((lat2 - lat1) * p / 2) ** 2 + Math.cos(lat1 * p) * Math.cos(lat2 * p) * Math.sin((lon2 - lon1) * p / 2) ** 2;
+  return 2 * 6371000 * Math.asin(Math.sqrt(x));
+}
+// Elevation is sampled every 10 m along the route; grade over a 30 m window.
+function gradeSegments(shape, elev) {
+  const cum = [0];
+  for (let i = 1; i < shape.length; i++) cum.push(cum[i - 1] + hav(shape[i - 1], shape[i]));
+  const at = d => { const i = Math.max(0, Math.min(elev.length - 1, d / 10)); const a = Math.floor(i), b = Math.min(elev.length - 1, a + 1); return elev[a] + (elev[b] - elev[a]) * (i - a); };
+  const feats = [];
+  for (let i = 1; i < shape.length; i++) {
+    const mid = (cum[i - 1] + cum[i]) / 2;
+    const g = Math.abs(at(mid + 15) - at(mid - 15)) / 30 * 100;
+    feats.push({ type: 'Feature', properties: { col: GRADE_COL(g), g }, geometry: { type: 'LineString', coordinates: [shape[i - 1], shape[i]] } });
+  }
+  return { type: 'FeatureCollection', features: feats };
+}
+const fc = features => ({ type: 'FeatureCollection', features });
+const line = coords => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } });
+
+Promise.all([
+  fetch('../data/valhalla-routes.json').then(r => r.json()),
+  fetch('../data/coverage.geojson').then(r => r.json()),
+]).then(([data, cov]) => {
+  const byId = new Map(cov.features.map(f => [f.properties.kind + ':' + f.properties.id, f]));
+  const sel = document.getElementById('dest');
+  const params = new URLSearchParams(location.search);
+  for (const r of data.routes) {
+    const o = document.createElement('option'); o.value = r.id; o.textContent = r.name + (r.entrance ? ' (entrance)' : ''); sel.append(o);
+  }
+  if (params.get('dest')) sel.value = params.get('dest');
+  const map = new maplibregl.Map({ container: 'map', style: STYLE, center: [151.287, -33.801], zoom: 14.6, attributionControl: { compact: true } });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+  let markers = [], ready = false;
+  map.on('load', () => {
+    ready = true;
+    map.addSource('steps', { type: 'geojson', data: fc(cov.features.filter(f => f.properties.kind === 'steps')) });
+    map.addLayer({ id: 'steps', type: 'line', source: 'steps', paint: { 'line-color': '#7A1FA2', 'line-width': 3, 'line-opacity': .55 } });
+    map.addSource('foot', { type: 'geojson', data: fc([]) });
+    map.addLayer({ id: 'foot', type: 'line', source: 'foot', paint: { 'line-color': '#555', 'line-width': 3, 'line-dasharray': [1.5, 1.5] } });
+    map.addSource('route', { type: 'geojson', data: fc([]) });
+    map.addLayer({ id: 'route-case', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#fff', 'line-width': 10 } });
+    map.addLayer({ id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'col'], 'line-width': 6 } });
+    if (params.get('coverage')) { coverage(); return; }
+    show(sel.value);
+  });
+  // ?coverage=1 — the OSM data behind the routes: crossings by kerb info, kerbs, entrances, town-centre box.
+  function coverage() {
+    const C = cov.features;
+    map.addSource('xing', { type: 'geojson', data: fc(C.filter(f => f.properties.kind === 'crossing')) });
+    map.addLayer({ id: 'xing', type: 'line', source: 'xing', paint: { 'line-width': 4,
+      'line-color': ['case', ['>=', ['get', 'kerbs'], 2], '#1E6B3E', ['==', ['get', 'kerbs'], 1], '#C77700', '#A1251B'] } });
+    map.addSource('kerb', { type: 'geojson', data: fc(C.filter(f => f.properties.kind === 'kerb')) });
+    map.addLayer({ id: 'kerb', type: 'circle', source: 'kerb', paint: { 'circle-radius': 4, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1,
+      'circle-color': ['match', ['get', 'kerb'], 'lowered', '#1E6B3E', 'flush', '#1E6B3E', 'raised', '#A1251B', '#777'] } });
+    map.addSource('ent', { type: 'geojson', data: fc(C.filter(f => f.properties.kind === 'entrance')) });
+    map.addLayer({ id: 'ent', type: 'circle', source: 'ent', paint: { 'circle-radius': 5, 'circle-color': '#2F3E8F', 'circle-stroke-color': '#fff', 'circle-stroke-width': 1.5 } });
+    const b = { s: -33.8020, w: 151.2805, n: -33.7935, e: 151.2905 };
+    map.addSource('centre', { type: 'geojson', data: fc([line([[b.w, b.s], [b.e, b.s], [b.e, b.n], [b.w, b.n], [b.w, b.s]])]) });
+    map.addLayer({ id: 'centre', type: 'line', source: 'centre', paint: { 'line-color': '#1A1A1A', 'line-width': 2, 'line-dasharray': [3, 2] } });
+    map.jumpTo({ center: [151.2855, -33.7978], zoom: 15.6 });
+    document.querySelector('h1').textContent = 'OSM coverage: Manly town centre';
+    document.querySelector('.sub').textContent = 'Cached Overpass extract, 6 November 2026';
+    sel.parentElement.querySelector('label').remove(); sel.remove();
+    document.querySelector('.legend').innerHTML = '<span><i class="sw" style="background:#1E6B3E"></i>crossing, both kerbs mapped</span><span><i class="sw" style="background:#C77700"></i>one kerb</span><span><i class="sw" style="background:#A1251B"></i>no kerb info</span><span><i class="sw" style="background:#7A1FA2"></i>steps</span><span>● green lowered/flush · red raised · grey height unknown</span><span><i class="sw" style="background:#2F3E8F;height:10px;width:10px;border-radius:50%"></i>entrance node</span><span>- - - town-centre box</span>';
+  }
+  sel.addEventListener('change', () => show(sel.value));
+
+  function pin(lngLat, html, title) {
+    const el = document.createElement('div');
+    el.innerHTML = html; el.title = title; el.setAttribute('aria-hidden', 'true');
+    const m = new maplibregl.Marker({ element: el }).setLngLat(lngLat).addTo(map); markers.push(m);
+  }
+  const dot = (bg, txt) => `<div style="width:24px;height:24px;border-radius:50%;background:${bg};color:#fff;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font:700 13px system-ui">${txt}</div>`;
+
+  function show(id) {
+    if (!ready) return;
+    const r = data.routes.find(x => x.id === id);
+    const w = r.wheelchair_entrance || r.wheelchair;
+    const dest = r.wheelchair_entrance ? r.entrance : r;
+    markers.forEach(m => m.remove()); markers = [];
+    pin([data.origin.lon, data.origin.lat], dot('#2F3E8F', 'A'), 'Manly Wharf');
+    pin([dest.lon, dest.lat], dot('#1A1A1A', 'B'), r.name);
+    map.getSource('foot').setData(r.foot && !r.foot.error ? fc([line(r.foot.shape)]) : fc([]));
+    const out = document.getElementById('out');
+    const items = [];
+    if (w.error) {
+      map.getSource('route').setData(fc([]));
+      items.push(['bad', '✕', `<b>No step-free route found.</b> In OpenStreetMap every way to this point has steps or an unsuitable surface. The dashed walking route is ${r.foot.km} km and may use steps.`]);
+      fit(r.foot.shape);
+    } else {
+      map.getSource('route').setData(gradeSegments(w.shape, w.elevation));
+      fit(w.shape);
+      if (w.end_gap_m > 25) items.push(['bad', '!', `<b>The step-free route stops ${w.end_gap_m} m before ${r.name}.</b> The last part has steps in OpenStreetMap.`]);
+      if (w.steep_edges.length) {
+        const max = Math.max(...w.steep_edges.map(s => Math.max(s.up, -s.down)));
+        const total = w.steep_edges.reduce((a, s) => a + s.m, 0);
+        const named = [...new Set(w.steep_edges.map(s => s.name).filter(n => n && !/^(footway|cycleway|road|path|service_road|driveway)$/.test(n)))];
+        items.push(['warn', '↗', `<b>Steep in ${w.steep_edges.length} place${w.steep_edges.length > 1 ? 's' : ''}</b>, up to about ${max}% (${total} m in total)${named.length ? ', including ' + named.join(', ') : ''}. <span style="color:#4A4A4A">Estimated from an elevation model, not measured.</span>`]);
+      }
+      for (const c of w.osm.crossings) {
+        const f = byId.get('crossing:' + c.way); if (!f) continue;
+        const mid = f.geometry.coordinates[Math.floor(f.geometry.coordinates.length / 2)];
+        if (c.kerbs.includes('raised')) { pin(mid, dot('#A1251B', '!'), 'Raised kerb'); items.push(['bad', '!', `<b>Raised kerbs at a crossing</b> (OpenStreetMap). Valhalla still routes across it.`]); }
+        else if (!c.kerbs.length || c.kerbs.includes('height unknown')) pin(mid, dot('#C77700', '?'), 'Kerb not mapped');
+        else pin(mid, dot('#1E6B3E', '✓'), 'Lowered or flush kerb');
+      }
+      const unknown = w.osm.crossings.filter(c => !c.kerbs.length).length;
+      if (unknown) items.push(['warn', '?', `Kerbs not mapped at ${unknown} of ${w.osm.crossings.length} crossing${w.osm.crossings.length > 1 ? 's' : ''}: check first.`]);
+      if (!items.length) items.push(['ok', '✓', 'No steps, steep stretches or unknown kerbs found in the data.']);
+    }
+    out.innerHTML = `
+      <div class="summary"><div><b>${w.error ? '—' : w.km.toFixed(1) + ' km'}</b>distance</div><div><b>${w.error ? '—' : w.minutes + ' min'}</b>at wheelchair pace</div><div><b>${w.error ? '—' : w.climb_m + ' m'}</b>climb</div></div>
+      <div class="honest"><strong>Based on OpenStreetMap, not checked by people.</strong>Steep stretches are estimated from an elevation model. Kerbs, ramps and temporary barriers may be missing. Ends at ${r.wheelchair_entrance ? 'the entrance mapped in OpenStreetMap (' + r.entrance.tags + ').' : 'the venue’s map point, not a confirmed entrance.'}</div>
+      <h2>Check before you go</h2>
+      <ul class="warn">${items.sort((a, b) => (a[0] === 'bad' ? 0 : 1) - (b[0] === 'bad' ? 0 : 1)).map(([k, ic, t]) => `<li><span class="ic ${k}" aria-hidden="true">${ic}</span><span>${t}</span></li>`).join('')}</ul>`;
+  }
+  function fit(shape) {
+    const b = shape.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(shape[0], shape[0]));
+    map.fitBounds(b, { padding: 60, duration: 0 });
+  }
+});
+</script>
+</body>
+</html>
