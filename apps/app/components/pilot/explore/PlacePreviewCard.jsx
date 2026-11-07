@@ -13,6 +13,7 @@ import { verdictSourceShortT } from '@/lib/trust/labels';
 import { firstQuestion, keyFacts } from '@/lib/pilot/key-facts';
 import { EntranceLine } from '../arrival/GettingThere';
 import { useDirections } from '../arrival/directions';
+import { NoticeLine } from '../owners/VenueNotices';
 
 // PlacePreviewCard — what a map pin opens (Domain / Airbnb / Google Maps
 // style): a photo on the left, the place, its personalised verdict, the key
@@ -220,6 +221,9 @@ const PlacePreviewCard = React.forwardRef(function PlacePreviewCard({
           {reports.length > 1 ? t('preview.moreReports', { count: reports.length - 1 }) : null}
         </Banner>
       )}
+
+      {/* the venue's newest update ("Venue says · date"): never a verdict */}
+      {!asking && <NoticeLine venue={v} style={{ marginTop: SPACE.sm }}/>}
 
       {!asking && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs, marginTop: SPACE.sm }}>

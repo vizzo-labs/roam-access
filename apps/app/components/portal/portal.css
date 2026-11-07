@@ -53,7 +53,7 @@
 
 .pt label { display: block; font-weight: 700; margin: 1rem 0 0.35rem; }
 .pt .hint { font-size: 0.92rem; color: var(--slate); margin: -0.15rem 0 0.4rem; font-weight: 400; }
-.pt input[type="text"], .pt input[type="email"], .pt input[type="tel"], .pt input[type="search"], .pt select, .pt textarea {
+.pt input[type="text"], .pt input[type="email"], .pt input[type="tel"], .pt input[type="search"], .pt input[type="date"], .pt input[type="url"], .pt select, .pt textarea {
   width: 100%; max-width: 40rem; font: inherit; font-size: 1rem; color: var(--char); background: var(--paper);
   border: 1.5px solid var(--line); border-radius: 12px; padding: 0.7rem 0.85rem; min-height: 48px; }
 .pt textarea { min-height: 6rem; resize: vertical; line-height: 1.45; }
@@ -107,3 +107,21 @@
   .pt a { color: var(--char); }
 }
 .pt-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* Business dashboard v2: section tabs (links; the current one has aria-current). */
+.pt-tabs { margin: 1.5rem 0 0; border-bottom: 1.5px solid var(--hair); }
+.pt-tabs ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.pt-tabs a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 48px; padding: 0 1rem; border-radius: 12px 12px 0 0;
+  color: var(--teal); font-weight: 700; text-decoration: none; border: 1.5px solid transparent; border-bottom: 0; margin-bottom: -1.5px; }
+.pt-tabs a:hover { background: var(--tealSoft); }
+.pt-tabs a[aria-current="page"] { background: var(--paper); color: var(--char); border-color: var(--hair); border-bottom: 3px solid var(--teal); }
+.pt-count { display: inline-flex; align-items: center; justify-content: center; min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;
+  border-radius: 999px; background: var(--stone); color: var(--char); font-size: 0.85rem; border: 1px solid var(--line); }
+.pt h2[tabindex="-1"]:focus { outline: none; }
+.pt h2[tabindex="-1"]:focus-visible { outline: 3px solid var(--char); }
+.pt-photos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+.pt-photos img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; background: var(--stone); }
+.pt .pt-file { font: inherit; font-size: 1rem; min-height: 48px; max-width: 100%; }
+.pt .pt-file::file-selector-button { font: inherit; font-weight: 700; min-height: 44px; padding: 0 1rem; margin-right: 0.75rem; border-radius: 12px;
+  border: 2px solid var(--teal); background: var(--paper); color: var(--teal); cursor: pointer; }
+@media (max-width: 40rem) { .pt-tabs a { padding: 0 0.75rem; } }

@@ -43,6 +43,7 @@ app/api/              bootstrap · profile (PUT, DELETE) · reviews · saved ·
                       venues/[id]/reviews · venues/[id]/confirm · venues/[id]/issues
                       venues/[id]/entrances · entrances/[id]/answer
                       photos (POST) · photos/[id] (GET, DELETE) · photos/[id]/suggest
+                      venue-photos/[id] (public) · business/venues/[id]/photos (POST) · notices/seen
                       venues/[id]/photos · venues/[id]/ask
                       · gaps (places needing one quick answer) · micro-answers (POST)
 app/admin/community/  create mapping days · moderate quick answers
@@ -78,6 +79,10 @@ lib/
                       source, count and latest date; confirmed absence; other entrances
   trust/              labels.ts (source + confidence wording) · entrance.ts
   data/trust.ts       confirmations, problem reports, the admin queue
+  data/owners.ts      business portal v2: venue updates (notices), photos from the venue,
+                      contact-detail corrections, review reports, "Updates from your saved
+                      places" — all "Venue says", never a verdict
+  notify/             where email / push for saved-place updates would hook in (in-app only today)
   data/photos.ts      review photos (private Blob) · data/ai-usage.ts daily AI limits
   photos/             kinds + limits (shared) · jpeg.ts strips metadata server-side
   ai/                 model.ts (gateway model + ZDR) · photo-suggest.ts · ask.ts

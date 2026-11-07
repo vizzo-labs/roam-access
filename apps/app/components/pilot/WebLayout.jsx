@@ -9,6 +9,7 @@ import { LayerToggles, layerExtras } from './layers/LayerToggles';
 import { metres } from './layers/layerUtils';
 import { useT } from './i18n';
 import { MapPlacePreview } from './explore/MapPlacePreview';
+import { UpdatesCount, UpdatesCountSr } from './owners/UpdatesCount';
 import React from 'react';
 
 export const PIN = {
@@ -77,7 +78,9 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
         {app.user?.done && (
           <nav className="web-nav" aria-label={t('app.nav.primary')}>
             {NAV.map(n => (
-              <button key={n.id} onClick={() => app.goto(n.id)} aria-current={active === n.id ? 'page' : undefined}>{t(n.label)}</button>
+              <button key={n.id} onClick={() => app.goto(n.id)} aria-current={active === n.id ? 'page' : undefined}>
+                {t(n.label)}{n.id === 'saved' && <><UpdatesCount sr={false} count={app.unseenUpdates} style={{ marginLeft: 6 }}/><UpdatesCountSr count={app.unseenUpdates}/></>}
+              </button>
             ))}
           </nav>
         )}

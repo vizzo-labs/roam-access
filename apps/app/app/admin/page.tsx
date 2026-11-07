@@ -58,7 +58,7 @@ async function Admin() {
   return (
     <>
       <h1 style={{ fontSize: 36, letterSpacing: '-0.03em', margin: '6px 0 20px' }}>Pilot overview<span style={{ color: C.rust }}>.</span></h1>
-      <p style={{ fontSize: 16, margin: '0 0 24px' }}><a href="/admin/community" style={{ color: C.teal, fontWeight: 700 }}>Mapping days and quick answers →</a> · <a href="/admin/venues" style={{ color: C.teal, fontWeight: 700 }}>Venue claims &amp; council access →</a> · <a href="/admin/arrival" style={{ color: C.teal, fontWeight: 700 }}>Arrival steps →</a> · <a href="/council" style={{ color: C.teal, fontWeight: 700 }}>Council dashboard →</a></p>
+      <p style={{ fontSize: 16, margin: '0 0 24px' }}><a href="/admin/community" style={{ color: C.teal, fontWeight: 700 }}>Mapping days and quick answers →</a> · <a href="/admin/venues" style={{ color: C.teal, fontWeight: 700 }}>Venues: claims, reports, updates &amp; photos →</a> · <a href="/admin/arrival" style={{ color: C.teal, fontWeight: 700 }}>Arrival steps →</a> · <a href="/council" style={{ color: C.teal, fontWeight: 700 }}>Council dashboard →</a></p>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
         {[[pilot.testers, 'testers onboarded'], [testers.length, 'accounts created'], [pilot.reviews, 'visible reviews'], [pilot.placesReviewed, 'places reviewed']].map(([n, l]) => (
           <div key={String(l)} style={card}>

@@ -13,6 +13,7 @@ import { buildReviewVM, ago } from '../venues';
 import { RA2_FEATURES, RA2_NEEDS, type NeedId } from '../pilot-data';
 import { coveredNeeds } from '../council/coverage';
 import type { ClaimStatus } from '../db/schema-venues';
+import { getCorrections } from './owners';
 
 const { venues, reviews, microAnswers, venueClaims, venueReplies, needsCards, venueViews } = schema;
 
@@ -145,10 +146,11 @@ export async function isClaimed(venueId: string) {
 /** What the app shows under "Venue says" for one place (public to signed-in testers). */
 export async function getVenueSays(venueId: string) {
   const db = getDb();
-  const [claimed, rows] = await Promise.all([
+  const [claimed, rows, corrections] = await Promise.all([
     isClaimed(venueId),
     db.select({ reviewId: venueReplies.reviewId, body: venueReplies.body, updatedAt: venueReplies.updatedAt })
       .from(venueReplies).where(and(eq(venueReplies.venueId, venueId), eq(venueReplies.hidden, false))),
+    getCorrections(venueId),
   ]);
   const now = Date.now();
   const statementRow = rows.find(r => !r.reviewId);
@@ -159,6 +161,9 @@ export async function getVenueSays(venueId: string) {
     claimed,
     statement: statementRow ? { body: statementRow.body, when: ago(+statementRow.updatedAt, now), at: new Date(statementRow.updatedAt).toISOString() } : null,
     replies,
+    // The venue's own phone / website / opening hours ("Venue says"); the
+    // OpenStreetMap values stay on the venue and show underneath.
+    corrections,
   };
 }
 

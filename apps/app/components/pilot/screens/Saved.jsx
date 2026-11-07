@@ -9,6 +9,7 @@ import { Banner, Card, EmptyState, GUTTER, List, SPACE, ScreenHeader } from '../
 import { PlaceRow } from '../explore/PlaceRow';
 import { useT } from '../i18n';
 import { kindLabel } from '@/lib/i18n/data';
+import { SavedUpdates } from '../owners/SavedUpdates';
 
 const INSTALL_TIP_KEY = 'ra2-install-tip-dismissed';
 
@@ -38,6 +39,7 @@ function V2SavedView({ app }) {
             {t('explore.saved.tipBody')}
           </Banner>
         )}
+        <SavedUpdates app={app}/>
         {places.length > 0 ? (
           <Card padding={0}>
             <List label={t('explore.saved.list')}>

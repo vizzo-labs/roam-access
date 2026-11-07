@@ -20,6 +20,7 @@ import sensory from './sensory';
 import preview from './preview';
 import arrival from './arrival';
 import nearby from './nearby';
+import business from './business';
 
-const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby };
+const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby, ...business };
 export default dict as Dict;

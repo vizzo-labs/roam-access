@@ -32,6 +32,9 @@ export const venueClaims = pgTable('venue_claims', {
   adminNote: text('admin_note'),
   decidedBy: text('decided_by'),
   decidedAt: timestamp('decided_at', { withTimezone: true }),
+  // Business portal v2 (202611071305): the owner's last dashboard visit and the one before.
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }),
+  prevSeenAt: timestamp('prev_seen_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, t => [
