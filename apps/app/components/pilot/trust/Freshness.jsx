@@ -9,7 +9,8 @@ import { useFormat, useT } from '../i18n';
 
 // "Last confirmed <date>", a quick "Still accurate?" (Yes / Something
 // changed) and "Report a problem". A "Yes" refreshes the date only — it never
-// changes the verdict; only reviews do that. Render with key={venue.id}.
+// changes the verdict; only reviews do that. Render with a per-venue key
+// that is unique among its siblings, e.g. key={'fresh-' + venue.id}.
 function Freshness({ app, venue }) {
   const t = useT();
   const fmt = useFormat();

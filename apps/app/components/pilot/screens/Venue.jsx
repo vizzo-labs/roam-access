@@ -148,7 +148,7 @@ function V2VenueView({ app }) {
         <FactList kind="works" facts={verdict.works}/>
         <FactList kind="check" facts={verdict.checks} style={{ marginBottom: SPACE.md }}/>
 
-        <Freshness key={v.id} app={app} venue={v}/>
+        <Freshness key={'fresh-' + v.id} app={app} venue={v}/>
 
         {/* Getting there (I1): the right door, and directions to it */}
         <GettingThere key={'arrive-' + v.id} app={app} venue={v}/>
@@ -178,7 +178,7 @@ function V2VenueView({ app }) {
           )}
         </section>
 
-        <AskPlace key={v.id} app={app} venue={v}/>
+        <AskPlace key={'ask-' + v.id} app={app} venue={v}/>
         {/* "Venue says" — separate from community facts; never changes the verdict */}
         <VenueSays app={app} venue={v} says={says}/>
 
