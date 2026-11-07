@@ -4,13 +4,15 @@ import 'server-only';
 //
 // One set per person per venue (adding again replaces yours). Others say
 // "This worked for me" (one per person); the venue shows the most-confirmed
-// set first. Describes how to get there — never changes a verdict. Shown by
-// lived experience (needs snapshot), never by name; the user id is only kept
-// for deletion and "one confirmation per person", and never sent.
+// set first. Describes how to get there — never changes a verdict. Never shown
+// with a name; shown with the needs snapshot only if the person allows it
+// (publicNeedsSql, Brief L); the user id is only kept for deletion and "one
+// confirmation per person", and never sent.
 
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { RA2_NEEDS } from '../pilot-data';
+import { publicNeedsSql } from './public-needs';
 import {
   ARRIVAL_FROM_MAX, ARRIVAL_STEP_MAX, ARRIVAL_STEP_MIN, ARRIVAL_STEPS_MAX,
 } from '../arrival/places';
@@ -35,14 +37,14 @@ function whoParts(needs: string[]) {
 }
 
 export async function getArrivalSteps(venueId: string, viewerId: string): Promise<ArrivalStepsVM[]> {
-  const rows = await getDb().select({ a: arrivalSteps, p: reviewPhotos })
+  const rows = await getDb().select({ a: arrivalSteps, p: reviewPhotos, needs: publicNeedsSql('"arrival_steps"."needs"', '"arrival_steps"."user_id"') })
     .from(arrivalSteps)
     .leftJoin(reviewPhotos, and(eq(reviewPhotos.id, arrivalSteps.photoId), eq(reviewPhotos.hidden, false)))
     .where(and(eq(arrivalSteps.venueId, venueId), eq(arrivalSteps.hidden, false)))
     // Most-confirmed first; ties go to the most recently confirmed.
     .orderBy(desc(arrivalSteps.confirmations), desc(arrivalSteps.lastConfirmedAt))
     .limit(20);
-  return rows.map(({ a, p }) => ({
+  return rows.map(({ a, p, needs }) => ({
     id: a.id, fromPlace: a.fromPlace, steps: a.steps,
     photo: p ? {
       id: p.id, src: `/api/photos/${p.id}`, thumb: `/api/photos/${p.id}?size=thumb`,
@@ -50,7 +52,7 @@ export async function getArrivalSteps(venueId: string, viewerId: string): Promis
     } : null,
     confirmations: a.confirmations,
     createdAt: a.createdAt.toISOString(), lastConfirmedAt: a.lastConfirmedAt.toISOString(),
-    ...whoParts(a.needs),
+    ...whoParts(needs ?? []),
     mine: a.userId === viewerId, confirmedByMe: a.confirmedBy.includes(viewerId),
   }));
 }

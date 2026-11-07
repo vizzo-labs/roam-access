@@ -15,7 +15,7 @@ export function ReviewsTab({ t, d, readOnly, since, reports }: TabProps & Extra)
   return (
     <>
       <h2 id="tab-h" tabIndex={-1}>{t('business.tab.reviewsCount', { count: d.reviews.length })}</h2>
-      <p className="muted">Reply publicly to say thanks, explain, or say what you’ll fix. Reviewers are shown by lived experience, never by name.</p>
+      <p className="muted">Reply publicly to say thanks, explain, or say what you’ll fix. Reviewers are shown by the name they chose (or “Roam Access member” if they post anonymously), with their access needs only if they chose to show them. Allies’ observations never change a verdict.</p>
       <p className="muted small">{t('business.reviews.cantEdit')}</p>
       {d.reviews.length ? d.reviews.map(r => {
         const isNew = !!since && new Date(r.at) > since;
@@ -24,7 +24,9 @@ export function ReviewsTab({ t, d, readOnly, since, reports }: TabProps & Extra)
           <article key={r.id} className="pt-card" aria-labelledby={`rv-${r.id}`}>
             <div className="pt-row">
               <strong id={`rv-${r.id}`}>{r.who}</strong>
-              <VerdictPill kind={r.v} label={{ works: 'It worked', check: 'Some barriers', barrier: 'Didn’t work' }[r.v]}/>
+              {r.v
+                ? <VerdictPill kind={r.v} label={{ works: 'It worked', check: 'Some barriers', barrier: 'Didn’t work' }[r.v]}/>
+                : <span className="muted small">Observed by an ally · no verdict</span>}
             </div>
             <p style={{ margin: '0.6rem 0 0.3rem' }}>{r.text}</p>
             {r.details && <p className="muted small" style={{ margin: 0 }}>{r.details}</p>}

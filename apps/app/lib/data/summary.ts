@@ -56,7 +56,7 @@ export async function getVenueSummary(id: string): Promise<VenueSummary | null> 
     ...venue.check.map(fact => ({ kind: 'check' as const, fact })),
   ];
   return {
-    venue, needs, facts, reviews: rs.length, quick: qs.length,
+    venue, needs, facts, reviews: venue.verified, quick: qs.length,
     // Newest review, quick answer or "Still accurate? Yes".
     updated: venue.lastConfirmed ? new Date(venue.lastConfirmed) : null,
   };

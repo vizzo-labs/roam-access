@@ -4,6 +4,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { isAdmin } from '@/lib/auth';
 import { getAdminOverview, setReviewHidden } from '@/lib/data';
 import { RA2_FEATURES, RA2_NEEDS } from '@/lib/pilot-data';
+import { resetPublicName } from '@/lib/data/contributors';
 import { IssuesQueue } from './IssuesQueue';
 import { AdminPhotos } from './photos';
 
@@ -20,6 +21,20 @@ async function toggleHidden(formData: FormData) {
   await setReviewHidden(String(formData.get('id')), formData.get('hidden') === 'true');
   revalidatePath('/admin');
 }
+
+// An offensive public name: cleared, so the person's reviews show
+// "Roam Access member" until they choose a new one (Me says why).
+async function resetName(formData: FormData) {
+  'use server';
+  if (!(await isAdmin())) throw new Error('Not allowed');
+  await resetPublicName(String(formData.get('userId')));
+  revalidatePath('/admin');
+}
+
+const publicLabel = (t: { relationship: string | null; postAnonymously: boolean; publicName: string | null }) =>
+  !t.relationship ? 'Not chosen yet (old anonymous display)'
+    : t.postAnonymously ? 'Posts anonymously (“Roam Access member”)'
+    : t.publicName?.trim() ? `“${t.publicName.trim()}”` : 'Name cleared (“Roam Access member”)';
 
 export default function AdminPage() {
   return (
@@ -74,11 +89,22 @@ async function Admin() {
       <p style={{ fontSize: 14, color: C.slate, margin: '0 0 12px' }}>Needs are sensitive information — don’t copy them out of this page.</p>
       <div style={{ overflowX: 'auto', marginBottom: 36 }}>
         <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead><tr><th style={th}>Name</th><th style={th}>Email</th><th style={th}>Needs</th><th style={th}>Reviews</th><th style={th}>Joined</th><th style={th}>Onboarded</th></tr></thead>
+          <thead><tr><th style={th}>Name</th><th style={th}>Shown on reviews</th><th style={th}>Email</th><th style={th}>Needs</th><th style={th}>Reviews</th><th style={th}>Joined</th><th style={th}>Onboarded</th></tr></thead>
           <tbody>
             {testers.map(t => (
               <tr key={t.userId}>
                 <td style={td}>{t.name || '—'}</td>
+                <td style={td}>
+                  {publicLabel(t)}{t.relationship ? ` · ${t.relationship}` : ''}
+                  {!!t.relationship && !t.postAnonymously && !!t.publicName?.trim() && (
+                    <form action={resetName} style={{ marginTop: 6 }}>
+                      <input type="hidden" name="userId" value={t.userId}/>
+                      <button type="submit" aria-label={`Reset name “${t.publicName.trim()}” to “Roam Access member”`} style={{ minHeight: 40, padding: '0 14px', borderRadius: 999, border: `1.5px solid ${C.rust}`, background: C.paper, color: C.rust, fontWeight: 700, cursor: 'pointer' }}>
+                        Reset name
+                      </button>
+                    </form>
+                  )}
+                </td>
                 <td style={td}>{emails.get(t.userId) || '—'}</td>
                 <td style={td}>{needLabel(t.needs)}</td>
                 <td style={td}>{t.reviews}</td>
@@ -86,7 +112,7 @@ async function Admin() {
                 <td style={td}>{t.onboardedAt ? 'Yes' : 'Not yet'}</td>
               </tr>
             ))}
-            {!testers.length && <tr><td style={td} colSpan={6}>No testers yet.</td></tr>}
+            {!testers.length && <tr><td style={td} colSpan={7}>No testers yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -100,7 +126,7 @@ async function Admin() {
               <tr key={r.id} style={r.hidden ? { opacity: 0.55 } : undefined}>
                 <td style={td}>{fmt(r.createdAt)}</td>
                 <td style={td}>{r.venueName}</td>
-                <td style={td}>{VERDICT[r.verdict] ?? r.verdict}</td>
+                <td style={td}>{r.verdict ? VERDICT[r.verdict] ?? r.verdict : 'Observation (ally, no verdict)'}</td>
                 <td style={td}>{needLabel(r.needs)}</td>
                 <td style={td}>{RA2_FEATURES.filter(f => r.features?.[f.id]).map(f => `${r.features[f.id] === 'yes' ? '✓' : '✗'} ${f.yesShort}`).join(' · ') || '—'}</td>
                 <td style={{ ...td, maxWidth: 320 }}>{r.note || '—'}</td>

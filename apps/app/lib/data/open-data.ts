@@ -2,7 +2,7 @@ import 'server-only';
 import { and, eq } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { A11YJSON_LICENSE, toPlaceInfo } from '../standards/a11yjson';
-import { featureCounts } from '../venues';
+import { featureCounts, hasVerdict } from '../venues';
 
 const { venues, reviews, microAnswers } = schema;
 
@@ -24,7 +24,7 @@ export async function getOpenDataPlaces(baseUrl: string, id?: string) {
   };
   const rBy = group(rs), qBy = group(qs);
   return vs.map(v => {
-    const vr = rBy.get(v.id) || [];
+    const vr = (rBy.get(v.id) || []).filter(hasVerdict); // ally observations are not reviews
     return toPlaceInfo(v, featureCounts(vr, qBy.get(v.id) || []), vr.length, baseUrl);
   });
 }

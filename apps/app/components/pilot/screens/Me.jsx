@@ -8,6 +8,7 @@ import { V2Shell } from '../ui/Shell';
 import { C2, F2, M2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { usePortalRows } from './MePortals';
+import { MeContrib } from '../contrib/MeContrib';
 import { Card, Chip, ChipGroup, GUTTER, Icon, List, ListRow, RADIUS, SPACE, SectionHeader, TYPE } from '../ds';
 
 // ─────────────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ function V2Me({ app }) {
           }}>{(name || t('me.you')).charAt(0).toUpperCase()}</span>
           <div style={{ minWidth: 0 }}>
             <h1 ref={h} tabIndex={-1} style={{ ...TYPE.title1, margin: 0 }}>
-              {name || t('me.you')}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
+              {name || t('me.you')}{!/[.!?。]$/.test(name || '') && <span aria-hidden="true" style={{ color: C2.rust }}>.</span>}
             </h1>
             <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0' }}>{t('me.role')}</p>
           </div>
@@ -77,6 +78,9 @@ function V2Me({ app }) {
             <p style={{ ...TYPE.footnote, margin: `${SPACE.sm}px 0 0` }}>{t('me.impact.first')}</p>
           )}
         </Card>
+
+        {/* recognition (Brief L): how I appear, badges, top contributors */}
+        <MeContrib app={app}/>
 
         {/* language (#21) — also in Accessibility settings */}
         <Card as="section" aria-label={t('common.language.title')} style={{ marginBottom: SPACE.md }}>

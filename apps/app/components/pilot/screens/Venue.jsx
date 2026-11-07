@@ -10,7 +10,9 @@ import { ra2Verdict } from '@/lib/pilot/match';
 import { verdictSourceT } from '@/lib/trust/labels';
 import { kindLabel, verdictLabel } from '@/lib/i18n/data';
 import { ReadAloud, UserText, useFormat, useT } from '../i18n';
-import { factText, reviewText, reviewWhen, reviewWho } from '../trust/text';
+import { factText, reviewText, reviewWhen } from '../trust/text';
+import { ReviewAuthor } from '../contrib/ReviewAuthor';
+import { ObservedFacts } from '../contrib/ObservedFacts';
 import { FactList } from '../trust/FactList';
 import { Freshness } from '../trust/Freshness';
 import { SourceLine } from '../trust/SourceLine';
@@ -27,7 +29,7 @@ import { VenueNotices } from '../owners/VenueNotices';
 import { VenueCorrections } from '../owners/VenueCorrections';
 import {
   ActionRow, Button, Card, Freshness as FreshnessBadge, GUTTER, RADIUS, SPACE,
-  ScreenHeader, SectionHeader, SkeletonText, TYPE,
+  ScreenHeader, SectionHeader, SkeletonText, SourceBadge, TYPE,
 } from '../ds';
 
 // Share the public summary page (/v/<id>): works for people without an
@@ -55,7 +57,8 @@ function V2VenueView({ app }) {
   const saved = app.world.saved.includes(v.id);
   const meta = V2_VERDICT_META[verdict.kind];
   const { reviews: loaded, error: reviewsError } = useVenueReviews(app, v.id);
-  const written = v.verified;
+  // Reviews plus allies' observations (which never count toward the verdict).
+  const written = v.verified + (v.observations || 0);
   const firstReview = loaded && loaded[0];
 
   React.useEffect(() => { app.markVisited(v.id); }, [v.id]); // eslint-disable-line
@@ -156,6 +159,8 @@ function V2VenueView({ app }) {
         <FactList kind="barrier" facts={verdict.barriers}/>
         <FactList kind="works" facts={verdict.works}/>
         <FactList kind="check" facts={verdict.checks} style={{ marginBottom: SPACE.md }}/>
+        {/* allies' observations (Brief L) — facts only, never the verdict */}
+        <ObservedFacts venue={v} style={{ marginBottom: SPACE.md }}/>
 
         <Freshness key={'fresh-' + v.id} app={app} venue={v}/>
 
@@ -177,7 +182,11 @@ function V2VenueView({ app }) {
           {firstReview && (
             <Card variant="filled">
               <p style={{ ...TYPE.body, margin: '0 0 10px' }}>“{firstReview.own === false ? reviewText(t, firstReview) : <UserText>{firstReview.text}</UserText>}”</p>
-              <p style={{ ...TYPE.caption, color: C2.slate, margin: 0 }}>{reviewWho(t, firstReview)} · {reviewWhen(fmt, firstReview)}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px' }}>
+                <ReviewAuthor r={firstReview}/>
+                {!firstReview.v && <SourceBadge source="ally"/>}
+                <span style={{ ...TYPE.caption, color: C2.slate }}>{reviewWhen(fmt, firstReview)}</span>
+              </div>
             </Card>
           )}
           {written === 0 && (

@@ -22,6 +22,7 @@ const app: Translation<typeof en> = {
   'app.view.toilets': "无障碍厕所",
   'app.view.beach': "海滩无障碍",
   'app.view.facility': "无障碍详情",
+  'app.view.profile': "我在评价上如何显示",
   'app.docTitle': "{title} · Roam Access 试点",
   'app.nav.primary': "主导航",
   'app.nav.home': "首页",

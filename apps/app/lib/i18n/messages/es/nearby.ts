@@ -114,7 +114,7 @@ const nearby: Translation<typeof en> = {
   'nearby.form.needStep': 'Agrega al menos un paso.',
   'nearby.form.needAlt': 'Describe la foto, para que todos sepan qué muestra.',
   'nearby.form.waitPhoto': 'Espera a que la foto termine de enviarse.',
-  'nearby.form.privacy': 'Tus pasos muestran tus necesidades de acceso (por ejemplo, «Usuario de silla de ruedas»), nunca tu nombre.',
+  'nearby.form.privacy': 'Tus pasos nunca muestran tu nombre. Muestran tus necesidades de acceso (como «Usuario de silla de ruedas») solo si tu perfil lo permite: mira Yo → Cómo aparezco en las reseñas.',
   'nearby.form.submit': 'Compartir mis pasos',
 
   // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).

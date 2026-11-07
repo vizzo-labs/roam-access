@@ -15,7 +15,7 @@ import {
   Icon, ICON_NAMES, Button, IconButton, Card, Chip, FilterChip, RemovableChip, ChipGroup,
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
-  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea,
+  SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea, ChoiceGroup, CheckRow,
 } from './index';
 import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
@@ -64,6 +64,23 @@ function FauxMap() {
       {[[70, 120, C2.blue], [150, 200, C2.amber], [220, 90, C2.red], [120, 300, '#475569']].map(([x, y, c], i) => (
         <span key={i} style={{ position: 'absolute', left: x, top: y, width: 26, height: 26, borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)', background: c, border: `2px solid ${C2.paper}` }}/>
       ))}
+    </div>
+  );
+}
+
+function ChoiceSample() {
+  const [rel, setRel] = React.useState('lived');
+  const [on, setOn] = React.useState(false);
+  return (
+    <div style={{ maxWidth: 480, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <ChoiceGroup legend="Which describes you?" hint="Self-described — we don’t check it." name="ds-rel" value={rel} onChange={setRel}
+        options={[
+          { value: 'lived', label: 'I have a disability or access need', sub: 'Shown as “Lived experience”' },
+          { value: 'carer', label: 'I’m a carer, family member or support worker' },
+          { value: 'ally', label: 'I want to help (ally)' },
+          { value: 'unsaid', label: 'Prefer not to say' },
+        ]}/>
+      <CheckRow checked={on} onChange={setOn} label="Show my access needs on my reviews (sample)" hint="Off until you turn it on. You can turn it off any time."/>
     </div>
   );
 }
@@ -287,6 +304,7 @@ export function DsPreview() {
             <SourceBadge source="venue"/>
             <SourceBadge source="partner" name="Companion Card"/>
             <SourceBadge source="photo" count={2}/>
+            <SourceBadge source="ally"/>
           </Row>
           <Row>
             <Freshness date={daysAgo(0)}/><Freshness date={daysAgo(20)}/><Freshness date={daysAgo(400)} tone="warn"/><Freshness/>
@@ -356,6 +374,10 @@ export function DsPreview() {
             <label htmlFor="ds-ta" style={{ display: 'block', ...TYPE.headline, fontSize: 15, marginBottom: 6 }}>Step 1</label>
             <TextAreaSample/>
           </div>
+        </Section>
+
+        <Section id="choice" title="ChoiceGroup · CheckRow" note="Native radios in a fieldset (one choice; arrow keys move) and a native checkbox for an explicit opt-in. Each row is one ≥ 56px target; selected = the control's own mark + a thicker teal border, never colour alone. Sensitive opt-ins are never pre-ticked.">
+          <ChoiceSample/>
         </Section>
 
         <Section id="banner" title="Banner" note="Inline messages: icon + words. live='polite' when it appears after an action; 'assertive' only for blocking errors; false for static notes.">

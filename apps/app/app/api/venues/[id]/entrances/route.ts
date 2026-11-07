@@ -3,7 +3,7 @@ import { getUserId, unauthorized } from '@/lib/auth';
 import { getVenueEntrances } from '@/lib/data/entrances';
 
 // Getting there (I1): every step-free entrance marked for this place, best
-// first, with who marked it (lived experience, never a name), its photo, and
+// first, with who marked it (never a name; their needs only if they allow it), its photo, and
 // the viewer's own "Still the way in?" answer.
 export async function GET(_req: NextRequest, ctx: RouteContext<'/api/venues/[id]/entrances'>) {
   const userId = await getUserId();

@@ -16,7 +16,9 @@ import { optionOf, slotLabel } from './sensory/defs';
 // Where a fact comes from. Only 'community' can make a place "Works for you";
 // 'osm' is always shown as unconfirmed. 'venue' is reserved for "Venue says"
 // (venue claims, later) — it must never be able to make a place work either.
-export type FactSource = 'community' | 'osm' | 'venue';
+// 'ally': an ally's observation (Brief L) — only ever in VenueVM.observed,
+// which the verdict engine never reads.
+export type FactSource = 'community' | 'osm' | 'venue' | 'ally';
 
 export type Fact = {
   t: string;            // full sentence (venue page)
@@ -51,6 +53,11 @@ export type VenueVM = {
   // Quick answers ("Help fill the gaps"): one yes/no about one feature. They
   // count toward that feature's facts and are always labelled as such.
   quick: number;
+  // Ally observations (reviews with no verdict): facts an ally noticed, shown
+  // as "Observed by an ally". NEVER in works/check/barriers, never a verdict,
+  // never counted in `verified`.
+  observed: Fact[];
+  observations: number;
   // Noise, light, crowds and quiet times (#17) — built in lib/data.ts from
   // reviews + check-ins. Describes the place; never changes the verdict.
   sensory?: SensoryVM | null;
@@ -64,8 +71,16 @@ export type VenueVM = {
 
 export type ConfirmationStat = { last: Date | string; count: number };
 
+/** A review with a verdict. Ally observations (verdict NULL) are not: they
+ *  never feed a verdict, a verdict fact or a review count. */
+export const hasVerdict = (r: Pick<Review, 'verdict'>): r is Review & { verdict: VerdictKind } =>
+  r.verdict === 'works' || r.verdict === 'check' || r.verdict === 'barrier';
+
 export type ReviewVM = {
-  id: string; who: string; filters: string[]; v: VerdictKind; when: string;
+  // v: null = an ally's observation (no verdict). writtenAs: 'carer' reviews
+  // are about the person the writer was with.
+  id: string; who: string; filters: string[]; v: VerdictKind | null; when: string;
+  writtenAs: Review['writtenAs'];
   text: string; details: string; mine: boolean;
   // Structured for translation (#21): the reviewer's first need + how many
   // more, the date to format client-side, whether `text` is the reviewer's
@@ -91,7 +106,12 @@ export type FeatureCount = {
 // Yes/no tallies per access feature from reviews and quick answers. One person
 // counts once per feature — their latest answer — so answering again (or a
 // quick answer after a review) never adds a second vote.
+// Ally observations are left out (they feed VenueVM.observed instead).
 export function featureCounts(reviews: Review[], quick: MicroAnswer[] = []): Map<FeatureId, FeatureCount> {
+  return tallyFeatures(reviews.filter(hasVerdict), quick);
+}
+
+function tallyFeatures(reviews: Review[], quick: MicroAnswer[] = []): Map<FeatureId, FeatureCount> {
   const latest = new Map<string, { k: FeatureId; val: 'yes' | 'no'; at: Date; quick: boolean }>();
   const consider = (userId: string, k: string, val: unknown, at: Date, isQuick: boolean) => {
     if (!FEATURE_IDS.includes(k as FeatureId) || (val !== 'yes' && val !== 'no')) return;
@@ -122,7 +142,11 @@ const viaQuickI18n = (q: number, all: number): I18nText | undefined =>
 const countedI18n = (what: string, count: number, q = 0): I18nText =>
   ({ key: 'facts.s.reports', params: { count }, refs: { what }, suffix: viaQuickI18n(q, count) });
 
-export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: ConfirmationStat, quick: MicroAnswer[] = []): VenueVM {
+export function buildVenueVM(venue: Venue, allReviews: Review[], confirm?: ConfirmationStat, quick: MicroAnswer[] = []): VenueVM {
+  // Everything below is built from reviews WITH a verdict. Ally observations
+  // only make `observed` (see observedFacts), so they can't change a verdict.
+  const reviews = allReviews.filter(hasVerdict);
+  const observations = allReviews.filter(r => !hasVerdict(r));
   const works: Fact[] = [], check: Fact[] = [], barriers: Fact[] = [];
   const bucket = { works, check, barrier: barriers };
 
@@ -274,7 +298,55 @@ export function buildVenueVM(venue: Venue, reviews: Review[], confirm?: Confirma
     lastConfirmed: newest([lastReview, confirm?.last, ...quick.map(a => a.updatedAt)]),
     confirmations: confirm?.count ?? 0,
     quick: quick.length,
+    observed: observedFacts(observations), observations: observations.length,
   };
+}
+
+/** Facts from ally observations: what they noticed, counted, source 'ally'. */
+export function observedFacts(observations: Review[]): Fact[] {
+  const out: Fact[] = [];
+  const counts = tallyFeatures(observations);
+  for (const f of RA2_FEATURES) {
+    const c = counts.get(f.id);
+    if (!c) continue;
+    const base = { tags: [f.id], src: 'ally' as const, n: c.yes + c.no };
+    if (c.yes !== c.no) {
+      const yes = c.yes > c.no;
+      const k = yes ? c.yes : c.no;
+      const short = `data.feature.${f.id}.${yes ? 'yesShort' : 'noShort'}`;
+      out.push({
+        ...base, n: k, t: yes ? f.yes : f.no, s: `${yes ? f.yesShort : f.noShort} — observed by ${n(k, 'ally', 'allies')}`,
+        last: iso((yes ? c.lastYes : c.lastNo)!), kind: yes ? 'feature' : 'absence',
+        i18n: { t: { key: `data.feature.${f.id}.${yes ? 'yes' : 'no'}` }, s: { key: 'contrib.fact.observed', params: { count: k }, refs: { what: short } } },
+      });
+    } else {
+      out.push({
+        ...base, kind: 'mixed', last: newest([c.lastYes, c.lastNo])!,
+        t: `Mixed reports on ${f.label}: ${c.yes} yes, ${c.no} no`, s: `Mixed: ${f.label} — ${c.yes} yes, ${c.no} no`,
+        i18n: {
+          t: { key: 'facts.t.mixed', params: { yes: c.yes, no: c.no }, refs: { label: `data.feature.${f.id}.label` } },
+          s: { key: 'facts.s.mixed', params: { yes: c.yes, no: c.no }, refs: { label: `data.feature.${f.id}.label` } },
+        },
+      });
+    }
+  }
+  const alts = new Map<EntranceAlt, { k: number; last: Date }>();
+  for (const r of observations) {
+    if (!r.entranceAlt || r.entranceAlt === 'none') continue;
+    const a = alts.get(r.entranceAlt) || { k: 0, last: r.createdAt };
+    a.k++; if (r.createdAt > a.last) a.last = r.createdAt;
+    alts.set(r.entranceAlt, a);
+  }
+  for (const x of ENTRANCE_ALTS) {
+    const a = alts.get(x.id);
+    if (!a) continue;
+    out.push({
+      t: `Step-free entrance ${x.where}`, s: `${x.short} — observed by ${n(a.k, 'ally', 'allies')}`,
+      tags: ['stepfree'], src: 'ally', n: a.k, last: iso(a.last), kind: 'entrance',
+      i18n: { t: { key: 'facts.t.altEntrance', refs: { where: `trust.entrance.${x.id}.where` } }, s: { key: 'contrib.fact.observed', params: { count: a.k }, refs: { what: `trust.entrance.${x.id}.short` } } },
+    });
+  }
+  return out;
 }
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -289,6 +361,20 @@ const DEFAULT_TEXT: Record<VerdictKind, string> = {
   check: 'I managed, but with workarounds worth knowing about.',
   barrier: 'I couldn’t use the venue as I needed.',
 };
+// A carer writes about the person they were with.
+const CARER_TEXT: Record<VerdictKind, string> = {
+  works: 'It worked for the person I was with.',
+  check: 'They managed, but with workarounds worth knowing about.',
+  barrier: 'They couldn’t use the venue as they needed.',
+};
+function defaultText(r: Review) {
+  if (!hasVerdict(r)) return 'What I noticed as an ally.';
+  return (r.writtenAs === 'carer' ? CARER_TEXT : DEFAULT_TEXT)[r.verdict];
+}
+function defaultTextKey(r: Review) {
+  if (!hasVerdict(r)) return 'contrib.observed.default';
+  return r.writtenAs === 'carer' ? `contrib.carer.default.${r.verdict}` : `review.default.${r.verdict}`;
+}
 
 export function buildReviewVM(r: Review, viewerId: string, now = Date.now()): ReviewVM {
   const needs = RA2_NEEDS.filter(x => r.needs.includes(x.id));
@@ -322,13 +408,14 @@ export function buildReviewVM(r: Review, viewerId: string, now = Date.now()): Re
     id: r.id,
     who: needs[0] ? needs[0].who + (needs.length > 1 ? ` (+${needs.length - 1})` : '') : 'Community member',
     filters: needs.map(x => x.filter),
-    v: r.verdict as VerdictKind,
+    v: hasVerdict(r) ? r.verdict : null,
+    writtenAs: r.writtenAs,
     when: ago(+r.createdAt, now),
-    text: r.note?.trim() || DEFAULT_TEXT[r.verdict as VerdictKind],
+    text: r.note?.trim() || defaultText(r),
     details: feats.join(' · '),
     mine: r.userId === viewerId,
     needs: needs.map(x => x.id), whoNeed: needs[0]?.id ?? null, whoMore: Math.max(0, needs.length - 1),
-    at: iso(r.createdAt), own: !!r.note?.trim(), textKey: r.note?.trim() ? null : `review.default.${r.verdict}`,
+    at: iso(r.createdAt), own: !!r.note?.trim(), textKey: r.note?.trim() ? null : defaultTextKey(r),
     items,
   };
 }

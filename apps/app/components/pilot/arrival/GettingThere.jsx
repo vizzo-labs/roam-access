@@ -7,7 +7,7 @@
 // step-by-step arrival).
 //
 // Honesty: entrances never change the verdict. Community-marked entrances say
-// who (lived experience) and when; OpenStreetMap ones are "unconfirmed"; a
+// when, and who by their access needs if that person allows it (never a name); OpenStreetMap ones are "unconfirmed"; a
 // "Changed" answer stops directions going there until someone confirms it.
 
 import React from 'react';

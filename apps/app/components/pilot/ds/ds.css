@@ -59,6 +59,11 @@
    containers: draw their focus ring inside so it's never cut off. */
 .ds-row-link:focus-visible, .ds-snap-grip:focus-visible, [role="tab"]:focus-visible { outline-offset: -3px; }
 
+/* ChoiceGroup / CheckRow: the transparent native input covers the row, so
+   the row shows its focus (keyboard only). */
+.ds-choice:has(input:focus-visible) { outline: 3px solid var(--ra-char); outline-offset: 2px; }
+.ds-choice input:focus-visible { outline: none; }
+
 /* /ds preview toolbar: sticky only where there's room for it. */
 .ds-preview-head { position: static; }
 @media (min-width: 900px) { .ds-preview-head { position: sticky; top: 0; } }

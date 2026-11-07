@@ -149,8 +149,9 @@ export default function HowItWorks() {
         <section aria-labelledby="privacy" style={section}>
           <H2 id="privacy">Your privacy</H2>
           <ul style={{ margin: 0, paddingLeft: 22 }}>
-            <li style={li}>Your access needs are sensitive information under the Privacy Act. We use them only to personalise verdicts and to label your reviews.</li>
-            <li style={li}>Reviews are shown by lived experience — for example “Wheelchair user” — <strong>never by your name</strong>.</li>
+            <li style={li}>Your access needs are sensitive information under the Privacy Act. We use them to personalise verdicts and, only if you choose, to label your reviews.</li>
+            <li style={li}>Reviews are public. They show the name you choose — or “Roam Access member” if you post anonymously — and how you describe yourself (lived experience, carer or ally). Your access needs (for example “Wheelchair user”) show <strong>only if you turn that on</strong>. Change it any time in Me → How I appear on reviews.</li>
+            <li style={li}>Reviews written before names were added keep showing only the writer’s lived experience, never their name, until that person chooses otherwise.</li>
             <li style={li}>We never sell your information or share your needs with venues, councils or advertisers.</li>
             <li style={li}>Me → Delete my account removes your needs, reviews, saved places, confirmations and reports. It can’t be undone.</li>
           </ul>

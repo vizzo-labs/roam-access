@@ -19,10 +19,10 @@ const onboarding = {
 
   'onboarding.needs.title': 'What do you need to enjoy a place',
   'onboarding.needs.lead': 'Pick as many as you like. We’ll rank places by what fits — you can change this anytime, or skip it.',
-  'onboarding.needs.privacy': 'Stored securely to personalise your results. Reviews show your lived experience (like “Wheelchair user”), never your name. Delete everything anytime from Me.',
+  'onboarding.needs.privacy': 'Stored securely to personalise your results. Your reviews show the name you choose (or “Roam Access member”), and your access needs only if you choose. Delete everything anytime from Me.',
 
   'onboarding.name.title': 'What should we call you',
-  'onboarding.name.lead': 'Totally optional — pick anything. Your reviews never show your name, only your lived experience.',
+  'onboarding.name.lead': 'This is how the app greets you. What shows on your reviews is up to you: Me → How I appear on reviews.',
   'onboarding.name.label': 'Your name',
   'onboarding.name.placeholder': 'e.g. Naomi',
   'onboarding.name.done': 'You’re set. Thanks for joining the pilot.',

@@ -117,7 +117,7 @@ const nearby = {
   'nearby.form.needStep': 'Add at least one step.',
   'nearby.form.needAlt': 'Describe the photo, so everyone knows what it shows.',
   'nearby.form.waitPhoto': 'Wait for the photo to finish sending.',
-  'nearby.form.privacy': 'Your steps show your access needs (like “Wheelchair user”), never your name.',
+  'nearby.form.privacy': 'Your steps never show your name. They show your access needs (like “Wheelchair user”) only if your profile allows it — see Me → How I appear on reviews.',
   'nearby.form.submit': 'Share my steps',
 
   // Getting there 4 (I4): the review form entry and the public page.

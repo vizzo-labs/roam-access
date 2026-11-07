@@ -92,9 +92,19 @@ and to the `/ds` page, rather than to a screen.
   never as a confirmed fact.
 - **Payment never changes a verdict.** Paid listings, partners or sponsors may change how a
   place is presented, never its verdict, its ranking by verdict, or which reviews are shown.
-- Reviews are shown by lived experience ("Wheelchair user"), **never by name**. Access needs
-  are disability information (sensitive under the Privacy Act): never expose them with a
-  name, never log them, delete them with the account.
+- **Allies' observations never set or change a verdict.** A review written as an ally has
+  no verdict (`reviews.verdict` NULL): its answers only make `VenueVM.observed` ("Observed
+  by an ally"), never works/check/barriers, review counts or "Works for you". Use
+  `hasVerdict()` (`lib/venues.ts`) in every verdict or count path.
+- **Who wrote a review** (`lib/contributors/author.ts`, the only place that decides): the
+  person's chosen public name, or "Roam Access member" if they post anonymously; their
+  self-described relationship (lived experience · carer · ally). Accounts that never chose
+  (`profiles.relationship` NULL) keep the old display — lived experience, never a name —
+  until they act themselves. Access needs are disability information (sensitive under the
+  Privacy Act): shown **only with the person's explicit opt-in** (`show_needs`; without it
+  they never leave the server — use `withAuthor()` for reviews and `publicNeedsSql()` for
+  photos, entrances and arrival steps), never logged, deleted with the account. Profile
+  links use `public_id`, never the Clerk id or email.
 
 ## Accessibility non-negotiables
 

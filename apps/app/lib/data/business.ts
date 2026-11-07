@@ -9,7 +9,8 @@ import { and, asc, desc, eq, gte, ilike, inArray, isNull, or, sql } from 'drizzl
 import { getDb, schema } from '../db';
 import { ensureProfile, getVenueVM } from '../data';
 import { managesVenue } from '../roles';
-import { buildReviewVM, ago } from '../venues';
+import { buildReviewVM, ago, hasVerdict } from '../venues';
+import { getAuthors, withAuthor } from './contributors';
 import { RA2_FEATURES, RA2_NEEDS, type NeedId } from '../pilot-data';
 import { coveredNeeds } from '../council/coverage';
 import type { ClaimStatus } from '../db/schema-venues';
@@ -195,7 +196,7 @@ export async function getVenueDashboard(venueId: string) {
   const venue = await getVenueRow(venueId);
   if (!venue) return null;
   const since = sql`(now() at time zone 'Australia/Sydney')::date - ${DAYS}::int`;
-  const [rs, qs, vm, views, says, cards] = await Promise.all([
+  const [all, qs, vm, views, says, cards] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, venueId), eq(reviews.hidden, false))).orderBy(desc(reviews.createdAt)),
     db.select().from(microAnswers).where(and(eq(microAnswers.venueId, venueId), eq(microAnswers.hidden, false))),
     getVenueVM(venueId), // the same facts the app shows
@@ -205,6 +206,10 @@ export async function getVenueDashboard(venueId: string) {
     getOwnPosts(venueId),
     listCardsForVenue(venueId),
   ]);
+  // Ally observations (no verdict) are listed, but never counted as reviews
+  // or as covering a need.
+  const rs = all.filter(hasVerdict);
+  const authors = await getAuthors(all.map(r => r.userId));
   const count = (kind: string, need: string) => views.find(v => v.kind === kind && v.need === need)?.n ?? 0;
   const covered = coveredNeeds(rs, qs);
   const now = Date.now();
@@ -228,7 +233,7 @@ export async function getVenueDashboard(venueId: string) {
     totals: { views: count('view', 'any'), searches: count('search', 'any'), reviews: rs.length, cards: cards.length },
     byNeed, unmet, missing,
     facts: { works: vm?.works ?? [], check: vm?.check ?? [], barriers: vm?.barriers ?? [] },
-    reviews: rs.map(r => ({ ...buildReviewVM(r, '', now), reply: says.replies[r.id] ?? null })),
+    reviews: all.map(r => ({ ...withAuthor(buildReviewVM(r, '', now), authors.get(r.userId)), reply: says.replies[r.id] ?? null })),
     statement: says.statement,
     hiddenCount: says.hiddenCount,
     cards,

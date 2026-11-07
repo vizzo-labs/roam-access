@@ -1,12 +1,14 @@
 import 'server-only';
 // Getting there (I1): step-free entrances marked in reviews, and "Still the
 // way in? Yes / Changed". Entrances never change a verdict. Only user ids are
-// stored; "who" comes from the linked review's needs (lived experience, never
-// a name). Rows cascade from the profile and the review.
+// stored; "who" comes from the linked review's needs — never a name, and the
+// needs only if the person allows it (publicNeedsSql, Brief L). Rows cascade
+// from the profile and the review.
 
 import { and, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import { getDb, schema } from '../db';
 import { RA2_NEEDS } from '../pilot-data';
+import { publicNeedsSql } from './public-needs';
 import {
   ENTRANCE_KINDS, ENTRANCE_NOTE_MAX, MAX_ENTRANCE_DISTANCE_M, distanceM, entranceStatus, rankEntrances,
   type EntranceVM,
@@ -70,7 +72,7 @@ async function loadEntrances(venueId?: string) {
     or(isNull(venueEntrances.reviewId), eq(reviews.hidden, false)),
     venueId ? eq(venueEntrances.venueId, venueId) : undefined,
   );
-  const rows = await db.select({ e: venueEntrances, needs: reviews.needs })
+  const rows = await db.select({ e: venueEntrances, needs: publicNeedsSql('"reviews"."needs"', '"venue_entrances"."user_id"') })
     .from(venueEntrances).leftJoin(reviews, eq(reviews.id, venueEntrances.reviewId))
     .where(where);
   if (!rows.length) return { rows, stats: new Map<string, Stat>() };

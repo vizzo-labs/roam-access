@@ -11,24 +11,31 @@ import { Button, ChipGroup, EmptyState, FilterChip, GUTTER, PhotoGrid, PhotoView
 import { useVenueSays, VenueReply } from './VenueSays';
 import { UserText, useFormat, useT } from '../i18n';
 import { localPhoto, reviewItems, reviewText, reviewWhen, reviewWho } from '../trust/text';
+import { ReviewAuthor } from '../contrib/ReviewAuthor';
+import { HelpedButton } from '../contrib/HelpedButton';
 
 // ─────────────────────────────────────────────────────────────
-// ALL REVIEWS — filter by lived experience
+// ALL REVIEWS — filter by who wrote it (lived experience · carers · allies,
+// self-described) or by access need (only reviews whose author shows them)
 // ─────────────────────────────────────────────────────────────
+const REL_FILTERS = ['lived', 'carer', 'ally'];
 function V2AllReviews({ app }) {
   const t = useT();
   const fmt = useFormat();
   const v = app.venueById(app.selectedId);
   const h = useV2Heading('reviews-' + v.id);
-  const [filter, setFilter] = React.useState('all'); // 'all' or a need id
+  const [filter, setFilter] = React.useState('all'); // 'all', 'rel:<lived|carer|ally>' or a need id
   const { reviews: loaded, error } = useVenueReviews(app, v.id);
   const says = useVenueSays(v.id);
   const all = loaded || [];
-  const filters = ['all', ...RA2_NEEDS.map(n => n.id)];
-  const filterLabel = f => (f === 'all' ? t('review.all.everyone') : t(`data.need.${f}.filter`));
+  const filters = ['all', ...REL_FILTERS.map(r => `rel:${r}`), ...RA2_NEEDS.map(n => n.id)];
+  const filterLabel = f => (f === 'all' ? t('review.all.everyone') : f.startsWith('rel:') ? t(`contrib.filter.${f.slice(4)}`) : t(`data.need.${f}.filter`));
   const needFilter = id => RA2_NEEDS.find(n => n.id === id)?.filter;
-  const shown = filter === 'all' ? all : all.filter(r => (r.needs ? r.needs.includes(filter) : r.filters.includes(needFilter(filter))));
-  const photosOf = r => (r.photos || []).map(p => localPhoto(t, fmt, p));
+  const shown = filter === 'all' ? all
+    : filter.startsWith('rel:') ? all.filter(r => r.author?.rel === filter.slice(4))
+    : all.filter(r => (r.needs ? r.needs.includes(filter) : r.filters.includes(needFilter(filter))));
+  // A photo in a review is credited like the review itself.
+  const photosOf = r => (r.photos || []).map(p => ({ ...localPhoto(t, fmt, p), who: reviewWho(t, r) }));
   const [viewer, setViewer] = React.useState(null); // { photos, index }
   const closeViewer = () => setViewer(null);
 
@@ -51,8 +58,10 @@ function V2AllReviews({ app }) {
             border: `1.5px solid ${C2.hair}`, borderRadius: 18, padding: 18, marginBottom: 12,
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: C2.teal, fontFamily: F2 }}>{reviewWho(t, r)}</span>
-              <V2Verdict kind={r.v} label={t(`review.v.${r.v}`)}/>
+              <ReviewAuthor r={r}/>
+              {r.v
+                ? <V2Verdict kind={r.v} label={t(`review.v.${r.v}`)}/>
+                : <SourceBadge source="ally" size="md"/>}
             </div>
             <p style={{ fontSize: 15.5, lineHeight: 1.5, margin: '0 0 12px', color: C2.char, fontFamily: F2 }}>
               {r.own === false ? reviewText(t, r) : <UserText>{r.text}</UserText>}
@@ -77,10 +86,12 @@ function V2AllReviews({ app }) {
                 <PhotoGrid photos={photosOf(r)} size={72} onOpen={i => setViewer({ photos: photosOf(r), index: i })}/>
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {!r.v && <p style={{ fontSize: 14, lineHeight: 1.45, margin: '0 0 10px', color: C2.slate, fontFamily: F2 }}>{t('contrib.observed.note')}</p>}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <span style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>
                 {reviewWhen(fmt, r)}{r.mine ? ` · ${t('review.yours')}` : ''}
               </span>
+              <HelpedButton key={`${r.id}-${app.reviewsVersion}`} r={r} app={app}/>
             </div>
             <VenueReply reply={says?.replies?.[r.id]} venueName={v.name}/>
           </article>

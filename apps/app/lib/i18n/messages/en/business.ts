@@ -142,7 +142,7 @@ const business = {
   'business.reviews.new': 'New since your last visit',
   'business.reviews.yourReply': 'Your reply',
   'business.reviews.replyPublicly': 'Reply publicly',
-  'business.reviews.toReviewBy': 'to the review by a {who}',
+  'business.reviews.toReviewBy': 'to the review by {who}',
   'business.reviews.replyLabel': 'Your public reply',
   'business.reviews.replyHint': 'It shows under the review as “Venue says”.',
   'business.reviews.postReply': 'Post reply',
