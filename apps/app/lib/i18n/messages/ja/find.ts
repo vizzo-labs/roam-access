@@ -32,6 +32,19 @@ const find: Translation<typeof en> = {
   'find.showMore': "あと {n} 件表示（残り {rest} 件）",
   'find.empty.body': "カフェやビーチなど、場所の種類でさがしてみてください。",
   'find.empty.seeAll': "すべての場所を見る",
+  // The map inside Find (a view of the list).
+  'find.map.title': { other: "{count} か所の地図" },
+  'find.map.region': "地図。ピンはボタンです。押すと地図の下に短いカードが開きます。",
+  'find.map.skip': "地図を飛ばす",
+  'find.map.key': "凡例",
+  'find.map.keyTitle': "ピンの意味",
+  'find.map.keyLead': "色と記号で、その場所があなたに合うかがわかります。「あなたに合う」になるのは、同じようなニーズのある人の口コミだけです。",
+  'find.map.symbols': "ピンの中の絵は場所の種類です。",
+  'find.map.onThisMap': "この地図の場所",
+  'find.map.next': { other: "次の {count} か所を表示" },
+  'find.map.prev': { other: "前の {count} か所を表示" },
+  'find.map.credit': "地図：OpenFreeMap、© OpenMapTiles。データ：",
+  'find.map.creditOsm': "© OpenStreetMap 貢献者",
 };
 
 export default find;

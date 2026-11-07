@@ -35,7 +35,7 @@ function SegmentedControl({ label, options, value, onChange, full = false, style
   return (
     <div role="radiogroup" aria-label={label} onKeyDown={onKeyDown} style={{
       display: full ? 'flex' : 'inline-flex', flexWrap: 'wrap', maxWidth: '100%', padding: 3, gap: 2, boxSizing: 'border-box',
-      background: C2.stone, borderRadius: RADIUS.pill, border: `1.5px solid ${C2.line}`, ...style,
+      background: C2.stone, borderRadius: 26, border: `1.5px solid ${C2.line}`, ...style,
     }}>
       {options.map((o, i) => {
         const on = i === index;

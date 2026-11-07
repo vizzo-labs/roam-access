@@ -32,6 +32,19 @@ const find: Translation<typeof en> = {
   'find.showMore': "再显示 {n} 个（还剩 {rest} 个）",
   'find.empty.body': "试试搜索地点类型，比如咖啡馆或海滩。",
   'find.empty.seeAll': "查看所有地点",
+  // The map inside Find (a view of the list).
+  'find.map.title': { other: "{count} 个地点的地图" },
+  'find.map.region': "地图。每个图钉都是一个按钮，会在地图下方打开一张小卡片。",
+  'find.map.skip': "跳过地图",
+  'find.map.key': "图例",
+  'find.map.keyTitle': "图钉的含义",
+  'find.map.keyLead': "颜色和符号表示一个地点是否适合你。只有和你需求相似的人的评价，才能让一个地点成为“适合你”。",
+  'find.map.symbols': "图钉里的图案表示地点的类型。",
+  'find.map.onThisMap': "这张地图上的地点",
+  'find.map.next': { other: "显示接下来的 {count} 个地点" },
+  'find.map.prev': { other: "显示前面的 {count} 个地点" },
+  'find.map.credit': "地图：OpenFreeMap，© OpenMapTiles。数据：",
+  'find.map.creditOsm': "© OpenStreetMap 贡献者",
 };
 
 export default find;

@@ -9,11 +9,12 @@ import { useV2Heading } from '../ui/useHeading';
 import { ra2ParseQuery, ra2QueryLabel, ra2Search, ra2Verdict } from '@/lib/pilot/match';
 import { useTrackSearch } from '../track';
 import { useBadgeFilter } from '../layers/BadgeFilter';
-import { Button, Card, EmptyState, GUTTER, Icon, List, SPACE, SearchField, TYPE, scrollIntoViewSafe } from '../ds';
+import { Button, Card, EmptyState, GUTTER, Icon, List, SPACE, SearchField, SegmentedControl, TYPE, scrollIntoViewSafe } from '../ds';
 import { PlaceRow } from '../explore/PlaceRow';
 import { BrowseGrid, ALL } from '../explore/BrowseGrid';
 import { FindHeader } from '../explore/FindHeader';
 import { EnglishSearchNote } from '../explore/EnglishSearchNote';
+import { MapSection } from '../explore/MapSection';
 import { CLEAR_FILTERS, PAGE, applyFilters, filtersOn, verdictCounts } from '../explore/filters';
 
 const NEAR_ROWS = 5;
@@ -43,6 +44,7 @@ function FindHome({ app }) {
   const byDistance = app.venues.map(v => ({ ...v, verdict: ra2Verdict(v, needs) })).sort((a, b) => a.mins - b.mins);
   const known = byDistance.filter(hasCommunityFact).slice(0, NEAR_ROWS);
   const near = [...known, ...byDistance.filter(v => !known.includes(v))].slice(0, NEAR_ROWS);
+  const mapOn = !app.wide && app.exploreView === 'map';
 
   return (
     <V2Shell tabs app={app} active="find">
@@ -77,7 +79,10 @@ function FindHome({ app }) {
 
       <section aria-labelledby="near-h" style={{ padding: `${SPACE.xl}px 0 ${SPACE.xl}px` }}>
         <div style={{ padding: `0 ${GUTTER}px` }}>
-          <h2 id="near-h" style={{ ...TYPE.title3, fontSize: 20, margin: 0, color: C2.char }}>{t('find.near.title')}</h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.xs }}>
+            <h2 id="near-h" style={{ ...TYPE.title3, fontSize: 20, margin: 0, color: C2.char }}>{t('find.near.title')}</h2>
+            {!app.wide && <ShowAs app={app}/>}
+          </div>
           <p style={{ ...TYPE.footnote, color: C2.slate, margin: '2px 0 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 6 }}>
             <span>{t('find.walkingFrom', { origin: app.origin.name })}</span>
             {!app.origin.mine && (
@@ -85,6 +90,12 @@ function FindHome({ app }) {
             )}
           </p>
         </div>
+        {mapOn && (
+          <div style={{ marginTop: SPACE.sm }}>
+            <MapSection app={app} places={near} listHeadingId="near-list-h"/>
+            <h3 id="near-list-h" tabIndex={-1} style={{ ...TYPE.headline, margin: `${SPACE.md}px ${GUTTER}px 0`, color: C2.char }}>{t('find.map.onThisMap')}</h3>
+          </div>
+        )}
         <List label={t('find.near.list')} style={{ marginTop: SPACE.xs }}>
           {near.map(v => <PlaceRow key={v.id} app={app} place={v}/>)}
         </List>
@@ -114,9 +125,14 @@ function FindResults({ app }) {
   const firstPage = backTo >= PAGE ? Math.ceil((backTo + 1) / PAGE) * PAGE : PAGE;
   const [limit, setLimit] = React.useState(firstPage);
   const initialText = query.raw || (query.cats.length || query.tags.length ? queryLabel : '');
+  // The map view shows one page at a time: these ≤ 10 places are its pins.
+  const [mapPage, setMapPage] = React.useState(backTo >= 0 ? Math.floor(backTo / PAGE) : 0);
   const [shownFor, setShownFor] = React.useState(initialText);
-  if (shownFor !== initialText) { setShownFor(initialText); setLimit(PAGE); }
+  if (shownFor !== initialText) { setShownFor(initialText); setLimit(PAGE); setMapPage(0); }
   const results = all.slice(0, limit);
+  const mapOn = !app.wide && app.exploreView === 'map';
+  const page = Math.min(mapPage, Math.max(0, Math.ceil(all.length / PAGE) - 1));
+  const pageRows = all.slice(page * PAGE, (page + 1) * PAGE);
 
   const listRef = React.useRef(null);
   React.useEffect(() => {
@@ -134,15 +150,35 @@ function FindResults({ app }) {
       <div ref={listRef}>
         <FindHeader app={app} headingRef={h} queryLabel={queryLabel} initialText={initialText}
           total={all.length} counts={counts} searched={searched} badgeFilter={badgeFilter}
-          view="list" onView={v => v === 'map' && app.goto('map', null, { replace: true })}/>
+          view={mapOn ? 'map' : 'list'} onView={app.setExploreView}/>
 
-        {results.length > 0 && (
+        {mapOn && pageRows.length > 0 && (
+          <div style={{ marginTop: SPACE.md }}>
+            <MapSection app={app} places={pageRows} listHeadingId="map-list-h"/>
+            <h2 id="map-list-h" tabIndex={-1} style={{ ...TYPE.title3, margin: `${SPACE.lg}px ${GUTTER}px 0`, color: C2.char }}>{t('find.map.onThisMap')}</h2>
+            <List label={t('find.map.onThisMap')} style={{ marginTop: SPACE.xs }}>
+              {pageRows.map(r => <PlaceRow key={'map-' + r.id} app={app} place={r} selected={r.id === app.lastVenueId}/>)}
+            </List>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: SPACE.xs, padding: `${SPACE.sm}px ${GUTTER}px 0` }}>
+              {(page + 1) * PAGE < all.length && (
+                <Button full variant="secondary" onClick={() => setMapPage(page + 1)}>
+                  {t('find.map.next', { count: Math.min(PAGE, all.length - (page + 1) * PAGE) })}
+                </Button>
+              )}
+              {page > 0 && (
+                <Button full variant="ghost" onClick={() => setMapPage(page - 1)}>{t('find.map.prev', { count: PAGE })}</Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!mapOn && results.length > 0 && (
           <List label={t('explore.placesList', { query: queryLabel })} style={{ marginTop: SPACE.md }}>
             {results.map(r => <PlaceRow key={r.id} app={app} place={r} selected={r.id === app.lastVenueId}/>)}
           </List>
         )}
 
-        {rest > 0 && (
+        {!mapOn && rest > 0 && (
           <div style={{ padding: `${SPACE.sm}px ${GUTTER}px 0` }}>
             <Button full variant="secondary" onClick={() => setLimit(l => l + PAGE)}>
               {t('find.showMore', { n: Math.min(PAGE, rest), rest })}
@@ -179,6 +215,15 @@ function FindResults({ app }) {
         <div style={{ height: SPACE.xl }}/>
       </div>
     </V2Shell>
+  );
+}
+
+// "Show as List · Map" (phones): the map is a view above the same list.
+function ShowAs({ app }) {
+  const t = useT();
+  return (
+    <SegmentedControl label={t('find.showAs')} value={app.exploreView} onChange={app.setExploreView}
+      options={[{ value: 'list', label: t('explore.list'), icon: 'list' }, { value: 'map', label: t('explore.map'), icon: 'map' }]}/>
   );
 }
 
