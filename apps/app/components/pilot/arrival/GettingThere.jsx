@@ -40,7 +40,8 @@ function entranceTitle(t, e) {
   return t(`arrival.kind.${e.kind}.title`);
 }
 
-function GettingThere({ app, venue, children }) {
+// `bare`: the Getting there screen, whose h1 already says it — no h2 here.
+function GettingThere({ app, venue, children, bare = false }) {
   const t = useT();
   const needs = app.user?.needs || [];
   const [mapsApp, setMapsApp] = useMapsApp();
@@ -66,9 +67,11 @@ function GettingThere({ app, venue, children }) {
   }
 
   return (
-    <section aria-labelledby="arrive-h" style={{ marginBottom: SPACE.md }}>
-      <SectionHeader id="arrive-h" title={t('arrival.title')} size="sm"
-        description={best ? null : t('arrival.none.description')}/>
+    <section aria-labelledby={bare ? undefined : 'arrive-h'} style={{ marginBottom: SPACE.md }}>
+      {!bare && (
+        <SectionHeader id="arrive-h" title={t('arrival.title')} size="sm"
+          description={best ? null : t('arrival.none.description')}/>
+      )}
 
       <Card variant="outline" style={{ marginBottom: SPACE.sm }}>
         {best && (

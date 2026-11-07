@@ -32,13 +32,13 @@ const layers = {
   'layers.badges.filterLabel': 'Filter by partner program',
 
   // Temporary reports: `label` in the "what's wrong" list, `banner` when shown.
-  'layers.report.lift_out.label': 'Lift out of order',
+  'layers.report.lift_out.label': 'Lift not working',
   'layers.report.lift_out.banner': 'Lift out of order',
   'layers.report.ramp_blocked.label': 'Ramp or step-free way blocked',
   'layers.report.ramp_blocked.banner': 'Ramp or step-free way blocked',
   'layers.report.roadworks.label': 'Roadworks or footpath closed',
   'layers.report.roadworks.banner': 'Roadworks or footpath closed nearby',
-  'layers.report.event_noise.label': 'Event or loud noise',
+  'layers.report.event_noise.label': 'Event on — loud and crowded',
   'layers.report.event_noise.banner': 'Event on — expect noise and crowds',
   'layers.report.toilet_closed.label': 'Accessible toilet closed or locked',
   'layers.report.toilet_closed.banner': 'Accessible toilet closed or locked',

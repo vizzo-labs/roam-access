@@ -9,6 +9,7 @@ const app: Translation<typeof en> = {
   'app.view.setup-name': "Tu nombre",
   'app.view.home': "Buscar un lugar",
   'app.view.find': "Buscar un lugar",
+  'app.view.arrival': "Cómo llegar",
   'app.view.voice': "Búsqueda por voz",
   'app.view.results': "Resultados de búsqueda",
   'app.view.map': "Mapa",

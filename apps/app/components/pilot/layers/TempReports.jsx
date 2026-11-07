@@ -64,20 +64,22 @@ export function TempReportBanner({ app, reports, placeName, style = {} }) {
 }
 
 // "Report a temporary problem" → a sheet with the types that apply here.
-export function ReportButton({ app, target, style = {} }) {
+// `label` / `title` / `description` let the place page say "Report a problem
+// today" (its Today block); other screens keep the defaults.
+export function ReportButton({ app, target, label, title, description, variant = 'ghost', size = 'lg', style = {} }) {
   const { t } = useLocale();
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <Button variant="ghost" size="lg" full icon="warn" onClick={() => setOpen(true)} style={{ whiteSpace: 'normal', ...style }}>
-        {t('layers.report.button')}
+      <Button variant={variant} size={size} full icon="warn" aria-haspopup="dialog" onClick={() => setOpen(true)} style={{ whiteSpace: 'normal', ...style }}>
+        {label || t('layers.report.button')}
       </Button>
-      {open && <ReportSheet app={app} target={target} onClose={() => setOpen(false)}/>}
+      {open && <ReportSheet app={app} target={target} title={title} description={description} onClose={() => setOpen(false)}/>}
     </>
   );
 }
 
-function ReportSheet({ app, target, onClose }) {
+function ReportSheet({ app, target, title, description, onClose }) {
   const { t } = useLocale();
   const types = reportTypesFor(target.where);
   const [type, setType] = React.useState(null);
@@ -101,14 +103,14 @@ function ReportSheet({ app, target, onClose }) {
   }
 
   const row = on => ({
-    display: 'flex', alignItems: 'center', gap: SPACE.sm, minHeight: 52, padding: `6px ${SPACE.md - 2}px`, marginBottom: SPACE.xs,
+    display: 'flex', alignItems: 'center', gap: SPACE.sm, minHeight: 60, padding: `6px ${SPACE.md - 2}px`, marginBottom: SPACE.xs,
     borderRadius: RADIUS.md, border: `${on ? 2.5 : 1.5}px solid ${on ? C2.teal : C2.line}`, boxSizing: 'border-box',
     background: on ? C2.tealSoft : C2.paper, cursor: 'pointer', fontFamily: F2, fontSize: 16, fontWeight: on ? 700 : 600, color: C2.char,
   });
 
   return (
-    <Sheet open onClose={onClose} title={t('layers.report.sheetTitle', { name: target.name })} closeLabel={t('layers.report.sheetClose')}
-      description={t('layers.report.sheetDesc')}
+    <Sheet open onClose={onClose} title={title || t('layers.report.sheetTitle', { name: target.name })} closeLabel={t('layers.report.sheetClose')}
+      description={description || t('layers.report.sheetDesc')}
       footer={<Button type="submit" form={formId} full size="lg" disabled={sending}>{sending ? t('common.sending') : t('layers.report.submit')}</Button>}>
       <form id={formId} onSubmit={submit}>
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>

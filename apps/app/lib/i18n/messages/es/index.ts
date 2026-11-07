@@ -23,6 +23,7 @@ import nearby from './nearby';
 import business from './business';
 import contrib from './contrib';
 import find from './find';
+import place from './place';
 
-const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby, ...business, ...contrib, ...find };
+const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby, ...business, ...contrib, ...find, ...place };
 export default dict as Dict;
