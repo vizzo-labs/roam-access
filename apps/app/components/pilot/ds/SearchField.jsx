@@ -5,6 +5,7 @@ import { useT } from '../i18n/I18nProvider';
 import { C2, F2, RA2_INPUT_FONT } from '../ui/palette';
 import { Icon } from './Icon';
 import { IconButton } from './IconButton';
+import { TextArea } from './TextArea';
 import { TARGET, elevation } from './tokens';
 
 // SearchField — the persistent search bar (Google/Apple Maps pattern): a real
@@ -33,11 +34,14 @@ const SearchField = React.forwardRef(function SearchField({
         ? <IconButton icon="back" label={back.label || t('common.back')} onClick={back.onClick} variant="ghost"/>
         : <span aria-hidden="true" style={{ width: 44, display: 'inline-flex', justifyContent: 'center', color: C2.slate }}><Icon name="search" size={20}/></span>}
       <label htmlFor={id} className="ra-sr-only">{label}</label>
-      <input ref={ref} id={id} type="search" enterKeyHint="search" autoComplete="off" value={value}
-        onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      {/* A one-line TextArea, not an <input>: the example text and long
+          words wrap instead of being cut off at large text sizes. Enter
+          searches; line breaks are removed. */}
+      <TextArea ref={ref} id={id} singleLine rows={1} aria-multiline="false" enterKeyHint="search" autoComplete="off"
+        spellCheck={false} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         style={{
-          flex: '1 1 8em', minWidth: 0, minHeight: TARGET.min, border: 0, background: 'transparent',
-          fontFamily: F2, fontSize: RA2_INPUT_FONT, color: C2.char, padding: '0 4px',
+          flex: '1 1 8em', width: 'auto', minWidth: 0, minHeight: TARGET.min, border: 0, borderRadius: 0, background: 'transparent',
+          fontFamily: F2, fontSize: RA2_INPUT_FONT, color: C2.char, padding: '11px 4px',
         }}/>
       {value && <IconButton icon="close" label={t('ds.search.clear')} variant="ghost" size="sm" onClick={() => { onChange(''); ref?.current?.focus?.(); }}/>}
       {onVoice && <IconButton icon="mic" label={t('ds.search.voice')} variant="ghost" onClick={onVoice} style={{ color: C2.teal }}/>}

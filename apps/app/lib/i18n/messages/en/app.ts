@@ -7,6 +7,7 @@ const app = {
   'app.view.setup': 'Set your needs',
   'app.view.setup-name': 'Your name',
   'app.view.home': 'Find a place',
+  'app.view.find': 'Find a place',
   'app.view.voice': 'Voice search',
   'app.view.results': 'Search results',
   'app.view.map': 'Map',

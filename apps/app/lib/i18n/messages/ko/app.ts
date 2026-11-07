@@ -8,6 +8,7 @@ const app: Translation<typeof en> = {
   'app.view.setup': "필요한 것 설정",
   'app.view.setup-name': "이름",
   'app.view.home': "장소 찾기",
+  'app.view.find': "장소 찾기",
   'app.view.voice': "음성 검색",
   'app.view.results': "검색 결과",
   'app.view.map': "지도",

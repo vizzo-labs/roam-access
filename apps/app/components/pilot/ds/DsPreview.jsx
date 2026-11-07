@@ -16,7 +16,7 @@ import {
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
   SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea, ChoiceGroup, CheckRow,
-  TabBar,
+  TabBar, TileButton,
 } from './index';
 import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
@@ -433,6 +433,16 @@ export function DsPreview() {
           <div style={{ maxWidth: 390, border: `1px solid ${C2.hair}`, borderRadius: RADIUS.md, overflow: 'hidden', ['--ra-tabs-pad']: '12px' }}>
             <TabBar label="Main (sample)" active={tabAt} onSelect={setTabAt}
               items={[{ id: 'find', label: 'Find', icon: 'search' }, { id: 'saved', label: 'Saved', icon: 'bookmark', count: 2, countSr: '2 new updates' }, { id: 'me', label: 'Me', icon: 'user' }]}/>
+          </div>
+        </Section>
+
+        <Section id="tilebutton" title="TileButton" note="Find’s big browse buttons: icon + word, the whole tile one button (≥ 96px; `wide` ≥ 64px and spans the row). Two columns on a phone; the grid drops to one column at 200 % so words never break.">
+          <div style={{ maxWidth: 390, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 9em), 1fr))', gap: 10 }}>
+            <TileButton wide icon="locate" label="Near me now" onClick={() => {}}/>
+            <TileButton icon="food" label="Food & drink" onClick={() => {}}/>
+            <TileButton icon="tree" label="Parks & beaches" onClick={() => {}}/>
+            <TileButton icon="palette" label="Arts & culture" onClick={() => {}}/>
+            <TileButton icon="toilet" label="Toilets" onClick={() => {}}/>
           </div>
         </Section>
 

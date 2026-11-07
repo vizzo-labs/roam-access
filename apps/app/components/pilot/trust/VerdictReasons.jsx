@@ -53,4 +53,4 @@ function VerdictReasons({ venue, verdict, needs = [], max = 3, fontSize = 15 }) 
   );
 }
 
-export { VerdictReasons };
+export { VerdictReasons, reasonsFor, MARK as REASON_MARK };

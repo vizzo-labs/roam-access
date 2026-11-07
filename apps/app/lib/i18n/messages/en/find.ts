@@ -1,0 +1,34 @@
+// English (Australia) — 'find' namespace. The Find screen (search, browse, near you, results).
+// Plain, first-person, short sentences; en-AU spelling. See lib/i18n/README.md.
+const find = {
+  'find.title': "Find a place",
+  'find.lead': "Places around Manly, checked by people with needs like yours.",
+  'find.search.label': "Search for a place or a kind of place",
+  'find.search.placeholder': "Cafe, beach, Hugos…",
+  'find.browse': "Browse",
+  'find.nearMe': "Near me now",
+  'find.toilets': "Toilets",
+  'find.prompt': "Been to {name}? Tell us how it was.",
+  'find.promptHint': "One tap. It helps people with needs like yours.",
+  'find.near.title': "Near you",
+  'find.near.list': "Places near you",
+  'find.walkingFrom': "Walking from {origin}.",
+  'find.seeAll': { one: "See {count} place", other: "See all {count} places" },
+  'find.row.name': "{name}, {kind}, {walk}, {verdict}",
+  'find.row.beFirst': "Been here? Be the first",
+  'find.results.back': "Back",
+  'find.results.backLabel': "Back to Find",
+  'find.results.srFor': "Search results for {query}.",
+  'find.filters.nearest': "Nearest first",
+  'find.filters.more': "More filters",
+  'find.filters.moreOn': { one: "{count} on", other: "{count} on" },
+  'find.more.lead': "Filters only narrow the list. They never change a verdict.",
+  'find.more.hideBarriers': "Hide places with barriers",
+  'find.more.show': { one: "Show {count} place", other: "Show {count} places" },
+  'find.showAs': "Show as",
+  'find.showMore': "Show {n} more ({rest} left)",
+  'find.empty.body': "Try a kind of place, like cafe or beach.",
+  'find.empty.seeAll': "See all places",
+};
+
+export default find;

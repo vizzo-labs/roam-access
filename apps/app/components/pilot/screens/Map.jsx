@@ -129,7 +129,7 @@ function V2MapView({ app }) {
               back={{ label: t('explore.backHome'), onClick: () => app.goto('home') }}/>
           </div>
           <div style={{ pointerEvents: 'auto', marginTop: SPACE.xs }}>
-            <ExploreFilters app={app} counts={counts} bleed={false}/>
+            <ExploreFilters app={app} counts={counts} searched={searched}/>
           </div>
         </div>
 

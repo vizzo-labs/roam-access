@@ -1,39 +1,50 @@
 'use client';
 
 import React from 'react';
-import { ChipGroup, FilterChip } from '../ds';
+import { C2, F2 } from '../ui/palette';
+import { ChipGroup, FilterChip, Icon, RADIUS, TARGET } from '../ds';
 import { useT } from '../i18n';
-import { tileLabel } from '@/lib/i18n/data';
-import { CATEGORY_CHIPS, tileOn, toggleTile } from './filters';
+import { MoreFiltersSheet } from './MoreFiltersSheet';
 
-// The filter chips under the search bar: "Works for me", "Hide barriers",
-// "Quiet now" / "Has quiet times" (once anyone has reported sensory details),
-// then the categories. One tap each; every chip is a real toggle button.
-// `counts` = verdict counts of the current search (before these filters).
-function ExploreFilters({ app, counts, bleed = true, style }) {
+// The chips above the results: "Works for me (n)" (hidden while no place
+// works for this person), "Nearest first", and "More filters" (a dialog with
+// the rest). They wrap, so none is ever cut off. Filters only narrow or
+// re-order by the person's own choice; they never change a verdict.
+// `counts` = verdict counts of the current search (before these filters);
+// `searched` = that search's places, so the dialog can say how many are left.
+function ExploreFilters({ app, counts, searched, badgeFilter, style }) {
   const t = useT();
   const f = app.filters;
-  const q = app.query || { cats: [], tags: [], label: 'All places', raw: '' };
-  const sensory = (counts?.sensory ?? 0) > 0 || f.quietNow || f.quietTimes;
+  const [open, setOpen] = React.useState(false);
+  const more = [f.hideBarriers, f.quietNow, f.quietTimes].filter(Boolean).length + (badgeFilter?.on.length || 0);
+  const nearest = on => {
+    app.setFilters({ sort: on ? 'near' : 'match' });
+    if (on && !app.origin.mine) app.locateMe();
+  };
   return (
-    <ChipGroup label={t('explore.filters.label')} bleed={bleed} style={style}>
-      <FilterChip selected={f.works} count={counts?.works} icon="success"
-        onChange={on => app.setFilters({ works: on })}>{t('explore.filters.works')}</FilterChip>
-      {!f.works && (
-        <FilterChip selected={f.hideBarriers} onChange={on => app.setFilters({ hideBarriers: on })}>{t('explore.filters.hideBarriers')}</FilterChip>
-      )}
-      {sensory && (
-        <FilterChip selected={f.quietNow} count={counts?.quietNow} icon="clock"
-          onChange={on => app.setFilters({ quietNow: on })}>{t('explore.filters.quietNow')}</FilterChip>
-      )}
-      {sensory && (
-        <FilterChip selected={f.quietTimes} count={counts?.quietTimes}
-          onChange={on => app.setFilters({ quietTimes: on })}>{t('explore.filters.quietTimes')}</FilterChip>
-      )}
-      {CATEGORY_CHIPS.map(c => (
-        <FilterChip key={c.id} selected={tileOn(q, c)} onChange={on => app.setQuery(toggleTile(q, c, on))}>{tileLabel(t, c.id)}</FilterChip>
-      ))}
-    </ChipGroup>
+    <>
+      <ChipGroup label={t('explore.filters.label')} wrap style={style}>
+        {(counts?.works > 0 || f.works) && (
+          <FilterChip selected={f.works} count={counts?.works} onChange={on => app.setFilters({ works: on })}>{t('explore.filters.works')}</FilterChip>
+        )}
+        <FilterChip selected={f.sort === 'near'} onChange={nearest}>{t('find.filters.nearest')}</FilterChip>
+        <button type="button" className="ds-press" aria-haspopup="dialog" onClick={() => setOpen(true)} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: TARGET.min, maxWidth: '100%', boxSizing: 'border-box',
+          padding: '6px 16px', borderRadius: RADIUS.pill, border: `1.5px solid ${more ? C2.teal : C2.line}`,
+          background: more ? C2.tealSoft : C2.paper, color: more ? C2.teal : C2.char, cursor: 'pointer',
+          fontFamily: F2, fontSize: 15, fontWeight: 600, lineHeight: 1.2, textAlign: 'left',
+        }}>
+          <Icon name="sliders" size={18}/>
+          <span>{t('find.filters.more')}</span>
+          {more > 0 && (
+            <span style={{ minWidth: 22, padding: '1px 7px', borderRadius: RADIUS.pill, fontSize: 13, fontWeight: 700, textAlign: 'center', background: C2.teal, color: C2.paper, flexShrink: 0 }}>
+              <span className="ra-sr-only">, {t('find.filters.moreOn', { count: more })}</span><span aria-hidden="true">{more}</span>
+            </span>
+          )}
+        </button>
+      </ChipGroup>
+      <MoreFiltersSheet open={open} onClose={() => setOpen(false)} app={app} counts={counts} searched={searched} badgeFilter={badgeFilter}/>
+    </>
   );
 }
 

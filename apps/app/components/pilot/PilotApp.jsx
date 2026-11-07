@@ -16,9 +16,8 @@ import { V2BigBtn } from './ui/Buttons';
 import { V2Welcome } from './screens/Welcome';
 import { V2Setup } from './screens/Setup';
 import { V2SetupName } from './screens/SetupName';
-import { V2Home } from './screens/Home';
 import { V2Voice } from './screens/Voice';
-import { V2Results } from './screens/Results';
+import { V2Find } from './screens/Find';
 import { V2MapView } from './screens/Map';
 import { V2VenueView } from './screens/Venue';
 import { V2AllReviews } from './screens/AllReviews';
@@ -43,11 +42,14 @@ import { AppSkeleton } from './explore/AppSkeleton';
 const PREFS_KEY = 'ra2-a11y';
 
 // Every route; its title (document.title + the route announcer) is app.view.<route>.
+// `find` is the Find screen; `results` is Find with a search on (its own
+// history entry, so Back returns to Find); `home` is an old name for `find`.
 const ROUTES = [
-  'setup', 'setup-name', 'home', 'voice', 'results', 'map', 'venue', 'reviews', 'review',
+  'setup', 'setup-name', 'find', 'voice', 'results', 'map', 'venue', 'reviews', 'review',
   'thanks', 'saved', 'me', 'gaps', 'card', 'toilets', 'beach', 'facility', 'profile',
 ];
-const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'home'}`);
+const ALIASES = { home: 'find' };
+const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'find'}`);
 const DARK_VIEWS = ['voice', 'thanks'];
 // Screens that render one venue: an id that isn't in the data is not a route.
 const VENUE_VIEWS = ['venue', 'reviews', 'review', 'thanks'];
@@ -79,14 +81,15 @@ function initialPrefs() {
 
 function parseHashOrNull(ids) {
   const raw = (window.location.hash || '').replace(/^#\/?/, '');
-  const [view, id] = raw.split('/');
+  const [rawView, id] = raw.split('/');
+  const view = ALIASES[rawView] || rawView;
   if (!ROUTES.includes(view)) return null;
   let decoded = null;
   if (id) { try { decoded = decodeURIComponent(id); } catch (e) { decoded = null; } }
   if (VENUE_VIEWS.includes(view) && !ids.has(decoded)) return null;
   return { view, id: decoded };
 }
-const parseHash = ids => parseHashOrNull(ids) || { view: 'home', id: null };
+const parseHash = ids => parseHashOrNull(ids) || { view: 'find', id: null };
 const isAppHash = () => /^#\//.test(window.location.hash || '');
 
 function metres(a, b) {
@@ -279,8 +282,8 @@ function PilotScreens({ initial, userId }) {
 
   useEffect(() => {
     const toHome = () => {
-      history.replaceState(history.state, '', '#/home');
-      setRoute({ view: 'home', id: null });
+      history.replaceState(history.state, '', '#/find');
+      setRoute({ view: 'find', id: null });
     };
     if (!parseHashOrNull(idsRef.current) && isAppHash()) toHome();
     const onHash = () => {
@@ -305,16 +308,17 @@ function PilotScreens({ initial, userId }) {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const venueOriginRef = useRef('home');
+  const venueOriginRef = useRef('find');
 
   // { replace: true } swaps the current history entry: used when leaving the
   // voice screen (it would listen again on Back) and a sent review form.
-  const goto = useCallback((nextView, id, opts) => {
+  const goto = useCallback((to, id, opts) => {
+    const nextView = ALIASES[to] || to;
     window.RA2_NAVIGATED = true;
     if (nextView === 'venue') {
       setLastVenueId(id);
       const from = parseHash(idsRef.current).view;
-      if (['home', 'results', 'map', 'saved', 'toilets', 'beach'].includes(from)) venueOriginRef.current = from;
+      if (['find', 'results', 'map', 'saved', 'toilets', 'beach'].includes(from)) venueOriginRef.current = from;
     }
     const hash = id ? `#/${nextView}/${encodeURIComponent(id)}` : `#/${nextView}`;
     if (opts && opts.replace) {
@@ -428,6 +432,13 @@ function PilotScreens({ initial, userId }) {
     newBadges: badgeMoment.pending,
     clearNewBadges: badgeMoment.clear,
 
+    // "Near me now": every place, nearest first, from my location if I share it.
+    nearMe: () => {
+      setFiltersState(f => ({ ...f, sort: 'near' }));
+      app.runSearch({ cats: [], tags: [], label: 'All places', raw: '' });
+      if (!origin.mine) app.locateMe();
+    },
+
     runSearch: (parsed) => {
       setQuery(parsed);
       goto('results', null, { replace: parseHash(idsRef.current).view === 'voice' });
@@ -510,6 +521,7 @@ function PilotScreens({ initial, userId }) {
             return;
           }
           setOrigin({ name: 'your location', ...here, mine: true });
+          setFiltersState(f => ({ ...f, sort: 'near' })); // location known → nearest first
           setToast(t('app.toast.walkFromYou'));
         },
         () => setToast(t('app.toast.locateFailed')),
@@ -543,7 +555,7 @@ function PilotScreens({ initial, userId }) {
 
   const screens = {
     setup: V2Setup, 'setup-name': V2SetupName,
-    home: V2Home, voice: V2Voice, results: V2Results, map: V2MapView,
+    find: V2Find, voice: V2Voice, results: V2Find, map: V2MapView,
     venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
     gaps: V2Gaps,
@@ -551,13 +563,13 @@ function PilotScreens({ initial, userId }) {
     toilets: V2Toilets, beach: V2Beach, facility: V2Facility,
     profile: V2Profile,
   };
-  const Screen = screens[view] || V2Home;
+  const Screen = screens[view] || V2Find;
 
   const content = (
     <div id="ra-main" role="main" tabIndex={-1} style={{ position: 'absolute', inset: 0 }}>
       <div className="ra-sr-only" role="status" aria-live="polite">{viewTitle(t, view)}</div>
       <Screen app={app}/>
-      {view === 'home' && <NamePrompt app={app}/>}
+      {view === 'find' && <NamePrompt app={app}/>}
       <V2A11ySheet open={a11yOpen} onClose={() => setA11yOpen(false)} prefs={prefs} onChange={p => applyPrefs(p)}/>
       <V2Toast message={toast}/>
     </div>

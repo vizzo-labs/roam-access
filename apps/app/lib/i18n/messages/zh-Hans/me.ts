@@ -21,6 +21,8 @@ const me: Translation<typeof en> = {
   'me.row.a11y.sub': '文字大小 · 对比度 · 动画 · 语言 · 朗读',
   'me.row.card': '我的需求卡',
   'me.row.card.sub': '出发前告诉地点你需要什么',
+  'me.row.gaps': "回答一个小问题",
+  'me.row.gaps.sub': "你附近的地点需要一个“是”或“否”",
   'me.row.install': '安装应用',
   'me.row.install.sub': '把 Roam Access 添加到主屏幕',
   'me.row.invite': '邀请别人加入试点',

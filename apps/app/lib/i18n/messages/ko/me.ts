@@ -21,6 +21,8 @@ const me: Translation<typeof en> = {
   'me.row.a11y.sub': '글자 크기 · 대비 · 움직임 · 언어 · 소리 내어 읽기',
   'me.row.card': '나의 필요 카드',
   'me.row.card.sub': '가기 전에 장소에 필요한 것을 알려요',
+  'me.row.gaps': "간단한 질문 하나에 답하기",
+  'me.row.gaps.sub': "내 근처 장소에 예 또는 아니요가 필요해요",
   'me.row.install': '앱 설치',
   'me.row.install.sub': 'Roam Access를 홈 화면에 추가',
   'me.row.invite': '시범 서비스에 초대하기',

@@ -18,6 +18,8 @@ const me = {
   'me.row.a11y.sub': 'Text size · contrast · motion · language · read aloud',
   'me.row.card': 'My needs card',
   'me.row.card.sub': 'Tell a place what you need before you go',
+  'me.row.gaps': 'Answer one quick question',
+  'me.row.gaps.sub': 'Places near you need a yes or no',
   'me.row.install': 'Install the app',
   'me.row.install.sub': 'Add Roam Access to your home screen',
   'me.row.invite': 'Invite someone to the pilot',

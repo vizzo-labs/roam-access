@@ -7,6 +7,9 @@
 import { RA2_TILES } from '@/lib/pilot-data';
 import { hasQuietTimes, isQuietNow } from '@/lib/sensory/summary';
 
+/** Places per page in a results list ("Show 10 more"). */
+export const PAGE = 10;
+
 export const DEFAULT_FILTERS = { works: false, hideBarriers: false, quietNow: false, quietTimes: false, sort: 'match' };
 
 /** Any filter that hides places is on (sort doesn't hide anything). */

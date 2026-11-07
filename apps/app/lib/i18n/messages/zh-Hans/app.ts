@@ -8,6 +8,7 @@ const app: Translation<typeof en> = {
   'app.view.setup': "设置你的需求",
   'app.view.setup-name': "你的名字",
   'app.view.home': "查找地点",
+  'app.view.find': "查找地点",
   'app.view.voice': "语音搜索",
   'app.view.results': "搜索结果",
   'app.view.map': "地图",

@@ -8,7 +8,7 @@ import { TabBar } from '../ds/TabBar';
 // ── Screen scaffold ───────────────────────────────────────────────────────
 // Flex column: scrollable content + fixed chrome (action bar, tabs) below it,
 // so nothing ever hides under the chrome and the chrome never scrolls away.
-function V2Shell({ children, bg = null, scroll = true, bar = null, tabs = null, app = null, active = 'home' }) {
+function V2Shell({ children, bg = null, scroll = true, bar = null, tabs = null, app = null, active = 'find' }) {
   return (
     <div className="v2-screen" style={{ background: bg || C2.paper }}>
       {scroll
@@ -20,17 +20,17 @@ function V2Shell({ children, bg = null, scroll = true, bar = null, tabs = null, 
   );
 }
 
-// Find · Saved · Me (ds/TabBar). `active` is the tab id; the Find tab is
-// still the 'home' route.
+// Find · Saved · Me (ds/TabBar). `active` is the tab id ('home' is an old
+// name for 'find').
 function V2TabBar({ active, app }) {
   const t = useT();
   if (app.wide) return null; // the web layout's header carries navigation
   const items = [
-    { id: 'home',  label: t('app.nav.find'),  icon: 'search' },
+    { id: 'find',  label: t('app.nav.find'),  icon: 'search' },
     { id: 'saved', label: t('app.nav.saved'), icon: 'bookmark', count: app.unseenUpdates, countSr: app.unseenUpdates ? t('owner.updates.newSr', { count: app.unseenUpdates }) : null },
     { id: 'me',    label: t('app.nav.me'),    icon: 'user' },
   ];
-  return <TabBar label={t('app.nav.primary')} items={items} active={active} onSelect={id => app.goto(id)}/>;
+  return <TabBar label={t('app.nav.primary')} items={items} active={active === 'home' ? 'find' : active} onSelect={id => app.goto(id)}/>;
 }
 
 export { V2Shell, V2TabBar };
