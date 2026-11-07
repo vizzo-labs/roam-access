@@ -179,6 +179,9 @@ another branch added. It is removed. Instead:
 Every PR, from `apps/app`:
 
 1. `npm run build` and `npx tsc --noEmit` must pass.
+   `build` first runs `npm run check:keys`, which fails on sibling JSX elements that share a
+   `key` (React then leaves the old element on the page when the key changes); prefix such
+   keys, e.g. `key={'fresh-' + v.id}`.
 2. Start the app on a **random free port** — other threads run in parallel:
    `PORT=$(( RANDOM % 900 + 3100 )); lsof -i :$PORT || npx next start -p $PORT`.
 3. Test in a headless browser with the **`bb browser-automation`** CLI (`open`, `run`,
