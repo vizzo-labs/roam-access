@@ -159,6 +159,25 @@ review). OpenStreetMap `entrance=*` nodes would be `source = 'osm'` and "unconfi
 imported (the pilot area had 39 entrance nodes in November 2026, the 4 with `wheelchair=*` all
 `no`, mostly private homes). Later stages plug into `components/pilot/arrival/slots.js`.
 
+**Community recognition** (Brief L, `lib/contributors/`, `lib/data/contributors.ts`,
+`components/pilot/contrib/`): reviews show **who wrote them** — the public name the person chose
+(default first name + last initial) or "Roam Access member" if they post anonymously — and a
+**self-described** label: Lived experience · Carer · Ally (or nothing for "Prefer not to say").
+Access needs show next to a review only with an explicit opt-in (`profiles.show_needs`); without it
+they never leave the server (reviews: `withAuthor()`; photos, entrances, arrival steps:
+`publicNeedsSql()`). Accounts from before this feature (`profiles.relationship` NULL) keep the old
+display — lived experience, never a name — and see a one-time prompt; nothing changes until they
+choose in Me → How I appear on reviews (`#/profile`). **The review form adapts**: carers review for the
+person they were with ("It worked for them", "Whose needs?"); **allies** get no verdict question —
+their observation is a review with `verdict` NULL that only feeds `VenueVM.observed` ("Observed by
+an ally") and never a verdict, a verdict fact or a review count (`hasVerdict()`; test:
+`npx tsx lib/contributors/contributors.test.ts`). **"This helped me"** (`review_thanks`, one per
+person per review, not your own) → "Helped N people". **Contributor badges** are computed from
+visible content (`lib/contributors/badges.ts`; no table; not the venue badges in `venue_badges`),
+with a "New badge" moment (localStorage). Public profile **`/u/<public_id>`** (random id, noindex,
+named people only); **Top contributors this month** on Me; admins can reset an offensive name
+(`/admin`). Privacy-policy draft for these changes: [`docs/privacy-draft-reviews-names.md`](../../docs/privacy-draft-reviews-names.md).
+
 **Languages and read aloud** (#21, `lib/i18n/`, `components/pilot/i18n/`): English (Australia),
 简体中文, 日本語, 한국어, Español — chosen in Me or Accessibility settings (saved on this device;
 the browser's language on a first visit). `<html lang>` follows it; people's own words keep
