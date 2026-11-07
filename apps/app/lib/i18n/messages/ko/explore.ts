@@ -96,7 +96,7 @@ const explore: Translation<typeof en> = {
   'explore.saved.tipInstall': "앱 설치",
   'explore.saved.list': "저장한 장소",
   'explore.saved.emptyTitle': "아직 저장한 곳이 없습니다",
-  'explore.saved.emptyBody': "나에게 맞는 장소를 저장하면 시범 참여자들의 최신 소식과 함께 여기에 모입니다.",
+  'explore.saved.emptyBody': "장소 페이지에서 저장하면 여기에 보관돼요.",
   'explore.saved.explore': "장소 둘러보기",
   'explore.saved.footer': "저장한 장소는 계정에 저장되어 모든 기기에서 볼 수 있습니다.",
 };

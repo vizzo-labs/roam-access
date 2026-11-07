@@ -96,7 +96,7 @@ const explore: Translation<typeof en> = {
   'explore.saved.tipInstall': "Instalar la app",
   'explore.saved.list': "Lugares guardados",
   'explore.saved.emptyTitle': "Aún no has guardado nada",
-  'explore.saved.emptyBody': "Guarda lugares que funcionen para ti y te esperarán aquí, con lo último de las personas del piloto.",
+  'explore.saved.emptyBody': "Guarda un lugar desde su página. Te espera aquí.",
   'explore.saved.explore': "Explorar lugares",
   'explore.saved.footer': "Los lugares guardados se guardan en tu cuenta, en todos tus dispositivos.",
 };

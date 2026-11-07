@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { C2 } from '../ui/palette';
+import { Icon } from './Icon';
 import { RADIUS, SPACE, TARGET, TYPE } from './tokens';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -52,10 +53,10 @@ function rowStyle(on, disabled) {
 // that gets focus, clicks and keys; `.ds-choice` draws its focus ring on the row.
 const inputStyle = { position: 'absolute', inset: 0, width: '100%', height: '100%', margin: 0, opacity: 0, cursor: 'inherit' };
 
-function Text({ label, sub, id }) {
+function Text({ label, sub, id, big = false }) {
   return (
     <span style={{ minWidth: 0 }}>
-      <span style={{ ...TYPE.label, display: 'block', lineHeight: 1.35, color: C2.char }}>{label}</span>
+      <span style={{ ...TYPE.label, ...(big ? { fontSize: 17, fontWeight: 700 } : null), display: 'block', lineHeight: 1.35, color: C2.char }}>{label}</span>
       {sub && <span id={id} style={{ ...TYPE.footnote, display: 'block', color: C2.slate, marginTop: 3 }}>{sub}</span>}
     </span>
   );
@@ -85,14 +86,16 @@ function ChoiceGroup({ legend, hint, name, value, onChange, options, style }) {
   );
 }
 
-function CheckRow({ checked, onChange, label, hint, disabled, style }) {
+// `icon` (set-up's needs): a 72px row with the icon beside the words.
+function CheckRow({ checked, onChange, label, hint, disabled, icon, style }) {
   const id = React.useId();
   return (
-    <label className="ds-choice" style={{ ...rowStyle(checked, disabled), ...style }}>
+    <label className="ds-choice" style={{ ...rowStyle(checked, disabled), ...(icon ? { minHeight: 72, alignItems: 'center' } : null), ...style }}>
       <input type="checkbox" checked={!!checked} disabled={disabled} onChange={e => onChange(e.target.checked)}
         aria-describedby={hint ? id : undefined} style={inputStyle}/>
       <Mark type="checkbox" on={!!checked}/>
-      <Text label={label} sub={hint} id={id}/>
+      {icon && <span style={{ color: C2.teal, display: 'inline-flex', flexShrink: 0 }}><Icon name={icon} size={26}/></span>}
+      <Text label={label} sub={hint} id={id} big={!!icon}/>
     </label>
   );
 }

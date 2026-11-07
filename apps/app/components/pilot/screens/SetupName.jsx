@@ -5,17 +5,14 @@ import { V2BigBtn } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
 import { C2, F2, RA2_INPUT_FONT, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
-import { V2Verdict } from '../ui/Verdict';
-import { Card, SPACE, TYPE } from '../ds';
+import { SPACE, Stepper } from '../ds';
 import { useT } from '../i18n';
 import { useUser } from '@clerk/nextjs';
 import { PublicProfileForm, initialPublic, publicError } from '../contrib/PublicProfileForm';
 import { suggestPublicName } from '../contrib/authorText';
 
-const VERDICT_HELP = ['works', 'check', 'barrier', 'unknown'];
-
 // ─────────────────────────────────────────────────────────────
-// SETUP · step 3 — the first time: how you'll appear on reviews (Brief L:
+// SETUP · step 2 of 2 — the first time: how you'll appear on reviews (Brief L:
 // name shown on reviews, post anonymously, which describes you, show my
 // needs). Editing needs later (from Me) ends with the private name only.
 // ─────────────────────────────────────────────────────────────
@@ -40,7 +37,7 @@ function V2SetupName({ app }) {
     } else {
       app.setUser({ ...(app.user || {}), name: name.trim(), needs: app.user?.needs || [], done: true });
     }
-    app.goto('home');
+    app.goto('find');
     app.toast(t('onboarding.name.done'));
   }
 
@@ -53,12 +50,8 @@ function V2SetupName({ app }) {
   return (
     <V2Shell bar={bar}>
       <div style={{ padding: '14px 24px 24px' }}>
-        <div style={{ display: 'flex', gap: 5, marginBottom: 24 }} aria-hidden="true">
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
-        </div>
-        <p className="ra-sr-only">{t('onboarding.step', { step: 3, total: 3 })}</p>
+        {first && <Stepper step={2} total={2} style={{ marginBottom: SPACE.lg }}/>}
+        {first && <p className="ra-sr-only">{t('onboarding.step', { step: 2, total: 2 })}</p>}
 
         {first ? (
           <>
@@ -88,23 +81,6 @@ function V2SetupName({ app }) {
           }}/>
         </>)}
 
-        {/* First time only: what the answers will look like, before the first search. */}
-        {!app.user?.done && (
-          <Card variant="filled" as="section" aria-labelledby="verdicts-h" style={{ marginTop: SPACE.xl }}>
-            <h2 id="verdicts-h" style={{ ...TYPE.headline, margin: '0 0 4px' }}>{t('onboarding.verdicts.title')}</h2>
-            <p style={{ ...TYPE.footnote, color: C2.slate, margin: `0 0 ${SPACE.sm}px` }}>
-              {t('onboarding.verdicts.lead')}
-            </p>
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: SPACE.sm }}>
-              {VERDICT_HELP.map(kind => (
-                <li key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-                  <V2Verdict kind={kind}/>
-                  <span style={{ ...TYPE.footnote, color: C2.char }}>{t(`onboarding.verdicts.${kind}`)}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
       </div>
     </V2Shell>
   );

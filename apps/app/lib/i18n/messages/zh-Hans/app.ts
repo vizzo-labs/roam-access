@@ -81,7 +81,7 @@ const app: Translation<typeof en> = {
   'app.invite.title': "Roam Access 试点",
   'app.invite.text': "帮忙测试 Roam Access——在 Manly 找到真正适合残障人士的地方。",
   'app.deleteConfirm': "要删除你的账户吗？这会从试点中删除你的需求、评价和已保存的地点。此操作无法撤销。",
-  'app.dictate.start': "想用说的？改用语音输入",
+  'app.dictate.start': "用说的代替打字",
   'app.dictate.listening': "正在听…点一下停止",
   'app.photoPlaceholder': "场所照片",
 };

@@ -14,12 +14,12 @@ const onboarding = {
 
   'onboarding.step': 'Step {step} of {total}',
   'onboarding.questionMark': '?',
-  'onboarding.continue': 'Continue →',
-  'onboarding.finish': 'Finish →',
+  'onboarding.continue': 'Continue',
+  'onboarding.finish': 'Finish',
 
-  'onboarding.needs.title': 'What do you need to enjoy a place',
-  'onboarding.needs.lead': 'Pick as many as you like. We’ll rank places by what fits — you can change this anytime, or skip it.',
-  'onboarding.needs.privacy': 'Stored securely to personalise your results. Your reviews show the name you choose (or “Roam Access member”), and your access needs only if you choose. Delete everything anytime from Me.',
+  'onboarding.needs.title': 'What do you need at a place',
+  'onboarding.needs.lead': 'Tick all that apply. You can change this any time.',
+  'onboarding.needs.privacy': 'Kept private. Reviews show your needs (like “Wheelchair user”) only if you say so on the next step.',
 
   'onboarding.name.title': 'What should we call you',
   'onboarding.name.lead': 'This is how the app greets you. What shows on your reviews is up to you: Me → How I appear on reviews.',
