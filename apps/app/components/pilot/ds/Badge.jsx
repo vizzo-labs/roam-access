@@ -39,6 +39,8 @@ const SOURCES = {
   venue:     { tone: 'neutral', icon: 'flag',     label: (_, t) => t('ds.badge.venue') },
   partner:   { tone: 'info',    icon: 'success',  label: ({ name }, t) => (name ? t('ds.badge.partnerNamed', { name }) : t('ds.badge.partner')) },
   photo:     { tone: 'teal',    icon: 'camera',   label: ({ count }, t) => (typeof count === 'number' ? t('common.photos', { count }) : t('ds.badge.photo')) },
+  // An ally's observation (Brief L): facts only, never part of a verdict.
+  ally:      { tone: 'neutral', icon: 'heart',    label: (_, t) => t('contrib.observed.label') },
 };
 
 function SourceBadge({ source = 'community', count, name, date, size = 'sm', children, style }) {

@@ -21,6 +21,7 @@ const app = {
   'app.view.toilets': 'Accessible toilets',
   'app.view.beach': 'Beach access',
   'app.view.facility': 'Access details',
+  'app.view.profile': 'How I appear on reviews',
   'app.docTitle': '{title} · Roam Access pilot',
 
   'app.nav.primary': 'Primary',

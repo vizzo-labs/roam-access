@@ -7,6 +7,7 @@ import { C2, F2, M2, V2_H1 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { GapsPrompt } from '../community/GapsPrompt';
 import { useT } from '../i18n';
+import { NewBadge } from '../contrib/NewBadge';
 
 // ─────────────────────────────────────────────────────────────
 // THANKS — the community loop, made visible
@@ -27,7 +28,9 @@ function V2Thanks({ app }) {
           <svg width="40" height="32" viewBox="0 0 16 12" fill="none"><path d="M1 6l5 5L15 1" stroke={C2.paper} strokeWidth="2" strokeLinecap="round"/></svg>
         </div>
         <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 34, letterSpacing: '-0.03em', lineHeight: 1.1, color: C2.paper, marginBottom: 12 }}>
-          {name ? t('review.thanks.titleName', { name }) : t('review.thanks.title')}<span aria-hidden="true" style={{ color: 'rgba(250,249,246,0.55)' }}>.</span>
+          {name ? t('review.thanks.titleName', { name }) : t('review.thanks.title')}
+          {/* No decorative full stop after a name that already ends in one ("Sam K.") */}
+          {!/[.!?。]$/.test(name || '') && <span aria-hidden="true" style={{ color: 'rgba(250,249,246,0.55)' }}>.</span>}
         </h1>
         <p style={{ fontSize: 17.5, lineHeight: 1.5, color: 'rgba(250,249,246,0.9)', margin: '0 auto', maxWidth: 300, fontFamily: F2 }}>
           {t('review.thanks.live', { name: v.name })}
@@ -50,6 +53,9 @@ function V2Thanks({ app }) {
           </div>
         ))}
       </div>
+
+      {/* contributor badges (Brief L): the "New badge" moment */}
+      <NewBadge app={app} style={{ padding: '4px 26px 0' }}/>
 
       <GapsPrompt app={app} onColor style={{ padding: '14px 26px 0' }}/>
 

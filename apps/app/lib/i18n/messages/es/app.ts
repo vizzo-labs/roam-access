@@ -22,6 +22,7 @@ const app: Translation<typeof en> = {
   'app.view.toilets': "Baños accesibles",
   'app.view.beach': "Acceso a la playa",
   'app.view.facility': "Detalles de accesibilidad",
+  'app.view.profile': "Cómo aparezco en las reseñas",
   'app.docTitle': "{title} · Piloto de Roam Access",
   'app.nav.primary': "Principal",
   'app.nav.home': "Inicio",

@@ -79,7 +79,7 @@ export async function OwnerModeration() {
   return (
     <>
       <h2 id="review-reports">Reports about reviews{open.length ? ` (${open.length} open)` : ''}</h2>
-      <p className="muted">A venue asked us to look at these. Hide a review only if it breaks the rules (personal information, abuse, the wrong place, clearly fake). A bad review is not a reason. Venues never see who wrote a review.</p>
+      <p className="muted">A venue asked us to look at these. Hide a review only if it breaks the rules (personal information, abuse, the wrong place, clearly fake). A bad review is not a reason. Venues see only what everyone sees: the name the reviewer chose, or “Roam Access member” — never their account or email.</p>
       <div className="pt-table-wrap">
         <table>
           <thead><tr><th scope="col">Place</th><th scope="col">Review</th><th scope="col">Reason</th><th scope="col">Reported</th><th scope="col"><span className="pt-sr">Decision</span></th></tr></thead>
@@ -87,7 +87,7 @@ export async function OwnerModeration() {
             {reports.map(r => (
               <tr key={r.id} style={r.status !== 'open' ? { opacity: 0.6 } : undefined}>
                 <td>{r.venueName}</td>
-                <td style={{ maxWidth: '24rem', whiteSpace: 'pre-line' }}>{VERDICT[r.reviewVerdict] ?? r.reviewVerdict} · {fmt(r.reviewCreatedAt)}<br/>{r.reviewNote || <span className="muted">(no written note)</span>}{r.reviewHidden ? <span className="muted small"><br/>Review is hidden</span> : null}</td>
+                <td style={{ maxWidth: '24rem', whiteSpace: 'pre-line' }}>{r.reviewVerdict ? VERDICT[r.reviewVerdict] ?? r.reviewVerdict : 'Ally observation (no verdict)'} · {fmt(r.reviewCreatedAt)}<br/>{r.reviewNote || <span className="muted">(no written note)</span>}{r.reviewHidden ? <span className="muted small"><br/>Review is hidden</span> : null}</td>
                 <td>{REASON[r.reason] ?? r.reason}{r.note ? <span className="small" style={{ display: 'block', whiteSpace: 'pre-line' }}>“{r.note}”</span> : null}</td>
                 <td>{fmt(r.createdAt)}</td>
                 <td>

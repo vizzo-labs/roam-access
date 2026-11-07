@@ -5,6 +5,7 @@ import { del, get, put } from '@vercel/blob';
 import { getDb, schema } from '../db';
 import { RA2_NEEDS } from '../pilot-data';
 import { ago } from '../venues';
+import { publicNeedsSql } from './public-needs';
 import {
   ALT_MAX, ALT_MIN, MAX_PHOTOS_PER_REVIEW, PHOTO_KINDS, PHOTO_KIND_IDS,
   PHOTO_MAX_BYTES, THUMB_MAX_BYTES, type PhotoKind,
@@ -163,7 +164,7 @@ export async function attachPhotos(userId: string, reviewId: string, venueId: st
 const visible = and(eq(reviewPhotos.hidden, false), eq(reviews.hidden, false));
 
 export async function getVenuePhotos(venueId: string, viewerId: string): Promise<PhotoVM[]> {
-  const rows = await getDb().select({ p: reviewPhotos, needs: reviews.needs })
+  const rows = await getDb().select({ p: reviewPhotos, needs: publicNeedsSql('"reviews"."needs"', '"reviews"."user_id"') })
     .from(reviewPhotos).innerJoin(reviews, eq(reviews.id, reviewPhotos.reviewId))
     .where(and(eq(reviewPhotos.venueId, venueId), visible))
     .orderBy(desc(reviewPhotos.createdAt)).limit(60);
@@ -174,7 +175,7 @@ export async function getVenuePhotos(venueId: string, viewerId: string): Promise
 export async function getPhotosByReview(reviewIds: string[], viewerId: string) {
   const out = new Map<string, PhotoVM[]>();
   if (!reviewIds.length) return out;
-  const rows = await getDb().select({ p: reviewPhotos, needs: reviews.needs })
+  const rows = await getDb().select({ p: reviewPhotos, needs: publicNeedsSql('"reviews"."needs"', '"reviews"."user_id"') })
     .from(reviewPhotos).innerJoin(reviews, eq(reviews.id, reviewPhotos.reviewId))
     .where(and(inArray(reviewPhotos.reviewId, reviewIds), visible))
     .orderBy(reviewPhotos.createdAt);

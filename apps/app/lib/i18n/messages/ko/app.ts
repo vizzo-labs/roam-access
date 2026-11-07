@@ -22,6 +22,7 @@ const app: Translation<typeof en> = {
   'app.view.toilets': "장애인 화장실",
   'app.view.beach': "해변 접근성",
   'app.view.facility': "접근성 상세 정보",
+  'app.view.profile': "후기에 내가 보이는 방식",
   'app.docTitle': "{title} · Roam Access 시범 서비스",
   'app.nav.primary': "주 메뉴",
   'app.nav.home': "홈",

@@ -21,6 +21,7 @@ import preview from './preview';
 import arrival from './arrival';
 import nearby from './nearby';
 import business from './business';
+import contrib from './contrib';
 
-const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby, ...business };
+const dict = { ...common, ...app, ...ds, ...explore, ...onboarding, ...me, ...card, ...data, ...venue, ...review, ...trust, ...photos, ...ask, ...facts, ...layers, ...community, ...sensory, ...preview, ...arrival, ...nearby, ...business, ...contrib };
 export default dict as Dict;

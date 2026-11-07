@@ -114,7 +114,7 @@ const nearby: Translation<typeof en> = {
   'nearby.form.needStep': '请至少添加一个步骤。',
   'nearby.form.needAlt': '请描述这张照片，让每个人都知道照片里是什么。',
   'nearby.form.waitPhoto': '请等照片发送完成。',
-  'nearby.form.privacy': '你的步骤只显示你的无障碍需求（例如“轮椅使用者”），从不显示你的名字。',
+  'nearby.form.privacy': '你的步骤从不显示你的名字。只有在你的个人资料允许时，才会显示你的无障碍需求（例如“轮椅使用者”）——见 我 → 我在评价上如何显示。',
   'nearby.form.submit': '分享我的步骤',
 
   // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).

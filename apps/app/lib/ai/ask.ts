@@ -49,7 +49,7 @@ export function buildSources(venue: VenueVM, reviews: ReviewVM[], photosByReview
     const ref = `R${i + 1}`;
     refs.set(ref, r);
     const photos = (photosByReview.get(r.id) || []).map(p => `[photo of ${p.kindLabel.toLowerCase()}: ${esc(p.alt)}]`).join(' ');
-    lines.push(`<review id="${ref}" reviewer="${esc(r.who)}" when="${esc(r.when)}" verdict="${VERDICT_WORDS[r.v]}">`
+    lines.push(`<review id="${ref}" reviewer="${esc(r.who)}" when="${esc(r.when)}" verdict="${r.v ? VERDICT_WORDS[r.v] : 'none — an ally\'s observation'}">`
       + `${esc(r.text)}${r.details ? `\nAnswers: ${esc(r.details)}` : ''}${photos ? `\nPhotos: ${photos}` : ''}</review>`);
   });
   const osm = venue.check.filter(f => f.src === 'osm');

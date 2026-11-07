@@ -114,7 +114,7 @@ const nearby: Translation<typeof en> = {
   'nearby.form.needStep': '단계를 하나 이상 추가해 주세요.',
   'nearby.form.needAlt': '모두가 무엇이 찍혔는지 알 수 있게 사진을 설명해 주세요.',
   'nearby.form.waitPhoto': '사진을 다 보낼 때까지 기다려 주세요.',
-  'nearby.form.privacy': '내 단계에는 이름이 아니라 접근성 필요(예: “휠체어 사용자”)만 보여요.',
+  'nearby.form.privacy': '내 단계에는 이름이 절대 보이지 않아요. 접근성 필요(예: “휠체어 사용자”)는 프로필에서 허용할 때만 보여요. 내 정보 → 후기에 내가 보이는 방식을 확인하세요.',
   'nearby.form.submit': '내 단계 공유하기',
 
   // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).

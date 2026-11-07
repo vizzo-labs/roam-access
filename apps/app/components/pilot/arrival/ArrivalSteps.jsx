@@ -2,8 +2,9 @@
 // Getting there 2 (I2) · "Step by step from the street" — a Getting there
 // slot (./slots.js). Short arrival steps from people who've been ("From The
 // Corso turn into the laneway; ramp on the left"), most-confirmed set first,
-// with an optional photo. Others say "This worked for me". Shown by lived
-// experience and date, never by name; never part of a verdict.
+// with an optional photo. Others say "This worked for me". Shown with the
+// date and — if the person allows it — their access needs; never a name;
+// never part of a verdict.
 
 import React from 'react';
 import {

@@ -18,7 +18,7 @@ assert.equal(slotOf(SAT_7PM), 'evening');
 const review = (id: string, o: Partial<Review>): Review => ({
   id, venueId: 'v', userId: 'u-' + id, verdict: 'works', needs: [], features: {}, note: null, hidden: false,
   createdAt: T(THU_8AM), entranceAlt: null, entranceNote: null,
-  sensoryNoise: null, sensoryLight: null, sensoryCrowd: null, quietTimes: [], ...o,
+  sensoryNoise: null, sensoryLight: null, sensoryCrowd: null, quietTimes: [], writtenAs: null, ...o,
 });
 const report = (id: string, o: Partial<SensoryReport>): SensoryReport => ({
   id, venueId: 'v', userId: 'u', reviewId: null, noise: null, light: null, crowd: null,

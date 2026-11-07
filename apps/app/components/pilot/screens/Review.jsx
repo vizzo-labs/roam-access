@@ -17,15 +17,27 @@ import { ReviewStepsEntry } from '../arrival/ReviewStepsEntry';
 import { ReviewPhotos, useReviewPhotos, PhotoSuggestion } from '../photos/ReviewPhotos';
 import { SensoryQuestions, EMPTY_SENSORY } from '../sensory/SensoryQuestions';
 import { useT } from '../i18n';
-import { featureText } from '@/lib/i18n/data';
+import { featureText, needText } from '@/lib/i18n/data';
+import { RA2_NEEDS } from '@/lib/pilot-data';
+import { previewLine } from '../contrib/authorText';
 
 // ─────────────────────────────────────────────────────────────
-// REVIEW — one tap required, everything else optional
+// REVIEW — one tap required, everything else optional.
+// Adapts to who is writing (Me → How I appear on reviews, Brief L):
+// - lived experience / prefer not to say / never chosen: this form as always;
+// - carer: the same steps about the person they were with ("It worked for
+//   them"), plus "Whose needs?" (from the profile, editable for this visit);
+// - ally: NO verdict question. It opens at "What did you notice?" (the yes/no
+//   questions, photos, the entrance pin, sensory, a note, arrival steps) and is
+//   saved as an observation that never sets or changes a verdict.
 // ─────────────────────────────────────────────────────────────
 function V2ReviewView({ app }) {
   const t = useT();
   const v = app.venueById(app.selectedId);
   const h = useV2Heading('review-' + v.id);
+  const rel = app.user?.pub?.relationship;
+  const mode = rel === 'ally' ? 'ally' : rel === 'carer' ? 'carer' : 'lived';
+  const [whose, setWhose] = React.useState(() => new Set(app.user?.needs || []));
   const [choice, setChoice] = React.useState(null);
   const [features, setFeatures] = React.useState({});
   const [note, setNote] = React.useState('');
@@ -42,13 +54,19 @@ function V2ReviewView({ app }) {
     ? t('review.hint.photosBusy')
     : photos.needsAlt.length ? t('review.hint.describe', { count: photos.needsAlt.length }) : null;
 
-  // Questions that touch this tester's own needs come first.
-  const mine = ra2NeedTags(app.user?.needs || []);
+  // Questions that touch this tester's own needs (a carer: the person's) come first.
+  const mine = ra2NeedTags(mode === 'carer' ? [...whose] : app.user?.needs || []);
   const questions = [...RA2_FEATURES].sort((x, y) => (mine.includes(y.id) ? 1 : 0) - (mine.includes(x.id) ? 1 : 0));
 
-  const options = ['works', 'check', 'barrier'].map(kind => ({
-    kind, label: t(`review.opt.${kind}.label`), sub: t(`review.opt.${kind}.sub`),
+  const optKey = mode === 'carer' ? 'contrib.review.carer.opt' : 'review.opt';
+  const options = mode === 'ally' ? [] : ['works', 'check', 'barrier'].map(kind => ({
+    kind, label: t(`${optKey}.${kind}.label`), sub: t(`${optKey}.${kind}.sub`),
   }));
+  // An ally sends once they've answered something; everyone else picks a verdict.
+  const answered = Object.keys(features).length > 0 || !!entranceAlt || !!note.trim() || photos.photos.length > 0
+    || !!(sensory.noise || sensory.light || sensory.crowd || sensory.quietTimes?.length) || (markOpen && !!mark.pin);
+  const ready = mode === 'ally' ? answered : !!choice;
+  const toggleWhose = id => setWhose(prev => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   // Tapping the selected answer again clears it ("not sure").
   const setFeature = (id, val) => setFeatures(f => {
@@ -58,13 +76,16 @@ function V2ReviewView({ app }) {
   });
 
   async function send() {
-    if (!choice || sending || photoBlock) return;
+    if (!ready || sending || photoBlock) return;
     setSending(true);
     // The entrance follow-up only counts when the main way in has steps.
     const entrance = features.stepfree === 'no' && entranceAlt
       ? { entranceAlt, entranceNote: entranceAlt === 'none' ? '' : entranceNote } : {};
     const door = entrancePayload({ features, entranceAlt, entranceNote, mark, markOpen, photos: photos.photos });
-    const ok = await app.submitReview({ venueId: v.id, verdict: choice, features, note, ...entrance, entrance: door, photos: photos.payload, sensory });
+    const ok = await app.submitReview({
+      venueId: v.id, verdict: mode === 'ally' ? null : choice, features, note, ...entrance, entrance: door, photos: photos.payload, sensory,
+      ...(mode === 'carer' ? { needs: [...whose] } : {}),
+    });
     if (ok) app.goto('thanks', v.id, { replace: true }); // Back must not reopen a sent form
     else setSending(false);
   }
@@ -81,14 +102,35 @@ function V2ReviewView({ app }) {
 
       <div style={{ padding: '14px 24px 24px' }}>
         <p style={{ fontFamily: M2, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: C2.slate, margin: '0 0 10px' }}>
-          {t('review.overline')}
+          {mode === 'ally' ? t('contrib.observed.label') : t('review.overline')}
         </p>
         <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 30, lineHeight: 1.1, marginBottom: 8 }}>
-          {t('review.title', { name: v.name })}
+          {mode === 'ally' ? t('contrib.review.ally.title', { name: v.name }) : t('review.title', { name: v.name })}
         </h1>
         <p style={{ fontSize: 16.5, color: C2.char, lineHeight: 1.5, margin: '0 0 26px', fontFamily: F2 }}>
-          {t('review.intro')}
+          {mode === 'ally' ? t('contrib.review.ally.intro') : mode === 'carer' ? t('contrib.review.carer.intro') : t('review.intro')}
         </p>
+
+        {mode === 'carer' && (
+          <section aria-labelledby="rev-whose" style={{ marginBottom: 22 }}>
+            <h2 id="rev-whose" style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', fontFamily: F2 }}>{t('contrib.review.carer.needs.title')}</h2>
+            <p style={{ fontSize: 14.5, color: C2.slate, margin: '0 0 10px', lineHeight: 1.45, fontFamily: F2 }}>{t('contrib.review.carer.needs.hint')}</p>
+            <div role="group" aria-label={t('contrib.review.carer.needs.group')} style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {RA2_NEEDS.map(n => {
+                const on = whose.has(n.id);
+                return (
+                  <button key={n.id} type="button" aria-pressed={on} onClick={() => toggleWhose(n.id)} style={{
+                    minHeight: 44, padding: '8px 14px', borderRadius: 999, cursor: 'pointer', fontFamily: F2, fontSize: 15, fontWeight: 600,
+                    border: on ? `2px solid ${C2.teal}` : `1.5px solid ${C2.line}`, background: on ? C2.tealSoft : C2.paper, color: C2.char,
+                    display: 'inline-flex', alignItems: 'center', gap: 6, textAlign: 'left',
+                  }}>
+                    {on && <span aria-hidden="true">✓</span>}{needText(t, n.id, 'chip')}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {options.map(o => {
           const meta = V2_VERDICT_META[o.kind];
@@ -114,14 +156,15 @@ function V2ReviewView({ app }) {
           );
         })}
 
-        <ReviewPhotos venueName={v.name} state={photos} hideTag={entranceShown(features, entranceAlt, markOpen) ? 'entrance' : null}/>
+        {/* An ally starts at "What did you notice?"; photos come after it. */}
+        {mode !== 'ally' && <ReviewPhotos venueName={v.name} state={photos} hideTag={entranceShown(features, entranceAlt, markOpen) ? 'entrance' : null}/>}
 
-        <section aria-labelledby="rev-more" style={{ marginTop: 22 }}>
+        <section aria-labelledby="rev-more" style={{ marginTop: mode === 'ally' ? 0 : 22 }}>
           <h2 id="rev-more" style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', fontFamily: F2 }}>
-            {t('review.more.title')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('common.optional')}</span>
+            {mode === 'ally' ? t('contrib.review.ally.more') : <>{t('review.more.title')} <span style={{ fontWeight: 500, color: C2.slate }}>{t('common.optional')}</span></>}
           </h2>
           <p style={{ fontSize: 14.5, color: C2.slate, margin: '0 0 10px', lineHeight: 1.45, fontFamily: F2 }}>
-            {t('review.more.hint')}
+            {mode === 'ally' ? t('contrib.review.ally.moreHint') : t('review.more.hint')}
           </p>
           {questions.map(q => (
             <React.Fragment key={q.id}>
@@ -164,6 +207,8 @@ function V2ReviewView({ app }) {
           ))}
         </section>
 
+        {mode === 'ally' && <ReviewPhotos venueName={v.name} state={photos} hideTag={entranceShown(features, entranceAlt, markOpen) ? 'entrance' : null}/>}
+
         <SensoryQuestions value={sensory} onChange={setSensory} needs={app.user?.needs || []}/>
 
         <div style={{ marginTop: 18 }}>
@@ -184,12 +229,16 @@ function V2ReviewView({ app }) {
         <ReviewStepsEntry venue={v}/>
 
         <div style={{ marginTop: 20 }}>
-          <V2BigBtn kind="primary" onClick={send} disabled={!choice || sending || !!photoBlock} ariaDescribedBy="rev-hint">
-            {sending ? t('common.sending') : t('review.send')}
+          <V2BigBtn kind="primary" onClick={send} disabled={!ready || sending || !!photoBlock} ariaDescribedBy="rev-hint">
+            {sending ? t('common.sending') : mode === 'ally' ? t('contrib.review.ally.send') : t('review.send')}
           </V2BigBtn>
         </div>
         <p id="rev-hint" style={{ fontSize: 13.5, color: C2.slate, textAlign: 'center', marginTop: 12, lineHeight: 1.4, fontFamily: F2 }}>
-          {!choice ? t('review.hint.choose') : photoBlock || t('review.hint.private')}
+          {!ready ? t(mode === 'ally' ? 'contrib.review.ally.choose' : 'review.hint.choose')
+            : photoBlock || (app.user?.pub?.relationship
+              // How this review will be credited (Brief L); older accounts keep the old promise.
+              ? t('contrib.review.shownAs', { who: previewLine(t, app.user.pub, mode === 'carer' ? [...whose] : app.user?.needs) })
+              : t('review.hint.private'))}
         </p>
       </div>
     </V2Shell>

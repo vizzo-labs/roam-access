@@ -41,13 +41,30 @@ export const profiles = pgTable('profiles', {
   onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+  // How the person appears on reviews (migrations/202611071303_contributors.sql).
+  // relationship NULL = never chosen: reviews keep the old anonymous display
+  // (lived experience only). Needs are shown next to a name only when
+  // show_needs is on. See lib/contributors/author.ts.
+  publicName: text('public_name'),
+  postAnonymously: boolean('post_anonymously').notNull().default(true),
+  relationship: text('relationship').$type<Relationship>(),
+  showNeeds: boolean('show_needs').notNull().default(false),
+  publicId: text('public_id').notNull().default(sql`substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)`),
+  namePromptedAt: timestamp('name_prompted_at', { withTimezone: true }),
+}, t => [
+  uniqueIndex('profiles_public_id_uq').on(t.publicId),
+  check('profiles_relationship_chk', sql`${t.relationship} is null or ${t.relationship} in ('lived', 'carer', 'ally', 'unsaid')`),
+]);
+
+export type Relationship = 'lived' | 'carer' | 'ally' | 'unsaid';
 
 export const reviews = pgTable('reviews', {
   id: uuid('id').primaryKey().defaultRandom(),
   venueId: text('venue_id').notNull().references(() => venues.id, { onDelete: 'cascade' }),
   userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
-  verdict: text('verdict').notNull(),
+  // NULL = an ally's observation (facts only): never part of a verdict or a
+  // review count (migrations/202611071307_contributors.sql, lib/venues.ts).
+  verdict: text('verdict'),
   // Reviewer's needs at the time of the review: reviews are shown by lived
   // experience ("Wheelchair user"), never by name.
   needs: text('needs').array().notNull().default(sql`'{}'::text[]`),
@@ -64,10 +81,14 @@ export const reviews = pgTable('reviews', {
   sensoryLight: text('sensory_light').$type<SensoryLight>(),
   sensoryCrowd: text('sensory_crowd').$type<SensoryCrowd>(),
   quietTimes: text('quiet_times').array().$type<SensorySlot[]>().notNull().default(sql`'{}'::text[]`),
+  // The writer's relationship when they wrote it (NULL = before Brief L).
+  writtenAs: text('written_as').$type<Relationship>(),
 }, t => [
   index('reviews_venue_idx').on(t.venueId),
   index('reviews_user_idx').on(t.userId),
+  index('reviews_created_idx').on(t.createdAt),
   check('reviews_verdict_chk', sql`${t.verdict} in ('works', 'check', 'barrier')`),
+  check('reviews_written_as_chk', sql`${t.writtenAs} is null or ${t.writtenAs} in ('lived', 'carer', 'ally', 'unsaid')`),
   check('reviews_entrance_alt_chk', sql`${t.entranceAlt} is null or ${t.entranceAlt} in ('side', 'back', 'lift', 'other', 'none')`),
 ]);
 
@@ -269,6 +290,17 @@ export const mappingEventMembers = pgTable('mapping_event_members', {
 
 export type MicroAnswer = typeof microAnswers.$inferSelect;
 export type MappingEvent = typeof mappingEvents.$inferSelect;
+
+// "This helped me" (migrations/202611071303_contributors.sql): one per person
+// per review, never on your own.
+export const reviewThanks = pgTable('review_thanks', {
+  reviewId: uuid('review_id').notNull().references(() => reviews.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => profiles.userId, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+  primaryKey({ name: 'review_thanks_pk', columns: [t.reviewId, t.userId] }),
+  index('review_thanks_user_idx').on(t.userId),
+]);
 
 // F5 · venues & councils (venue_claims, venue_replies, needs_cards, user_roles, venue_views)
 export * from './schema-venues';

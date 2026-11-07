@@ -12,6 +12,7 @@ import { getDb, schema } from '../db';
 import { RA2_NEEDS, type NeedId } from '../pilot-data';
 import { getVenueVMs } from '../data';
 import { ra2Verdict } from '../pilot/match'; // the app's own verdict engine (plain JS)
+import { hasVerdict } from '../venues';
 import { coveredNeeds } from './coverage';
 import { ATIC_CATEGORIES, FEATURE_TO_ATIC, NEED_TO_ATIC, type AticId } from '../standards/atic';
 
@@ -43,7 +44,7 @@ function needGap(need: NeedId, label: string, vs: { id: string }[], coveredBy: M
 export async function getCouncilMetrics() {
   const db = getDb();
   const demandSince = sql`(now() at time zone 'Australia/Sydney')::date - ${DEMAND_DAYS}::int`;
-  const [vs, rs, qs, vms, demandRows, testersByWeek, claims, replies, cards, totals] = await Promise.all([
+  const [vs, allReviews, qs, vms, demandRows, testersByWeek, claims, replies, cards, totals] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
     db.select().from(microAnswers).where(eq(microAnswers.hidden, false)),
@@ -60,6 +61,8 @@ export async function getCouncilMetrics() {
   ]);
   const venueIds = new Set(vs.map(v => v.id));
 
+  // Ally observations (no verdict) are not reviews: left out of every count.
+  const rs = allReviews.filter(hasVerdict);
   // Reviews and quick answers per venue, coverage per venue, verdicts per venue.
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) if (venueIds.has(r.venueId)) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);

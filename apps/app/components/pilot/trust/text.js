@@ -13,7 +13,17 @@ export function whoText(t, whoNeed, whoMore, fallback) {
   return whoMore ? t('review.who.needMore', { who, more: whoMore }) : t('review.who.need', { who });
 }
 
-export const reviewWho = (t, r) => whoText(t, r.whoNeed, r.whoMore, r.who);
+/** The author line as text: legacy reviews keep "Wheelchair user"; chosen
+ *  ones read "Sam K. · Lived experience · Wheelchair user" (needs only with
+ *  consent — the server leaves them out otherwise). See contrib/ReviewAuthor. */
+export function reviewWho(t, r) {
+  const a = r.author;
+  if (!a || a.legacy) return whoText(t, r.whoNeed, r.whoMore, r.who);
+  const parts = [a.name || t('contrib.member')];
+  if (a.rel) parts.push(t(`contrib.rel.${a.rel}`));
+  if (r.whoNeed) parts.push(whoText(t, r.whoNeed, r.whoMore));
+  return parts.join(' · ');
+}
 /** The reviewer's own words, or the translated default for their verdict. */
 export const reviewText = (t, r) => (r.own === false && r.textKey ? t(r.textKey) : r.text);
 export const reviewWhen = (fmt, r) => (r.at ? fmt.ago(r.at) : r.when);

@@ -121,7 +121,7 @@ async function Kit({ params }: { params: PageProps<'/events/[code]/kit'>['params
           <p>Roam Access tells people with disability whether a place will work for them, using reviews from people with the same needs. Right now most places around here have no information at all. Today we change that.</p>
           <p>Here’s how it works. Open the app. On the Home screen you’ll see “Help fill the gaps”: one yes-or-no question about a place near you. Tap Yes or No. That’s it. If you go inside a place, write a review: one tap for how it was, and anything else you noticed.</p>
           <p>Three rules. One: only record what you experienced yourself, today. Two: if you’re not sure, skip — a wrong answer is worse than no answer. Three: be kind to staff. We’re not inspecting anyone. If they ask, say you’re sharing access information for the community.</p>
-          <p>Your reviews show your lived experience, like “wheelchair user”, never your name. The leaderboard is anonymous unless you choose to show a name. It’s for fun, not a race.</p>
+          <p>Your reviews show the name you choose, or “Roam Access member” if you post anonymously. Your access needs, like “wheelchair user”, show only if you choose. You can change both in the app, under Me. The leaderboard is anonymous unless you choose to show a name. It’s for fun, not a race.</p>
           <p>Look after yourself. Take breaks, drink water, and stop whenever you want — every single answer helps. If you need anything, find me or another organiser.</p>
           <p>Any questions? Let’s go.</p>
         </div>

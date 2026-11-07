@@ -32,6 +32,9 @@ import { V2NeedsCard } from './screens/NeedsCard';
 import { V2Toilets } from './screens/Toilets';
 import { V2Beach } from './screens/Beach';
 import { V2Facility } from './screens/Facility';
+import { V2Profile } from './screens/Profile';
+import { NamePrompt } from './contrib/NamePrompt';
+import { useBadgeMoment } from './contrib/useBadgeMoment';
 import { useAccessLayers } from './layers/useAccessLayers';
 import { I18nProvider, useT } from './i18n';
 import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
@@ -42,7 +45,7 @@ const PREFS_KEY = 'ra2-a11y';
 // Every route; its title (document.title + the route announcer) is app.view.<route>.
 const ROUTES = [
   'setup', 'setup-name', 'home', 'voice', 'results', 'map', 'venue', 'reviews', 'review',
-  'thanks', 'saved', 'me', 'gaps', 'card', 'toilets', 'beach', 'facility',
+  'thanks', 'saved', 'me', 'gaps', 'card', 'toilets', 'beach', 'facility', 'profile',
 ];
 const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'home'}`);
 const DARK_VIEWS = ['voice', 'thanks'];
@@ -244,6 +247,8 @@ function PilotScreens({ initial, userId }) {
   const reviewsCache = useRef({});
   const farToastShown = useRef(false);
   const [reviewsVersion, setReviewsVersion] = useState(0);
+  // Contributor badges: a small "New badge" moment when one is earned.
+  const badgeMoment = useBadgeMoment(userId, initial.badges, setToast, t);
 
   // New testers go through needs + name first, whatever the URL says.
   const onboarded = me.onboarded;
@@ -315,7 +320,8 @@ function PilotScreens({ initial, userId }) {
     else window.location.hash = hash;
   }, []);
 
-  const user = { name: me.name, needs: me.needs, done: me.onboarded };
+  // `pub`: how I appear on reviews (Brief L); relationship null = never chosen.
+  const user = { name: me.name, needs: me.needs, done: me.onboarded, pub: me.pub };
 
   // Web layout: the map always shows places (grouped into bubbles until you
   // zoom in). A search or saved list narrows it and frames the best matches;
@@ -383,19 +389,40 @@ function PilotScreens({ initial, userId }) {
     reviewsCache: reviewsCache.current,
     reviewsVersion,
 
-    // Setup calls this with the new needs, then the name step with done:true.
+    // Setup calls this with the new needs, then the name step with done:true
+    // (and, the first time, `pub`: how they appear on reviews).
     // Saved to the server once the profile is complete (or when editing it).
     setUser: (next) => {
       const n = typeof next === 'function' ? next(user) : next;
-      const updated = { name: n.name ?? me.name, needs: n.needs ?? me.needs, onboarded: !!n.done || me.onboarded };
+      const updated = { ...me, name: n.name ?? me.name, needs: n.needs ?? me.needs, onboarded: !!n.done || me.onboarded };
+      if (n.pub) updated.pub = { ...me.pub, ...n.pub };
       const firstTime = !me.onboarded && updated.onboarded;
       setMe(updated);
       if (!updated.onboarded) return;
       if (firstTime) setPilot(p => ({ ...p, testers: p.testers + 1 }));
-      api('/api/profile', { method: 'PUT', body: JSON.stringify({ name: updated.name, needs: updated.needs, onboarded: true }) })
+      api('/api/profile', { method: 'PUT', body: JSON.stringify({ name: updated.name, needs: updated.needs, onboarded: true, ...(n.pub || {}) }) })
         .then(p => setMe(p))
         .catch(() => setToast(t('app.toast.profileFailed')));
     },
+
+    // Me → How I appear on reviews. Resolves true when saved.
+    savePublic: async (pub) => {
+      try {
+        setMe(await api('/api/profile', { method: 'PUT', body: JSON.stringify(pub) }));
+        reviewsCache.current = {};
+        setReviewsVersion(x => x + 1);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    // The one-time "Reviews can now show who wrote them" prompt was answered.
+    markPrompted: () => {
+      setMe(m => ({ ...m, pub: { ...m.pub, prompted: true } }));
+      api('/api/profile', { method: 'PUT', body: JSON.stringify({ prompted: true }) }).then(p => setMe(p), () => {});
+    },
+    newBadges: badgeMoment.pending,
+    clearNewBadges: badgeMoment.clear,
 
     runSearch: (parsed) => {
       setQuery(parsed);
@@ -426,13 +453,14 @@ function PilotScreens({ initial, userId }) {
     // A fresh view model from the server (e.g. after "Still accurate? Yes").
     updateVenue: (venue) => setVenues(vs => vs.map(v => (v.id === venue.id ? venue : v))),
 
-    submitReview: async ({ venueId, verdict, features, note, entranceAlt, entranceNote, entrance, photos, sensory }) => {
+    submitReview: async ({ venueId, verdict, features, note, entranceAlt, entranceNote, entrance, photos, sensory, needs }) => {
       try {
-        const r = await api('/api/reviews', { method: 'POST', body: JSON.stringify({ venueId, verdict, features, note, entranceAlt, entranceNote, entrance, photos, sensory }) });
+        const r = await api('/api/reviews', { method: 'POST', body: JSON.stringify({ venueId, verdict, features, note, entranceAlt, entranceNote, entrance, photos, sensory, needs }) });
         if (r.venue) setVenues(vs => vs.map(v => (v.id === venueId ? r.venue : v)));
         setReviewed(x => (x.includes(venueId) ? x : [...x, venueId]));
         setMyStats(r.myStats);
-        setLastSubmit({ venueId, venueReviews: r.venueReviews });
+        setLastSubmit({ venueId, venueReviews: r.venueReviews, observation: !!r.observation });
+        badgeMoment.update(r.badges, { quiet: true }); // shown on the Thanks screen
         delete reviewsCache.current[venueId];
         setReviewsVersion(x => x + 1);
         return true;
@@ -517,6 +545,7 @@ function PilotScreens({ initial, userId }) {
     gaps: V2Gaps,
     card: V2NeedsCard,
     toilets: V2Toilets, beach: V2Beach, facility: V2Facility,
+    profile: V2Profile,
   };
   const Screen = screens[view] || V2Home;
 
@@ -524,6 +553,7 @@ function PilotScreens({ initial, userId }) {
     <div id="ra-main" role="main" tabIndex={-1} style={{ position: 'absolute', inset: 0 }}>
       <div className="ra-sr-only" role="status" aria-live="polite">{viewTitle(t, view)}</div>
       <Screen app={app}/>
+      {view === 'home' && <NamePrompt app={app}/>}
       <V2A11ySheet open={a11yOpen} onClose={() => setA11yOpen(false)} prefs={prefs} onChange={p => applyPrefs(p)}/>
       <V2Toast message={toast}/>
     </div>

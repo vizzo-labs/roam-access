@@ -114,7 +114,7 @@ const nearby: Translation<typeof en> = {
   'nearby.form.needStep': '手順を1つ以上追加してください。',
   'nearby.form.needAlt': '何が写っているか誰にでもわかるように、写真の説明を書いてください。',
   'nearby.form.waitPhoto': '写真の送信が終わるまでお待ちください。',
-  'nearby.form.privacy': '道順には名前ではなく、あなたのアクセスのニーズ（例：「車いす利用者」）だけが表示されます。',
+  'nearby.form.privacy': '道順に名前が表示されることはありません。アクセスのニーズ（例：「車いす利用者」）は、プロフィールで許可したときだけ表示されます。マイページ → レビューでの表示 をご覧ください。',
   'nearby.form.submit': '私の道順を共有',
 
   // Getting there 4 (I4): the review form entry and the public page (machine-translated, not yet reviewed).

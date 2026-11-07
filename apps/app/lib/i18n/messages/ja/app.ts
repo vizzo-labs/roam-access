@@ -22,6 +22,7 @@ const app: Translation<typeof en> = {
   'app.view.toilets': "バリアフリートイレ",
   'app.view.beach': "ビーチのアクセス",
   'app.view.facility': "アクセスの詳細",
+  'app.view.profile': "レビューでの表示",
   'app.docTitle': "{title} · Roam Access パイロット",
   'app.nav.primary': "メインメニュー",
   'app.nav.home': "ホーム",

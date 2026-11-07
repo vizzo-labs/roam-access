@@ -37,6 +37,7 @@ export const SOURCE_NAME: Record<FactSource, string> = {
   community: 'Community',
   osm: 'OpenStreetMap (unconfirmed)',
   venue: 'Venue says (not checked by the community)',
+  ally: 'Observed by an ally (not part of any verdict)',
 };
 
 /** One fact's source line. */

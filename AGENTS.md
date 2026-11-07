@@ -75,6 +75,8 @@ import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE,
 | Explore filters | `explore/ExploreFilters` + `explore/filters.js` (`applyFilters`, `verdictCounts`, `countsLine`) | Shared by Results, the phone map and the desktop map (`app.filters`, `app.setFilters`, `app.setQuery`). Filters only narrow, or sort by distance when the tester asks; they never change a verdict. |
 | A list over a map | `SnapSheet snap onSnapChange label header` | Peek · half · full. The handle is a button (click, Enter, arrow keys) and each change is announced; tabbing into a collapsed list opens it. |
 | Getting there (arrival) | `arrival/GettingThere app venue` (venue page) · `arrival/EntranceLine venue` (cards) · `arrival/EntranceMarker` (review form) · `arrival/directions` (`useDirections`, `useMapsApp`) | Directions go to the step-free entrance someone marked (never an OpenStreetMap one, never one reported "Changed"); default for people with the mobility need, one tap for everyone else; Apple Maps on iOS, Google elsewhere, the person can choose. **Add later stages (parking, stops, step-by-step) as an entry in `arrival/slots.js`**, not by editing GettingThere. Entrances never change a verdict. Each kind (main · side · back · lift · other) has its own shape and on-map label (`arrival/entranceSymbols.js`); the mini-map key names them. Step-by-step arrival: `arrival/ArrivalSteps` (venue page) and `arrival/ReviewStepsEntry` (optional, end of the review form) share one sheet. "Parking & transport nearby" picks come from `nearbyPicks()` (`arrival/nearbyUtils`), shared by the app and the public `/v/[id]` page (`components/community/NearbyPublic`, server `t` from `lib/i18n/server`); community steps stay in the app. |
+| A choice or an opt-in | `ChoiceGroup legend hint value onChange options` (native radios in a fieldset) · `CheckRow checked onChange label hint` | Each row one ≥ 56px target; arrow keys move between radios. Never pre-tick a sensitive opt-in. |
+| Who wrote a review | `contrib/ReviewAuthor r` · `contrib/HelpedButton r app` · `trust/text reviewWho(t, r)` (text) | Name (links to `/u/<public_id>` only when the person shows one) + self-described label (icon + words) + needs only if sent. Don't build bylines by hand: the server decides what may show (`lib/contributors/author.ts`). |
 | Dates, plurals | `formatDate(d)` → "6 November 2026", `timeAgo(d)`, `plural(n, 'review')` | en-AU, Sydney time. |
 
 The old `ui/Buttons` (`V2BigBtn`, `V2RoundBtn`, `V2Back`) are now thin wrappers over `Button` and `IconButton`. Use the design-system names in new code.
@@ -92,9 +94,19 @@ and to the `/ds` page, rather than to a screen.
   never as a confirmed fact.
 - **Payment never changes a verdict.** Paid listings, partners or sponsors may change how a
   place is presented, never its verdict, its ranking by verdict, or which reviews are shown.
-- Reviews are shown by lived experience ("Wheelchair user"), **never by name**. Access needs
-  are disability information (sensitive under the Privacy Act): never expose them with a
-  name, never log them, delete them with the account.
+- **Allies' observations never set or change a verdict.** A review written as an ally has
+  no verdict (`reviews.verdict` NULL): its answers only make `VenueVM.observed` ("Observed
+  by an ally"), never works/check/barriers, review counts or "Works for you". Use
+  `hasVerdict()` (`lib/venues.ts`) in every verdict or count path.
+- **Who wrote a review** (`lib/contributors/author.ts`, the only place that decides): the
+  person's chosen public name, or "Roam Access member" if they post anonymously; their
+  self-described relationship (lived experience · carer · ally). Accounts that never chose
+  (`profiles.relationship` NULL) keep the old display — lived experience, never a name —
+  until they act themselves. Access needs are disability information (sensitive under the
+  Privacy Act): shown **only with the person's explicit opt-in** (`show_needs`; without it
+  they never leave the server — use `withAuthor()` for reviews and `publicNeedsSql()` for
+  photos, entrances and arrival steps), never logged, deleted with the account. Profile
+  links use `public_id`, never the Clerk id or email.
 
 ## Accessibility non-negotiables
 
