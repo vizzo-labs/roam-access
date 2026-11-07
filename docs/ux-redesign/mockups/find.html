@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Find · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top">
+  <span class="logo" aria-hidden="true">roam <span>/</span> access</span>
+  <span class="sr-only">Roam Access</span>
+</header>
+<main id="main" tabindex="-1">
+  <h1>Find a place<span class="dot">.</span></h1>
+  <p class="lead">Places around Manly, checked by people with needs like yours.</p>
+
+  <form class="search" role="search" aria-label="Search places" action="results.html">
+    <label class="sr-only" for="q">Search for a place or a kind of place</label>
+    <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+    <input id="q" name="q" type="search" placeholder="Cafe, beach, Hugos…" autocomplete="off" enterkeyhint="search">
+    <button type="button" class="icon-btn flat mic" aria-label="Search by voice"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+    <button type="submit" class="icon-btn" aria-label="Search"><svg class="icon" aria-hidden="true"><use href="#i-forward"/></svg></button>
+  </form>
+
+  <nav aria-label="Browse" style="margin-top:12px">
+    <div class="grid2">
+      <a class="tile wide" href="results.html?near=1"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>Near me now</a>
+      <a class="tile" href="results.html"><svg class="icon" aria-hidden="true"><use href="#i-food"/></svg>Food &amp; drink</a>
+      <a class="tile" href="results.html"><svg class="icon" aria-hidden="true"><use href="#i-park"/></svg>Parks &amp; beaches</a>
+      <a class="tile" href="results.html"><svg class="icon" aria-hidden="true"><use href="#i-arts"/></svg>Arts &amp; culture</a>
+      <a class="tile" href="results.html"><svg class="icon" aria-hidden="true"><use href="#i-toilet"/></svg>Toilets</a>
+    </div>
+  </nav>
+
+  <!-- One prompt, only after a visit; never two cards competing. -->
+  <a class="card tint row" href="review.html" style="margin-top:16px">
+    <svg class="icon lead-icon" aria-hidden="true"><use href="#i-edit"/></svg>
+    <span class="body"><span class="title">Been to Hugos? Tell us how it was.</span><span class="sub">One tap. It helps people with needs like yours.</span></span>
+    <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg>
+  </a>
+
+  <h2 id="near-h">Near you</h2>
+  <p class="muted small" style="margin-top:-6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">Walking from Manly Wharf. <a class="btn ghost sm" href="results.html?near=1" style="padding:0 6px">Use my location</a></p>
+  <ul class="list" aria-labelledby="near-h">
+    <li><a class="row" href="place.html">
+      <span class="body"><span class="title">Hugos</span><span class="sub">Restaurant · 1 min walk</span>
+        <span class="meta"><span class="verdict v-works"><span class="mark" aria-hidden="true">✓</span>Works for you</span><span class="why">Step-free way in · 3 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html">
+      <span class="body"><span class="title">Manly Wharf Hotel</span><span class="sub">Pub · 1 min walk</span>
+        <span class="meta"><span class="verdict v-check"><span class="mark" aria-hidden="true">!</span>Check first</span><span class="why">Few seats · 1 person</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html">
+      <span class="body"><span class="title">Manly Art Gallery</span><span class="sub">Gallery · 4 min walk</span>
+        <span class="meta"><span class="verdict v-works"><span class="mark" aria-hidden="true">✓</span>Works for you</span><span class="why">Accessible toilet · 2 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html">
+      <span class="body"><span class="title">Showbox Coffee</span><span class="sub">Cafe · 7 min walk</span>
+        <span class="meta"><span class="verdict v-barrier"><span class="mark" aria-hidden="true">✗</span>Has barriers</span><span class="why">Step at the door · 2 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html">
+      <span class="body"><span class="title">Guzman y Gomez</span><span class="sub">Takeaway · 1 min walk</span>
+        <span class="meta"><span class="verdict v-unknown"><span class="mark" aria-hidden="true">?</span>No info yet</span><span class="why">Been here? Be the first</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+  </ul>
+  <a class="btn secondary" href="results.html" style="margin-top:14px">See all 232 places</a>
+</main>
+<nav class="tabs" aria-label="Main">
+  <a class="tab" href="find.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>Find</a>
+  <a class="tab" href="saved.html"><svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg>Saved<span class="pip" aria-hidden="true">2</span><span class="sr-only">, 2 updates</span></a>
+  <a class="tab" href="me.html"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Me</a>
+</nav>
+</div></div></div>
+<script src="mock.js"></script>
+</body>
+</html>
