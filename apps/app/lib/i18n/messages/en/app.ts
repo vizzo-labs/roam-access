@@ -86,7 +86,7 @@ const app = {
   'app.invite.text': 'Help test Roam Access — find places in Manly that actually work for people with disability.',
   'app.deleteConfirm': 'Delete your account? This removes your needs, reviews and saved places from the pilot. It can’t be undone.',
 
-  'app.dictate.start': 'Prefer to talk? Dictate instead',
+  'app.dictate.start': 'Say it instead of typing',
   'app.dictate.listening': 'Listening… tap to stop',
   'app.photoPlaceholder': 'venue photo',
 };

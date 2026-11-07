@@ -4,80 +4,65 @@ import React from 'react';
 import { RA2_NEEDS } from '@/lib/pilot-data';
 import { needText } from '@/lib/i18n/data';
 import { useT } from '../i18n';
-import { V2BigBtn } from '../ui/Buttons';
 import { V2Shell } from '../ui/Shell';
-import { C2, F2, V2_H1 } from '../ui/palette';
+import { C2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
+import { Button, CheckRow, GUTTER, SPACE, Stepper, TYPE } from '../ds';
+
+// An icon beside every need's words.
+const NEED_ICON = { mobility: 'wheelchair', vision: 'eye', hearing: 'ear', autism: 'bell', cognitive: 'brain', mental: 'leaf', chronic: 'seat' };
 
 // ─────────────────────────────────────────────────────────────
-// SETUP · step 2 — first-person needs
+// SET-UP · step 1 of 2 — "What do you need at a place?" Real checkboxes
+// (screen readers hear "checkbox, checked"), an icon per need, and "Skip
+// for now". From Me → What I need it's this step only.
 // ─────────────────────────────────────────────────────────────
 function V2Setup({ app }) {
   const h = useV2Heading('setup');
   const t = useT();
-  const [needs, setNeeds] = React.useState(new Set(app.user?.needs || []));
+  const first = !app.user?.done;
+  const [needs, setNeeds] = React.useState(() => new Set(app.user?.needs || []));
+  const set = (id, on) => setNeeds(prev => { const n = new Set(prev); if (on) n.add(id); else n.delete(id); return n; });
 
-  function toggle(id) {
-    setNeeds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+  function next() {
+    app.setUser({ ...(app.user || {}), needs: RA2_NEEDS.map(n => n.id).filter(id => needs.has(id)) });
+    if (first) app.goto('setup-name');
+    else { app.goto('me'); app.toast(t('steps.setup.saved')); }
+  }
+  // Skip: straight to Find with no needs (results then show general access).
+  function skip() {
+    app.setUser({ ...(app.user || {}), needs: [], done: true });
+    app.goto('find');
   }
 
   const bar = (
-    <div style={{ padding: '14px 24px calc(var(--ra-tabs-pad) + 8px)', background: C2.paper, borderTop: `1px solid ${C2.hair}`, flexShrink: 0 }}>
-      <V2BigBtn kind="primary" onClick={() => {
-        app.setUser({ ...(app.user || {}), needs: Array.from(needs) });
-        app.goto('setup-name');
-      }}>{t('onboarding.continue')}</V2BigBtn>
+    <div style={{ padding: `${SPACE.sm}px ${GUTTER}px calc(var(--ra-tabs-pad) + 6px)`, background: C2.paper, borderTop: `1px solid ${C2.hair}`, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: SPACE.xs }}>
+      <Button full size="lg" onClick={next}>{t('onboarding.continue')}</Button>
+      {first && <Button full variant="ghost" onClick={skip}>{t('steps.setup.skip')}</Button>}
     </div>
   );
 
   return (
     <V2Shell bar={bar}>
-      <div style={{ padding: '14px 24px 24px' }}>
-        <div style={{ display: 'flex', gap: 5, marginBottom: 24 }} aria-hidden="true">
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.teal }}/>
-          <div style={{ flex: 1, height: 5, borderRadius: 3, background: C2.line }}/>
-        </div>
-        <p className="ra-sr-only">{t('onboarding.step', { step: 2, total: 3 })}</p>
-
-        <h1 ref={h} tabIndex={-1} style={{ ...V2_H1, fontSize: 29, lineHeight: 1.12, marginBottom: 10 }}>
-          {t('onboarding.needs.title')}<span style={{ color: C2.rust }}>{t('onboarding.questionMark')}</span>
+      <div style={{ padding: `${SPACE.sm}px ${GUTTER}px ${SPACE.xl}px` }}>
+        {first && <Stepper step={1} total={2} style={{ marginBottom: SPACE.lg }}/>}
+        <h1 ref={h} tabIndex={-1} style={{ ...TYPE.title1, margin: 0, color: C2.char }}>
+          {first && <span className="ra-sr-only">{t('onboarding.step', { step: 1, total: 2 })}. </span>}
+          {t('onboarding.needs.title')}<span aria-hidden="true" style={{ color: C2.rust }}>{t('onboarding.questionMark')}</span>
         </h1>
-        <p style={{ fontSize: 16.5, color: C2.char, lineHeight: 1.5, margin: '0 0 22px' }}>
-          {t('onboarding.needs.lead')}
-        </p>
+        <p style={{ ...TYPE.body, color: C2.char, margin: `${SPACE.xs}px 0 ${SPACE.md}px` }}>{t('onboarding.needs.lead')}</p>
 
-        {RA2_NEEDS.map(n => {
-          const on = needs.has(n.id);
-          return (
-            <button key={n.id} onClick={() => toggle(n.id)} aria-pressed={on} style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-              minHeight: 68, borderRadius: 16, padding: '10px 16px', marginBottom: 10,
-              border: on ? `2.5px solid ${C2.teal}` : `1.5px solid ${C2.line}`,
-              background: on ? C2.tealSoft : C2.paper,
-              cursor: 'pointer', fontFamily: F2, textAlign: 'left', boxSizing: 'border-box',
-            }}>
-              <span aria-hidden="true" style={{
-                width: 30, height: 30, borderRadius: 999, flexShrink: 0,
-                border: on ? 0 : `2px solid ${C2.line}`,
-                background: on ? C2.teal : 'transparent',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                boxSizing: 'border-box',
-              }}>
-                {on && <svg width="15" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6l5 5L15 1" stroke={C2.paper} strokeWidth="2.5" strokeLinecap="round"/></svg>}
-              </span>
-              <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35, color: C2.char }}>{needText(t, n.id, 'label')}</span>
-            </button>
-          );
-        })}
+        <fieldset style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+          <legend className="ra-sr-only">{t('steps.setup.group')}</legend>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: SPACE.xs }}>
+            {RA2_NEEDS.map(n => (
+              <CheckRow key={n.id} icon={NEED_ICON[n.id]} checked={needs.has(n.id)} onChange={on => set(n.id, on)}
+                label={needText(t, n.id, 'label')}/>
+            ))}
+          </div>
+        </fieldset>
 
-        <p style={{ fontSize: 14, color: C2.slate, lineHeight: 1.5, marginTop: 14, marginBottom: 0 }}>
-          {t('onboarding.needs.privacy')}
-        </p>
+        <p style={{ ...TYPE.footnote, color: C2.slate, margin: `${SPACE.md}px 0 0` }}>{t('onboarding.needs.privacy')}</p>
       </div>
     </V2Shell>
   );

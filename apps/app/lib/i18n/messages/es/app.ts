@@ -81,7 +81,7 @@ const app: Translation<typeof en> = {
   'app.invite.title': "Piloto de Roam Access",
   'app.invite.text': "Ayuda a probar Roam Access: encuentra lugares en Manly que de verdad funcionan para personas con discapacidad.",
   'app.deleteConfirm': "¿Borrar tu cuenta? Se eliminarán del piloto tus necesidades, reseñas y lugares guardados. No se puede deshacer.",
-  'app.dictate.start': "¿Prefieres hablar? Dicta en su lugar",
+  'app.dictate.start': "Dilo en vez de escribir",
   'app.dictate.listening': "Escuchando… toca para parar",
   'app.photoPlaceholder': "foto del lugar",
 };

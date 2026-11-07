@@ -1,0 +1,37 @@
+// English (Australia) — 'steps' namespace. The review in three steps, the ally form, and set-up in two steps.
+// Plain, first-person, short sentences; en-AU spelling. See lib/i18n/README.md.
+const steps = {
+  'steps.back': "Back",
+  'steps.backStep': "Back a step",
+  'steps.backTo': "Back to {name}",
+  'steps.announce': "Step {step} of {total}. {title}",
+  'steps.shownAs': "Shown as:",
+  'steps.change': "Change",
+  'steps.changeAria': "Change how I appear on reviews",
+  'steps.v.lead': "One tap is enough. The rest is optional.",
+  'steps.v.leadCarer': "Tell us how it went for the person you were with. One tap is enough.",
+  'steps.v.group': "How was it?",
+  'steps.v.hint': "Pick one of the three to send.",
+  'steps.send': "Send",
+  'steps.more': { one: "Add a bit more ({count} question)", other: "Add a bit more ({count} questions)" },
+  'steps.q.title': { one: "One quick question", other: "{count} quick questions" },
+  'steps.q.lead': "For people who need what you need. Skip any you’re not sure about.",
+  'steps.q.leadCarer': "About the needs of the person you were with. Skip any you’re not sure about.",
+  'steps.q.notSure': "Not sure",
+  'steps.q.map': "Show where it is on a map (optional)",
+  'steps.q.toExtras': "Add a photo or a note",
+  'steps.x.title': "Anything else?",
+  'steps.x.lead': "All optional. A photo of the door or the toilet helps most.",
+  'steps.x.addMore': "Want to add more?",
+  'steps.x.sensory': "Noise and crowds",
+  'steps.ally.lead': "Answer only what you saw yourself. Skip the rest.",
+  'steps.ally.banner': "You’re writing as an ally. What you share is shown as “Observed by an ally”. It never changes whether a place works for someone.",
+  'steps.ally.more': { one: "One more question", other: "{count} more questions" },
+  'steps.ally.extras': "Anything else? (optional)",
+  'steps.ally.sent': "Shown as “Observed by an ally”.",
+  'steps.setup.skip': "Skip for now",
+  'steps.setup.saved': "Your needs are saved.",
+  'steps.setup.group': "My needs",
+};
+
+export default steps;

@@ -16,7 +16,7 @@ import {
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
   SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea, ChoiceGroup, CheckRow,
-  TabBar, TileButton,
+  TabBar, TileButton, Disclosure, VerdictCard, YesNoNotSure, Stepper,
 } from './index';
 import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
@@ -122,6 +122,9 @@ export function DsPreview() {
   const [toggled, setToggled] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [tabAt, setTabAt] = React.useState('find');
+  const [yn, setYn] = React.useState(undefined);
+  const [discOpen, setDiscOpen] = React.useState(false);
+  const [needOn, setNeedOn] = React.useState(true);
 
   const pairs = [
     ['Body text', C2.char, C2.paper], ['Secondary text', C2.slate, C2.paper], ['Secondary on stone', C2.slate, C2.stone],
@@ -443,6 +446,27 @@ export function DsPreview() {
             <TileButton icon="tree" label="Parks & beaches" onClick={() => {}}/>
             <TileButton icon="palette" label="Arts & culture" onClick={() => {}}/>
             <TileButton icon="toilet" label="Toilets" onClick={() => {}}/>
+          </div>
+        </Section>
+
+        <Section id="verdictcard" title="VerdictCard" note="The top of a place: the big pill, ONE bold sentence, one source line with the date, then the screen’s own buttons (Read aloud, How we decide, “Still right?”). A section named by a hidden h2. It never decides a verdict — the caller passes the one ra2Verdict gave.">
+          <div style={{ maxWidth: 390, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <VerdictCard kind="works" heading="Does it work for you? (sample)" headingId="ds-vc-1" sentence="People with needs like yours say it worked." source="From 3 community reviews. Last checked 2 November 2026."/>
+            <VerdictCard kind="unknown" heading="Does it work for you? (sample 2)" headingId="ds-vc-2" sentence="Nobody with your needs has reviewed this place yet." source="From OpenStreetMap only. Not checked by anyone yet."/>
+          </div>
+        </Section>
+
+        <Section id="disclosure" title="Disclosure" note="More detail, one tap deeper, the same way every time: a native details/summary (announced collapsed/expanded), a 60px summary with an icon and a chevron (it doesn’t turn when motion is reduced). The body mounts only while open; emptyText shows when it renders nothing.">
+          <div style={{ maxWidth: 390 }}>
+            <Disclosure icon="photo" title="Photos" open={discOpen} onToggle={setDiscOpen} emptyText="Nothing here yet."><></></Disclosure>
+          </div>
+        </Section>
+
+        <Section id="yesno" title="YesNoNotSure · Stepper · CheckRow with icon" note="Review questions: three 52px buttons in a group named by the question; “Not sure” is a visible answer (no tap-again gesture). Stepper: one 8px segment per step (decorative — pair it with “Step n of m”). CheckRow with an icon: set-up’s needs, a real checkbox in a 72px row.">
+          <div style={{ maxWidth: 390 }}>
+            <Stepper step={2} total={3}/>
+            <YesNoNotSure id="ds-yn" question="Was there a step-free way in?" value={yn} onChange={setYn}/>
+            <CheckRow icon="wheelchair" checked={needOn} onChange={setNeedOn} label="I use a wheelchair or a walking aid"/>
           </div>
         </Section>
 

@@ -107,7 +107,7 @@ const explore = {
   'explore.saved.tipInstall': 'Install the app',
   'explore.saved.list': 'Saved places',
   'explore.saved.emptyTitle': 'Nothing saved yet',
-  'explore.saved.emptyBody': 'Save places that work for you and they’ll wait here, with the latest from people in the pilot.',
+  'explore.saved.emptyBody': 'Save a place from its page. It waits here.',
   'explore.saved.explore': 'Explore places',
   'explore.saved.footer': 'Saved places are stored with your account, on every device.',
 };

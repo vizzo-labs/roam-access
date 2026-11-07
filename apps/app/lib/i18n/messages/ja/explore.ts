@@ -96,7 +96,7 @@ const explore: Translation<typeof en> = {
   'explore.saved.tipInstall': "アプリをインストール",
   'explore.saved.list': "保存した場所",
   'explore.saved.emptyTitle': "まだ何も保存していません",
-  'explore.saved.emptyBody': "自分に合う場所を保存すると、パイロット参加者の最新情報と一緒にここに残ります。",
+  'explore.saved.emptyBody': "場所のページで保存すると、ここに表示されます。",
   'explore.saved.explore': "場所をさがす",
   'explore.saved.footer': "保存した場所はアカウントに保存され、どの端末でも見られます。",
 };

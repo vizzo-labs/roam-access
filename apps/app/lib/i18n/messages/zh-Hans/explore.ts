@@ -96,7 +96,7 @@ const explore: Translation<typeof en> = {
   'explore.saved.tipInstall': "安装应用",
   'explore.saved.list': "已保存的地点",
   'explore.saved.emptyTitle': "还没有保存任何地点",
-  'explore.saved.emptyBody': "保存适合你的地点，它们会在这里等你，并附上试点参与者的最新评价。",
+  'explore.saved.emptyBody': "在地点页面保存一个地点，它会在这里等你。",
   'explore.saved.explore': "探索地点",
   'explore.saved.footer': "已保存的地点存在你的账户里，所有设备都能看到。",
 };
