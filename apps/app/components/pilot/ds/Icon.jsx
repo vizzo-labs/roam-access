@@ -48,7 +48,27 @@ const PATHS = {
   speaker:  ['M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5Z', 'M15.5 9a4 4 0 0 1 0 6', 'M18 6.5a7.5 7.5 0 0 1 0 11'],
   stop:     ['M7 7h10v10H7z'],
   language: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'M3.5 9h17', 'M3.5 15h17', 'M12 3c-2.4 2.6-3.6 5.6-3.6 9s1.2 6.4 3.6 9', 'M12 3c2.4 2.6 3.6 5.6 3.6 9s-1.2 6.4-3.6 9'],
+  // Needs (set-up, "What I need") — an icon beside every need's words.
+  wheelchair: ['M11.5 5.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z', 'M11.5 7.5V13h5.2l2.6 5.8', 'M11.5 10h4.5', 'M8.4 10.2a5.6 5.6 0 1 0 7.8 7.4'],
+  eye:      ['M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'],
+  ear:      ['M7 9a5 5 0 0 1 10 0c0 3-2.5 4-3 6.5S12.5 20.5 10.5 20.5A2.5 2.5 0 0 1 8 18', 'M10 9.5a2 2 0 0 1 4 0c0 1.2-1 1.8-1.5 2.5'],
+  bell:     ['M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15L6 16.5Z', 'M10 20.5a2 2 0 0 0 4 0'],
+  brain:    ['M12 5.5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 2 4.8 3 3 0 0 0 5 1.7Z', 'M12 5.5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-2 4.8 3 3 0 0 1-5 1.7Z', 'M12 5.5v13'],
+  leaf:     ['M5 19c0-8 5-13.5 14-14 .5 9-5 14-13 14Z', 'M5 19c3-4 6-6.5 9.5-8.5'],
+  seat:     ['M7 3.5v17', 'M7 12.5h10v8', 'M7 16.5h10'],
+  // Places and getting there
+  door:     ['M6 20.5V4.5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v16', 'M3.5 20.5h17', 'M14.5 12.5h.1'],
+  parking:  ['M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z', 'M9.5 17V7h3.5a3 3 0 0 1 0 6H9.5'],
+  bus:      ['M6 3h12a2 2 0 0 1 2 2v12H4V5a2 2 0 0 1 2-2Z', 'M4 11h16', 'M8 20v-3', 'M16 20v-3', 'M8 14h.1', 'M16 14h.1'],
+  toilet:   ['M6 3h5v7H6z', 'M4 10h15v1.5A6.5 6.5 0 0 1 12.5 18h-2A6.5 6.5 0 0 1 4 11.5V10Z', 'M9 18l-1 3h7l-1-3'],
+  photo:    ['M5.5 4.5h13A1.5 1.5 0 0 1 20 6v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5Z', 'm4.5 16 4.5-4.5 4 4 2.5-2.5 4 4', 'M15.5 9.5h.1'],
+  food:     ['M7 3v7a2.5 2.5 0 0 0 5 0V3', 'M9.5 3v18', 'M17 3c-1.5 1-2.5 3-2.5 6v3h3v9'],
+  tree:     ['M12 3 6 12h4l-4 7h12l-4-7h4L12 3Z', 'M12 19v2'],
+  palette:  ['M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.3-1.2-1.6-1.2-2.8 0-.9.7-1.5 1.7-1.5H17a3.5 3.5 0 0 0 3.5-3.5c0-4.1-3.8-7.5-8.5-7.5Z', 'M7.6 12h.1', 'M9.5 8h.1', 'M14.5 8h.1'],
 };
+
+// Icons whose `h.1` paths are dots: drawn thicker so they read as dots.
+const DOTTED = new Set(['more', 'list', 'door', 'bus', 'photo', 'palette']);
 
 const ICON_NAMES = Object.keys(PATHS);
 
@@ -59,7 +79,7 @@ const FILLED = new Set(['bookmark', 'star']);
 function Icon({ name, size = 20, strokeWidth = 2, filled = false, color = 'currentColor', style }) {
   const d = PATHS[name];
   if (!d) return null;
-  const dots = name === 'more' || name === 'list';
+  const dots = DOTTED.has(name);
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"
       style={{ flexShrink: 0, display: 'block', ...style }}>

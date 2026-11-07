@@ -16,6 +16,7 @@ import {
   Badge, SourceBadge, Freshness, List, ListRow, SectionHeader,
   Skeleton, SkeletonList, SkeletonCard, EmptyState, Banner, ActionRow,
   SegmentedControl, Tabs, TabPanel, Sheet, SnapSheet, PhotoGrid, PhotoViewer, ScreenHeader, SearchField, TextArea, ChoiceGroup, CheckRow,
+  TabBar,
 } from './index';
 import { PlacePreviewSamples } from '../explore/PlacePreviewSamples';
 
@@ -102,7 +103,8 @@ export function DsPreview() {
     force();
   }, [contrast]);
   React.useEffect(() => { document.documentElement.dataset.raMotion = motion ? 'reduce' : ''; }, [motion]);
-  React.useEffect(() => () => { RA2SetContrast(false); delete document.documentElement.dataset.raContrast; delete document.documentElement.dataset.raMotion; }, []);
+  React.useEffect(() => { document.documentElement.dataset.raScale = scale === '2' ? 'max' : ''; }, [scale]);
+  React.useEffect(() => () => { RA2SetContrast(false); delete document.documentElement.dataset.raContrast; delete document.documentElement.dataset.raMotion; delete document.documentElement.dataset.raScale; }, []);
 
   // Demo state
   const [chips, setChips] = React.useState({ works: true, food: false, quiet: false, toilet: false });
@@ -119,6 +121,7 @@ export function DsPreview() {
   const closePhoto = React.useCallback(() => setPhotoAt(null), []);
   const [toggled, setToggled] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
+  const [tabAt, setTabAt] = React.useState('find');
 
   const pairs = [
     ['Body text', C2.char, C2.paper], ['Secondary text', C2.slate, C2.paper], ['Secondary on stone', C2.slate, C2.stone],
@@ -174,7 +177,7 @@ export function DsPreview() {
           </div>
         </Section>
 
-        <Section id="tokens" title="Tokens" note="Type scale (nothing under 13px; inputs 16px), 4-based spacing, radii, elevation (becomes a 2px border in high contrast), motion durations (0 when motion is reduced), target sizes.">
+        <Section id="tokens" title="Tokens" note="Type scale (body 17px; nothing under 13px; inputs 16px; text size goes to 200 %), 4-based spacing, radii, elevation (becomes a 2px border in high contrast), motion durations (0 when motion is reduced), target sizes.">
           <Label>Type</Label>
           {Object.entries(TYPE).filter(([k]) => k !== 'input').map(([k, t]) => (
             <div key={k} style={{ display: 'flex', alignItems: 'baseline', gap: 16, padding: '6px 0' }}>
@@ -212,7 +215,7 @@ export function DsPreview() {
           </Row>
         </Section>
 
-        <Section id="button" title="Button" note="A link when it navigates (href), a button when it acts. External links say “opens in a new tab” to screen readers. Sizes: sm 44 · md 52 · lg 60px.">
+        <Section id="button" title="Button" note="A link when it navigates (href), a button when it acts. External links say “opens in a new tab” to screen readers. Sizes: sm 44 · md 52 · lg 60px. Long labels wrap to a second line instead of clipping (try 200 %).">
           {['primary', 'secondary', 'outline', 'ghost', 'plain', 'danger', 'rust'].map(v => (
             <Row key={v}>
               <span style={{ fontFamily: M2, fontSize: 13, width: 90, color: C2.slate }}>{v}</span>
@@ -225,6 +228,7 @@ export function DsPreview() {
           <Row>
             <Button variant="outline" href="https://www.openstreetmap.org" external icon="external">OpenStreetMap (link)</Button>
             <div style={{ width: 320 }}><Button full size="lg">Full width</Button></div>
+            <div style={{ width: 220 }}><Button full icon="edit">Tell us how it was at this place</Button></div>
           </Row>
         </Section>
 
@@ -423,6 +427,19 @@ export function DsPreview() {
               </TabPanel>
             ))}
           </div>
+        </Section>
+
+        <Section id="tabbar" title="TabBar" note="The phone’s main navigation: Find · Saved · Me. Each tab is a ≥ 64px button with an icon and a 14px word; the current one has aria-current=“page”, a bar above it, a heavier icon and bolder words (never colour alone). A count draws a pip on the icon; screen readers hear it after the label (“Saved, 2 new updates”).">
+          <div style={{ maxWidth: 390, border: `1px solid ${C2.hair}`, borderRadius: RADIUS.md, overflow: 'hidden', ['--ra-tabs-pad']: '12px' }}>
+            <TabBar label="Main (sample)" active={tabAt} onSelect={setTabAt}
+              items={[{ id: 'find', label: 'Find', icon: 'search' }, { id: 'saved', label: 'Saved', icon: 'bookmark', count: 2, countSr: '2 new updates' }, { id: 'me', label: 'Me', icon: 'user' }]}/>
+          </div>
+        </Section>
+
+        <Section id="verdict" title="Verdict (ui/Verdict)" note="THE core pattern: glyph + colour + words. The pill wraps its words at large text sizes (never “Works for y…”); the glyph is 24px (32px big).">
+          <Row>{['works', 'check', 'barrier', 'unknown'].map(k => <V2Verdict key={k} kind={k}/>)}</Row>
+          <Row>{['works', 'check', 'barrier', 'unknown'].map(k => <V2Verdict key={'big-' + k} kind={k} big/>)}</Row>
+          <div style={{ width: 150 }}><V2Verdict kind="works" big/></div>
         </Section>
 
         <Section id="header" title="ScreenHeader · SearchField" note="ScreenHeader: Back always top-left (48px, “Back to …”), optional actions top-right, then the screen’s one h1. SearchField: a real search form — Back, Clear, mic, and a Search button once the text changed; Enter submits; the whole pill shows focus.">

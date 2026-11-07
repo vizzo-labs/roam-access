@@ -6,9 +6,11 @@ import { C2, F2 } from '../ui/palette';
 import { Icon } from './Icon';
 import { GUTTER, RADIUS, TARGET, tone as toneOf, transition } from './tokens';
 
+// Chips wrap their words inside the pill rather than clipping at large text
+// sizes (maxWidth 100 %); a short label stays on one line.
 const chipBase = {
-  display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, boxSizing: 'border-box',
-  borderRadius: RADIUS.pill, fontFamily: F2, fontWeight: 600, whiteSpace: 'nowrap', lineHeight: 1.2,
+  display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, boxSizing: 'border-box', maxWidth: '100%',
+  borderRadius: RADIUS.pill, fontFamily: F2, fontWeight: 600, whiteSpace: 'normal', lineHeight: 1.2, textAlign: 'left',
 };
 
 // Chip — a static label (a need, a tag). Not operable.
@@ -34,7 +36,7 @@ function FilterChip({ children, selected = false, onChange, icon, count, disable
     <button type="button" className="ds-press" aria-pressed={selected} disabled={disabled}
       onClick={() => onChange && onChange(!selected)}
       style={{
-        ...chipBase, minHeight: TARGET.min, padding: selected ? '0 16px 0 12px' : '0 16px', fontSize: 15,
+        ...chipBase, minHeight: TARGET.min, padding: selected ? '6px 16px 6px 12px' : '6px 16px', fontSize: 15,
         cursor: disabled ? 'not-allowed' : 'pointer',
         background: selected ? C2.teal : C2.paper, color: selected ? C2.paper : C2.char,
         border: `1.5px solid ${selected ? C2.teal : C2.line}`,
@@ -45,7 +47,7 @@ function FilterChip({ children, selected = false, onChange, icon, count, disable
       <span>{children}</span>
       {typeof count === 'number' && (
         <span style={{
-          minWidth: 22, padding: '1px 7px', borderRadius: RADIUS.pill, fontSize: 13, fontWeight: 700, textAlign: 'center',
+          minWidth: 22, padding: '1px 7px', flexShrink: 0, borderRadius: RADIUS.pill, fontSize: 13, fontWeight: 700, textAlign: 'center',
           background: selected ? 'rgba(250,249,246,0.18)' : C2.stone, color: selected ? C2.paper : C2.char,
         }}><span className="ra-sr-only">, </span>{count}</span>
       )}
@@ -60,7 +62,7 @@ function RemovableChip({ children, onRemove, removeLabel, style }) {
     <button type="button" className="ds-press" onClick={onRemove}
       aria-label={removeLabel || (typeof children === 'string' ? t('ds.removeFilter', { name: children }) : undefined)}
       style={{
-        ...chipBase, minHeight: TARGET.min, padding: '0 10px 0 16px', fontSize: 15, cursor: 'pointer',
+        ...chipBase, minHeight: TARGET.min, padding: '6px 10px 6px 16px', fontSize: 15, cursor: 'pointer',
         background: C2.tealSoft, color: C2.teal, border: `1.5px solid ${C2.teal}`, ...style,
       }}>
       <span>{children}</span>

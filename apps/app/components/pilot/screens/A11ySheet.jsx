@@ -16,9 +16,9 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
   const scaleRefs = React.useRef([]);
   const SCALES = [
     { v: 1, label: t('me.a11y.scale.default') },
-    { v: 1.125, label: t('me.a11y.scale.large') },
-    { v: 1.25, label: t('me.a11y.scale.larger') },
-    { v: 1.5, label: t('me.a11y.scale.largest') },
+    { v: 1.25, label: t('me.a11y.scale.large') },
+    { v: 1.5, label: t('me.a11y.scale.larger') },
+    { v: 2, label: t('me.a11y.scale.largest') },
   ];
   if (!open) return null;
 
@@ -33,8 +33,9 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
     if (el) el.focus();
   }
 
+  // Rows wrap at large text sizes: the control drops under its label.
   const row = {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+    display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12,
     paddingTop: 14, marginTop: 12, borderTop: `1px solid ${C2.hair}`,
   };
 
@@ -63,12 +64,12 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
         </p>
 
         <div style={row}>
-          <div>
+          <div style={{ flex: '1 1 9em', minWidth: 0 }}>
             <div id="a11y-scale-label" style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.textSize')}</div>
             <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.textSize.hint')}</div>
           </div>
           <div role="radiogroup" aria-labelledby="a11y-scale-label" style={{
-            display: 'inline-flex', border: `1px solid ${C2.line}`, borderRadius: 999, padding: 2, gap: 2, flexShrink: 0,
+            display: 'inline-flex', flexWrap: 'wrap', maxWidth: '100%', border: `1px solid ${C2.line}`, borderRadius: 24, padding: 2, gap: 2, flexShrink: 0,
           }}>
             {SCALES.map((s, i) => {
               const on = prefs.scale === s.v;
@@ -80,7 +81,7 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
                   onClick={() => onChange({ scale: s.v })}
                   style={{
                     minWidth: 44, minHeight: 44, padding: '0 6px',
-                    fontSize: 11 + (s.v - 1) * 8, fontWeight: 600, borderRadius: 999, cursor: 'pointer',
+                    fontSize: 12 + (s.v - 1) * 7, fontWeight: 600, borderRadius: 999, cursor: 'pointer',
                     background: on ? C2.char : 'transparent',
                     color: on ? C2.paper : C2.char, border: 0, fontFamily: F2,
                   }}><span aria-hidden="true">A</span></button>
@@ -90,7 +91,7 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
         </div>
 
         <div style={row}>
-          <div>
+          <div style={{ flex: '1 1 9em', minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.contrast')}</div>
             <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.contrast.hint')}</div>
           </div>
@@ -98,7 +99,7 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
         </div>
 
         <div style={row}>
-          <div>
+          <div style={{ flex: '1 1 9em', minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.motion')}</div>
             <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2 }}>{t('me.a11y.motion.hint')}</div>
           </div>
@@ -111,7 +112,7 @@ function V2A11ySheet({ open, onClose, prefs, onChange }) {
         </div>
 
         <div style={row}>
-          <div>
+          <div style={{ flex: '1 1 9em', minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 600, fontFamily: F2 }}>{t('me.a11y.voice')}</div>
             <div style={{ fontSize: 13, color: C2.slate, fontFamily: F2, maxWidth: 220 }}>
               {t('me.a11y.voice.hint')}

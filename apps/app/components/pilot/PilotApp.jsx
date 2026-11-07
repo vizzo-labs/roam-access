@@ -51,7 +51,10 @@ const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'hom
 const DARK_VIEWS = ['voice', 'thanks'];
 // Screens that render one venue: an id that isn't in the data is not a route.
 const VENUE_VIEWS = ['venue', 'reviews', 'review', 'thanks'];
-const SCALE_VALUES = [1, 1.125, 1.25, 1.5]; // must match SCALES in V2A11ySheet
+// Text size: up to 200 % (ds SCALE_MAX). Must match SCALES in V2A11ySheet.
+const SCALE_VALUES = [1, 1.25, 1.5, 2];
+// Sizes from before 200 % existed move to the nearest size still offered.
+const OLD_SCALES = { 1.125: 1.25 };
 
 const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
 function readJSON(key) {
@@ -68,7 +71,7 @@ function initialPrefs() {
   const s = isObj(saved) ? saved : {};
   const mq = q => typeof window.matchMedia === 'function' && window.matchMedia(q).matches;
   return {
-    scale: SCALE_VALUES.includes(s.scale) ? s.scale : 1,
+    scale: SCALE_VALUES.includes(s.scale) ? s.scale : OLD_SCALES[s.scale] || 1,
     contrast: typeof s.contrast === 'boolean' ? s.contrast : mq('(prefers-contrast: more)'),
     motion: typeof s.motion === 'boolean' ? s.motion : mq('(prefers-reduced-motion: reduce)'),
   };
@@ -263,6 +266,7 @@ function PilotScreens({ initial, userId }) {
     setPrefs(next);
     const el = document.documentElement;
     el.style.setProperty('--ra-scale', String(next.scale));
+    el.dataset.raScale = next.scale >= 2 ? 'max' : ''; // ds.css: tighter buttons at 200 %
     el.dataset.raContrast = next.contrast ? 'high' : '';
     el.dataset.raMotion = next.motion ? 'reduce' : '';
     RA2SetContrast(next.contrast);

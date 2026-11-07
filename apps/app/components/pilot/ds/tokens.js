@@ -13,18 +13,19 @@ import { C2, C2_HIGH, F2, M2, RA2_INPUT_FONT } from '../ui/palette';
 import './ds.css';
 
 // ── Type scale ────────────────────────────────────────────────────────────
-// px values; the in-app text size setting scales everything via CSS zoom.
-// Nothing smaller than 13px; inputs are 16px (RA2_INPUT_FONT) so iOS won't zoom.
+// px values; the in-app text size setting scales everything via CSS zoom
+// (up to SCALE_MAX = 200 %). Body text is 17px; nothing smaller than 13px;
+// inputs are 16px (RA2_INPUT_FONT) so iOS won't zoom.
 const TYPE = {
-  display:  { fontFamily: F2, fontSize: 34, lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.03em' },
+  display:  { fontFamily: F2, fontSize: 30, lineHeight: 1.1, fontWeight: 700, letterSpacing: '-0.025em' },
   title1:   { fontFamily: F2, fontSize: 28, lineHeight: 1.12, fontWeight: 700, letterSpacing: '-0.025em' },
   title2:   { fontFamily: F2, fontSize: 22, lineHeight: 1.2,  fontWeight: 700, letterSpacing: '-0.02em' },
   title3:   { fontFamily: F2, fontSize: 18, lineHeight: 1.3,  fontWeight: 700, letterSpacing: '-0.015em' },
   headline: { fontFamily: F2, fontSize: 16.5, lineHeight: 1.35, fontWeight: 700, letterSpacing: '-0.01em' },
-  body:     { fontFamily: F2, fontSize: 16, lineHeight: 1.5,  fontWeight: 400 },
+  body:     { fontFamily: F2, fontSize: 17, lineHeight: 1.5,  fontWeight: 400 },
   callout:  { fontFamily: F2, fontSize: 15, lineHeight: 1.45, fontWeight: 400 },
-  footnote: { fontFamily: F2, fontSize: 14, lineHeight: 1.4,  fontWeight: 400 },
-  caption:  { fontFamily: F2, fontSize: 13, lineHeight: 1.35, fontWeight: 600 },
+  footnote: { fontFamily: F2, fontSize: 15, lineHeight: 1.45, fontWeight: 400 },
+  caption:  { fontFamily: F2, fontSize: 14, lineHeight: 1.4,  fontWeight: 600 },
   label:    { fontFamily: F2, fontSize: 15, lineHeight: 1.2,  fontWeight: 600 },
   overline: { fontFamily: M2, fontSize: 11.5, lineHeight: 1.3, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase' },
   input:    { fontFamily: F2, fontSize: RA2_INPUT_FONT, lineHeight: 1.4 },
@@ -38,7 +39,13 @@ const GUTTER = 22; // side padding of every phone screen
 const RADIUS = { sm: 10, md: 14, lg: 18, xl: 24, pill: 999 };
 
 // ── Target sizes (WCAG 2.5.8 needs 24; we hold ourselves to 44+) ─────────
-const TARGET = { min: 44, std: 48, lg: 56, xl: 60 };
+// `row`: a list row or a tab (the whole row is one target).
+const TARGET = { min: 44, std: 48, lg: 56, xl: 60, row: 64 };
+
+// ── Text size ─────────────────────────────────────────────────────────────
+// The in-app text size goes up to 200 %; every screen must work there
+// (wrapping, never clipping). PilotApp's SCALE_VALUES end at SCALE_MAX.
+const SCALE_MAX = 2;
 
 // ── Colour helpers (read C2 at call time) ────────────────────────────────
 const isHighContrast = () => C2.line === C2_HIGH.line;
@@ -126,7 +133,7 @@ function contrastRatio(a, b) {
 }
 
 export {
-  TYPE, SPACE, GUTTER, RADIUS, TARGET,
+  TYPE, SPACE, GUTTER, RADIUS, TARGET, SCALE_MAX,
   tone, TONES, elevation, edge, divider, isHighContrast,
   DURATION, EASE, dur, transition, prefersReducedMotion, useReducedMotion, scrollIntoViewSafe,
   luminance, contrastRatio,

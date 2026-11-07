@@ -6,7 +6,7 @@ const app = {
   // Screen titles (document title + the screen-change announcement)
   'app.view.setup': 'Set your needs',
   'app.view.setup-name': 'Your name',
-  'app.view.home': 'Home',
+  'app.view.home': 'Find a place',
   'app.view.voice': 'Voice search',
   'app.view.results': 'Search results',
   'app.view.map': 'Map',
@@ -25,8 +25,7 @@ const app = {
   'app.docTitle': '{title} · Roam Access pilot',
 
   'app.nav.primary': 'Primary',
-  'app.nav.home': 'Home',
-  'app.nav.explore': 'Explore',
+  'app.nav.find': 'Find',
   'app.nav.saved': 'Saved',
   'app.nav.me': 'Me',
 
