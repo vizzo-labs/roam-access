@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Set up · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+<style>.step[hidden]{display:none}</style>
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top"><span class="logo" aria-hidden="true">roam <span>/</span> access</span><span class="sr-only">Roam Access</span></header>
+<main id="main" tabindex="-1">
+  <div class="progress" aria-hidden="true"><span class="on" id="p1"></span><span id="p2"></span></div>
+  <p class="sr-only" id="stepnum">Step 1 of 2</p>
+
+  <!-- STEP 1: needs. Real checkboxes, an icon with every label, Skip visible. -->
+  <form class="step" id="s1" aria-labelledby="h1a">
+    <h1 id="h1a" tabindex="-1">What do you need at a place?</h1>
+    <p class="lead">Tick all that apply. You can change this any time.</p>
+    <fieldset style="border:0;padding:0;margin:0"><legend class="sr-only">Your needs</legend>
+      <label class="choice"><input type="checkbox" name="n" value="mobility"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-wheelchair"/></svg><span class="label">I use a wheelchair or a walking aid</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="vision"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-eye"/></svg><span class="label">I'm blind or I don't see well</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="hearing"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-ear"/></svg><span class="label">I'm deaf or I don't hear well</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="autism"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-bell"/></svg><span class="label">Noise, light or crowds are hard for me</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="cognitive"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-brain"/></svg><span class="label">I need places that are easy to understand</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="mental"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-leaf"/></svg><span class="label">I need calm, low-stress places</span></label>
+      <label class="choice"><input type="checkbox" name="n" value="chronic"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><svg class="icon pic" aria-hidden="true"><use href="#i-seat"/></svg><span class="label">I need seats and places to rest</span></label>
+    </fieldset>
+    <p class="hint">Kept private. Reviews show your lived experience (like “Wheelchair user”) only if you say so on the next step.</p>
+    <button type="button" class="btn primary" id="next" style="margin-top:12px">Continue</button>
+    <a class="btn ghost" href="find.html">Skip for now</a>
+  </form>
+
+  <!-- STEP 2: how I appear (names, relationship, anonymity) -->
+  <form class="step" id="s2" hidden aria-labelledby="h1b">
+    <h1 id="h1b" tabindex="-1">How you'll appear on reviews</h1>
+    <p class="lead">Readers see who wrote a review. You choose what they see.</p>
+    <label class="lbl" for="name">Name on your reviews <span class="opt">(optional)</span></label>
+    <input class="text" id="name" placeholder="e.g. Sam K." autocomplete="nickname">
+    <p class="hint">A first name and last initial is fine. Or a nickname.</p>
+    <label class="choice" style="margin-top:12px"><input type="checkbox" name="anon"><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><span class="label">Post without a name<span class="hint">Reviews show “Roam Access member”.</span></span></label>
+
+    <fieldset style="border:0;padding:0;margin:12px 0 0"><legend class="lbl" style="margin-top:0">Which describes you?</legend>
+      <label class="radio"><input type="radio" name="rel" value="lived" checked> <span>I have a disability or access need<span class="hint" style="display:block;font-weight:400">Shown as “Lived experience”</span></span></label>
+      <label class="radio"><input type="radio" name="rel" value="carer"> <span>I'm a carer, family member or support worker<span class="hint" style="display:block;font-weight:400">Shown as “Carer”. You review for the person you were with.</span></span></label>
+      <label class="radio"><input type="radio" name="rel" value="ally"> <span>I want to help (ally)<span class="hint" style="display:block;font-weight:400">You share what you noticed. It never changes a verdict.</span></span></label>
+      <label class="radio"><input type="radio" name="rel" value="unsaid"> <span>Prefer not to say</span></label>
+    </fieldset>
+    <label class="choice" style="margin-top:12px"><input type="checkbox" name="needs" checked><span class="box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><span class="label">Show my needs on my reviews<span class="hint">Like “Wheelchair user”. Reviews are public. You can turn this off any time.</span></span></label>
+    <p class="card filled small" style="margin-top:12px" aria-live="polite">Your reviews will show: <strong id="preview">Sam K. · Lived experience · Wheelchair user</strong></p>
+    <a class="btn primary" href="find.html" style="margin-top:8px">Finish</a>
+  </form>
+</main>
+<script src="mock.js"></script>
+<script>
+  function go(n){ document.getElementById('s1').hidden = n !== 0; document.getElementById('s2').hidden = n !== 1; document.getElementById('p2').classList.toggle('on', n === 1); document.getElementById('stepnum').textContent = `Step ${n+1} of 2`; const h = document.querySelector(n ? '#h1b' : '#h1a'); h.focus(); raSay(`Step ${n+1} of 2. ${h.textContent}`); }
+  document.getElementById('next').onclick = () => go(1);
+  if (location.hash === '#step2') go(1);
+  const prev = document.getElementById('preview');
+  function update(){ const name = document.getElementById('name').value.trim() || 'Sam K.'; const anon = document.querySelector('[name=anon]').checked; const rel = document.querySelector('[name=rel]:checked').value; const needs = document.querySelector('[name=needs]').checked;
+    const relText = { lived: 'Lived experience', carer: 'Carer', ally: 'Ally', unsaid: '' }[rel];
+    prev.textContent = [anon ? 'Roam Access member' : name, relText, needs && rel !== 'ally' ? 'Wheelchair user' : ''].filter(Boolean).join(' · '); }
+  document.querySelectorAll('#s2 input').forEach(i => i.addEventListener('input', update));
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Review as an ally · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top">
+  <a class="back" href="place.html"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back</a>
+</header>
+<main id="main" tabindex="-1">
+  <p class="muted small" style="margin:4px 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">Shown as: <strong>Jo · Ally</strong> <a class="btn ghost sm" href="me.html" style="padding:0 6px">Change</a></p>
+  <h1 tabindex="-1">What did you notice at Hugos?</h1>
+  <div class="banner info" role="note">
+    <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+    <div>You're writing as an ally. What you share is shown as <strong style="display:inline">“Observed by an ally”</strong>. It never changes whether a place works for someone.</div>
+  </div>
+  <p class="lead">Answer only what you saw yourself. Skip the rest.</p>
+
+  <div class="q" role="group" aria-labelledby="q1"><span class="qt" id="q1">Step-free way in?</span>
+    <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1">Not sure</button></div></div>
+  <div class="q" role="group" aria-labelledby="q2"><span class="qt" id="q2">Accessible toilet?</span>
+    <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">Not sure</button></div></div>
+  <div class="q" role="group" aria-labelledby="q3"><span class="qt" id="q3">Seats and places to rest?</span>
+    <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">Not sure</button></div></div>
+  <div class="q" role="group" aria-labelledby="q4"><span class="qt" id="q4">Quiet enough to talk?</span>
+    <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q4">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q4">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q4">Not sure</button></div></div>
+  <div class="q" role="group" aria-labelledby="q5"><span class="qt" id="q5">Easy to find your way around?</span>
+    <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q5">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q5">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q5">Not sure</button></div></div>
+  <details style="margin-top:8px"><summary>Three more questions<svg class="icon chev" aria-hidden="true"><use href="#i-down"/></svg></summary>
+    <div class="inner">
+      <div class="q" role="group" aria-labelledby="q6"><span class="qt" id="q6">Calm, not hectic?</span>
+        <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q6">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q6">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q6">Not sure</button></div></div>
+      <div class="q" role="group" aria-labelledby="q7"><span class="qt" id="q7">Help for people who are deaf or hard of hearing?</span>
+        <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q7">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q7">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q7">Not sure</button></div></div>
+      <div class="q" role="group" aria-labelledby="q8"><span class="qt" id="q8">Good light and large print for low vision?</span>
+        <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q8">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q8">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q8">Not sure</button></div></div>
+    </div></details>
+
+  <h2>Anything else? <span class="muted" style="font-weight:400">(optional)</span></h2>
+  <button type="button" class="btn outline"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg>Add a photo</button>
+  <label class="lbl" for="note">A few words</label>
+  <textarea id="note" placeholder="e.g. There's a ramp at the back. Staff were helpful."></textarea>
+  <button type="button" class="btn outline" style="margin-top:8px"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>Say it instead of typing</button>
+
+  <button type="button" class="btn primary" id="send" disabled aria-describedby="send-hint" style="margin-top:18px">Send what I noticed</button>
+  <p class="hint" id="send-hint" style="text-align:center">Answer at least one question to send.</p>
+</main>
+<script src="mock.js"></script>
+<script>
+  document.addEventListener('ra-toggle', () => {
+    const any = !!document.querySelector('.q [aria-pressed="true"]');
+    document.getElementById('send').disabled = !any;
+    document.getElementById('send-hint').textContent = any ? 'Shown as “Observed by an ally”.' : 'Answer at least one question to send.';
+  });
+  document.getElementById('send').onclick = () => { location.href = 'thanks.html'; };
+</script>
+</body>
+</html>

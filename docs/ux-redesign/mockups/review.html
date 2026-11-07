@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Review · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+<style>
+  .step[hidden] { display: none; }
+  .who { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 6px; font-size: 15px; color: var(--slate); }
+</style>
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top">
+  <a class="back" href="place.html" id="back"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back</a>
+  <span style="flex:1"></span>
+  <!-- Demo only: show the carer wording -->
+  <button type="button" class="btn outline sm" id="demo-carer" aria-pressed="false">Demo: carer</button>
+</header>
+<main id="main" tabindex="-1">
+  <div class="progress" aria-hidden="true"><span class="on" id="p1"></span><span id="p2"></span><span id="p3"></span></div>
+  <p class="sr-only" id="stepnum">Step 1 of 3</p>
+  <p class="who"><span>Shown as: <strong id="shown">Alex K. · Lived experience · Wheelchair user</strong></span><a class="btn ghost sm" href="me.html" style="padding:0 6px">Change</a></p>
+
+  <!-- STEP 1: the only required thing -->
+  <section class="step" id="s1" aria-labelledby="h1a">
+    <h1 id="h1a" tabindex="-1">How was Hugos?</h1>
+    <p class="lead" id="lead1">One tap is enough. The rest is optional.</p>
+    <button type="button" class="choice big works" aria-pressed="false" data-toggle="verdict">
+      <span class="verdict v-works mark-only"><span class="mark" aria-hidden="true">✓</span></span>
+      <span><span class="label" data-l="It worked for me" data-c="It worked for them">It worked for me</span><span class="hint" data-l="I could get in, get around and enjoy it" data-c="They could get in, get around and enjoy it">I could get in, get around and enjoy it</span></span>
+    </button>
+    <button type="button" class="choice big check" aria-pressed="false" data-toggle="verdict">
+      <span class="verdict v-check"><span class="mark" aria-hidden="true">!</span></span>
+      <span><span class="label">Some problems</span><span class="hint" data-l="I managed, but others should know first" data-c="They managed, but others should know first">I managed, but others should know first</span></span>
+    </button>
+    <button type="button" class="choice big barrier" aria-pressed="false" data-toggle="verdict">
+      <span class="verdict v-barrier"><span class="mark" aria-hidden="true">✗</span></span>
+      <span><span class="label" data-l="It didn't work for me" data-c="It didn't work for them">It didn't work for me</span><span class="hint" data-l="I couldn't use it the way I needed" data-c="They couldn't use it the way they needed">I couldn't use it the way I needed</span></span>
+    </button>
+    <button type="button" class="btn primary" id="send1" disabled aria-describedby="hint1">Send</button>
+    <p class="hint" id="hint1" style="text-align:center">Pick one of the three to send.</p>
+    <button type="button" class="btn secondary" id="more1" disabled>Add a bit more (2 questions)</button>
+  </section>
+
+  <!-- STEP 2: only the questions for this person's needs (max 3) -->
+  <section class="step" id="s2" hidden aria-labelledby="h1b">
+    <h1 id="h1b" tabindex="-1">Two quick questions</h1>
+    <p class="lead">For people who need what you need. Skip any you're not sure about.</p>
+    <div class="q" role="group" aria-labelledby="q1"><span class="qt" id="q1">Was there a step-free way in?</span>
+      <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1" id="q1no">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1">Not sure</button></div>
+      <div id="q1-follow" hidden style="margin-top:12px" role="group" aria-labelledby="q1f">
+        <span class="qt" id="q1f" style="font-size:16px">Is there another way in without steps?</span>
+        <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1f">Yes, at the side</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1f">Yes, at the back</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q1f">No</button></div>
+        <a class="btn ghost" href="directions.html" style="margin-top:6px">Show where it is on a map (optional)</a>
+      </div>
+    </div>
+    <div class="q" role="group" aria-labelledby="q2"><span class="qt" id="q2">Was there an accessible toilet?</span>
+      <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q2">Not sure</button></div></div>
+    <div class="q" role="group" aria-labelledby="q3"><span class="qt" id="q3">Were there seats and places to rest?</span>
+      <div class="yn"><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">Yes</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">No</button><button type="button" class="btn outline" aria-pressed="false" data-toggle="q3">Not sure</button></div></div>
+    <button type="button" class="btn primary" id="send2" style="margin-top:14px">Send</button>
+    <button type="button" class="btn secondary" id="more2">Add a photo or a note</button>
+  </section>
+
+  <!-- STEP 3: everything optional, each one small -->
+  <section class="step" id="s3" hidden aria-labelledby="h1c">
+    <h1 id="h1c" tabindex="-1">Anything else?</h1>
+    <p class="lead">All optional. A photo of the door or the toilet helps most.</p>
+    <button type="button" class="btn outline"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg>Add a photo</button>
+    <p class="hint">We remove the location from photos. Please avoid people's faces.</p>
+    <label class="lbl" for="note">A few words <span class="opt">(optional)</span></label>
+    <textarea id="note" placeholder="e.g. The ramp is round the side. Staff were great."></textarea>
+    <button type="button" class="btn outline" style="margin-top:8px"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>Say it instead of typing</button>
+    <p class="small muted" style="margin-top:14px;margin-bottom:6px">Want to add more?</p><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn outline sm" href="#">Noise and crowds</a><a class="btn outline sm" href="directions.html">Steps from the street</a></div>
+    <button type="button" class="btn primary" id="send3" style="margin-top:14px">Send</button>
+  </section>
+</main>
+
+<script src="mock.js"></script>
+<script>
+  const steps = ['s1','s2','s3'];
+  function go(n) {
+    steps.forEach((id, i) => { document.getElementById(id).hidden = i !== n; document.getElementById('p' + (i + 1)).classList.toggle('on', i <= n); });
+    document.getElementById('stepnum').textContent = `Step ${n + 1} of 3`;
+    const h = document.querySelector('#' + steps[n] + ' h1'); h.focus();
+    raSay(`Step ${n + 1} of 3. ${h.textContent}`);
+    document.getElementById('back').textContent = n === 0 ? 'Back' : 'Back a step';
+    document.getElementById('back').onclick = n === 0 ? null : (e) => { e.preventDefault(); go(n - 1); };
+  }
+  document.addEventListener('ra-toggle', e => {
+    if (e.detail.dataset.toggle === 'verdict') {
+      const chosen = !!document.querySelector('[data-toggle="verdict"][aria-pressed="true"]');
+      document.getElementById('send1').disabled = !chosen; document.getElementById('more1').disabled = !chosen;
+      document.getElementById('hint1').textContent = chosen ? 'Shown with your name and lived experience, as you chose in Me.' : 'Pick one of the three to send.';
+    }
+    if (e.detail.id === 'q1no' || e.detail.dataset.toggle === 'q1') document.getElementById('q1-follow').hidden = document.getElementById('q1no').getAttribute('aria-pressed') !== 'true';
+  });
+  document.getElementById('more1').onclick = () => go(1);
+  document.getElementById('more2').onclick = () => go(2);
+  ['send1','send2','send3'].forEach(id => document.getElementById(id).onclick = () => { location.href = 'thanks.html'; });
+  // Demo: carer wording (the app reads this from the profile; a carer reviews for the person they were with)
+  document.getElementById('demo-carer').onclick = function () {
+    const on = this.getAttribute('aria-pressed') !== 'true'; this.setAttribute('aria-pressed', String(on));
+    document.querySelectorAll('[data-l]').forEach(el => { el.textContent = on ? el.dataset.c : el.dataset.l; });
+    document.getElementById('shown').textContent = on ? 'Alex K. · Carer · for a wheelchair user' : 'Alex K. · Lived experience · Wheelchair user';
+    document.getElementById('lead1').textContent = on ? 'Tell us how it went for the person you were with. One tap is enough.' : 'One tap is enough. The rest is optional.';
+  };
+</script>
+</body>
+</html>

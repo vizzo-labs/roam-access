@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Getting there · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top">
+  <a class="back" href="place.html"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to Hugos</a>
+</header>
+<main id="main" tabindex="-1">
+  <h1 style="margin-top:4px">Getting to Hugos<span class="dot">.</span></h1>
+  <p class="lead">The right door, and how to reach it.</p>
+
+  <section aria-labelledby="door-h" class="card">
+    <h2 id="door-h" style="margin-top:0;display:flex;gap:10px;align-items:center"><svg class="icon" aria-hidden="true" style="color:var(--teal)"><use href="#i-door"/></svg>Step-free door: at the back</h2>
+    <p>Go through the car park on Wharf Lane. The door is next to the bins, and it has a bell.</p>
+    <div class="photo" role="img" aria-label="Photo: a grey door with a ramp and a doorbell, next to two green bins">Entrance photo</div>
+    <p class="muted small" style="margin-top:8px">Marked by a wheelchair user · 2 November 2026</p><div role="group" aria-label="Still the way in?" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><span style="font-weight:700;align-self:center">Still the way in?</span><button type="button" class="btn outline sm">Yes</button><button type="button" class="btn outline sm">It changed</button></div>
+    <a class="btn primary" href="#" aria-describedby="maps-note"><svg class="icon" aria-hidden="true"><use href="#i-directions"/></svg>Directions to the step-free door</a>
+    <p id="maps-note" class="hint">Opens in Google Maps.</p>
+    <a class="btn outline" href="#" style="margin-top:8px">Directions to the front door instead</a>
+    <details style="margin-top:12px"><summary style="min-height:48px;font-size:16px">Change maps app<svg class="icon chev" aria-hidden="true"><use href="#i-down"/></svg></summary>
+      <div class="inner"><div class="seg" role="radiogroup" aria-label="Maps app"><button type="button" role="radio" aria-checked="false">Apple Maps</button><button type="button" role="radio" aria-checked="true">Google Maps</button></div></div></details>
+  </section>
+
+  <section aria-labelledby="map-h">
+    <h2 id="map-h">Where the door is</h2>
+    <div class="map" role="img" aria-label="Map: Hugos on Manly Wharf. The street address is at the front, on the Esplanade. The step-free door is at the back, on Wharf Lane, about 40 metres from the front." style="height:220px">
+      <svg class="ground" aria-hidden="true" viewBox="0 0 390 220" preserveAspectRatio="none"><rect width="390" height="220" fill="#E9EEEA"/><path d="M0 170 H390" stroke="#fff" stroke-width="14"/><path d="M0 50 H390" stroke="#fff" stroke-width="14"/><rect x="140" y="80" width="110" height="60" fill="#D8D3C8" stroke="#8A8680" stroke-width="2"/><text x="150" y="115" font-size="14" font-family="sans-serif" fill="#1A1A1A">Hugos</text></svg>
+      <span class="pin check" style="left:170px;top:140px;width:40px;height:40px;font-size:14px" aria-hidden="true">A</span>
+      <span class="pin works" style="left:170px;top:24px;width:40px;height:40px;font-size:14px" aria-hidden="true">D</span>
+    </div>
+    <ul class="plain small">
+      <li><span class="verdict v-check"><span class="mark" aria-hidden="true">A</span>Street address (front)</span></li>
+      <li style="margin-top:6px"><span class="verdict v-works"><span class="mark" aria-hidden="true">D</span>Step-free door (back)</span></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="near-h">
+    <h2 id="near-h">Parking and transport nearby</h2>
+    <p class="muted small" style="margin-top:-6px">Listed on OpenStreetMap, not yet checked by the community.</p>
+    <ul class="list">
+      <li><a class="row" href="#"><svg class="icon lead-icon" aria-hidden="true"><use href="#i-parking"/></svg><span class="body"><span class="title">Accessible parking</span><span class="sub">4 min walk · 9 accessible spaces</span></span><svg class="icon chev" aria-hidden="true"><use href="#i-directions"/></svg><span class="sr-only">Directions</span></a></li>
+      <li><a class="row" href="#"><svg class="icon lead-icon" aria-hidden="true"><use href="#i-bus"/></svg><span class="body"><span class="title">Manly Wharf (ferry)</span><span class="sub">1 min walk · step-free, says OpenStreetMap</span></span><svg class="icon chev" aria-hidden="true"><use href="#i-directions"/></svg><span class="sr-only">Directions</span></a></li>
+      <li><a class="row" href="#"><svg class="icon lead-icon" aria-hidden="true"><use href="#i-toilet"/></svg><span class="body"><span class="title">Accessible toilet: Wharf car park</span><span class="sub">1 min walk · MLAK key</span></span><svg class="icon chev" aria-hidden="true"><use href="#i-directions"/></svg><span class="sr-only">Directions</span></a></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="steps-h">
+    <h2 id="steps-h">Step by step from the street</h2>
+    <p class="muted small" style="margin-top:-6px">From a wheelchair user, 2 November 2026. <button type="button" class="btn ghost sm" style="display:inline-flex;min-height:44px">Read aloud</button></p>
+    <ol class="steps">
+      <li>From the ferry, turn left along the Esplanade for about 50 metres.</li>
+      <li>Turn left into Wharf Lane. It slopes gently down.</li>
+      <li>Go through the car park. The ramp and the door are at the far right corner.</li>
+    </ol>
+    <button type="button" class="btn outline">These steps are wrong or out of date</button>
+  </section>
+</main>
+<nav class="tabs" aria-label="Main">
+  <a class="tab" href="find.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>Find</a>
+  <a class="tab" href="saved.html"><svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg>Saved<span class="pip" aria-hidden="true">2</span><span class="sr-only">, 2 updates</span></a>
+  <a class="tab" href="me.html"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Me</a>
+</nav>
+</div></div></div>
+<script src="mock.js"></script>
+</body>
+</html>

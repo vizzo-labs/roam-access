@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Results · Roam Access mockup</title>
+<link rel="stylesheet" href="mock.css">
+</head>
+<body>
+<div class="phone-wrap"><div class="phone"><div class="screen">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top">
+  <a class="back" href="find.html"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back</a>
+</header>
+<main id="main" tabindex="-1">
+  <form class="search" role="search" aria-label="Search places" action="results.html">
+    <label class="sr-only" for="q">Search for a place or a kind of place</label>
+    <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+    <input id="q" name="q" type="search" value="Cafes" autocomplete="off" enterkeyhint="search">
+    <button type="button" class="icon-btn flat" aria-label="Clear search"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <button type="button" class="icon-btn flat mic" aria-label="Search by voice"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+  </form>
+
+  <h1 style="font-size:24px;margin-top:16px">24 cafes<span class="dot">.</span> <span class="sr-only">Search results for cafes.</span></h1>
+  <p id="sum" class="lead" style="margin-top:-4px">3 work for you · 12 check first · 9 no info yet.</p>
+
+  <div class="chips" role="group" aria-label="Filter places">
+    <button type="button" class="chip" aria-pressed="false" data-toggle="self" id="chip-works"><svg class="icon tick" aria-hidden="true" style="width:18px;height:18px"><use href="#i-check"/></svg>Works for me <span class="count">3</span></button>
+    <button type="button" class="chip" aria-pressed="true" data-toggle="self"><svg class="icon tick" aria-hidden="true" style="width:18px;height:18px"><use href="#i-check"/></svg>Nearest first</button>
+    <button type="button" class="chip" data-open="filters">More filters</button>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 6px;flex-wrap:wrap">
+    <span id="view-h" style="font-weight:700">Show as</span>
+    <div class="seg" role="radiogroup" aria-labelledby="view-h">
+      <button type="button" role="radio" aria-checked="true" data-view="list"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>List</button>
+      <button type="button" role="radio" aria-checked="false" data-view="map"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg>Map</button>
+    </div>
+  </div>
+
+  <!-- MAP: optional. Same places, 48 px pins, a Key dialog instead of a legend
+       that covers the map, and the list continues below — no sheet to drag. -->
+  <section id="mapview" hidden aria-labelledby="map-h">
+    <h2 id="map-h" class="sr-only">Map of 24 cafes</h2>
+    <div class="map" role="group" aria-label="Map. Each pin is a button that opens a short card below the map.">
+      <svg class="ground" aria-hidden="true" viewBox="0 0 390 300" preserveAspectRatio="none">
+        <rect width="390" height="300" fill="#E9EEEA"/>
+        <path d="M0 210 Q120 170 200 230 T390 190 V300 H0Z" fill="#CFE0EA"/>
+        <path d="M40 0 L90 300 M150 0 L170 300 M0 120 H390 M0 60 H390" stroke="#FFFFFF" stroke-width="10"/>
+        <text x="300" y="250" font-size="14" fill="#5A5651" font-family="sans-serif">Manly Cove</text>
+      </svg>
+      <button type="button" class="pin works" style="left:110px;top:40px" aria-label="Hugos, restaurant, Works for you" aria-pressed="false" data-toggle="pin">✓</button>
+      <button type="button" class="pin check" style="left:200px;top:70px" aria-label="Manly Wharf Hotel, pub, Check first" aria-pressed="false" data-toggle="pin">!</button>
+      <button type="button" class="pin works" style="left:60px;top:130px" aria-label="Manly Art Gallery cafe, Works for you" aria-pressed="false" data-toggle="pin">✓</button>
+      <button type="button" class="pin barrier" style="left:260px;top:130px" aria-label="Showbox Coffee, cafe, Has barriers" aria-pressed="false" data-toggle="pin">✗</button>
+      <button type="button" class="pin unknown" style="left:170px;top:150px" aria-label="Guzman y Gomez, takeaway, No info yet" aria-pressed="false" data-toggle="pin">?</button>
+      <button type="button" class="pin check" style="left:320px;top:60px" aria-label="Market Lane Cafe, Check first" aria-pressed="false" data-toggle="pin">!</button>
+      <button type="button" class="btn outline sm key" data-open="key">Key</button>
+      <button type="button" class="icon-btn locate" aria-label="Show my location on the map"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg></button>
+    </div>
+    <div id="pin-card" class="card tint" hidden role="region" aria-live="polite" aria-label="Selected place">
+      <p><strong id="pin-name">Hugos</strong> <span class="muted">· Restaurant · 1 min walk</span></p>
+      <p><span class="verdict v-works" id="pin-verdict"><span class="mark" aria-hidden="true">✓</span>Works for you</span></p>
+      <div style="display:flex;gap:8px;margin-top:8px"><a class="btn primary sm" href="place.html" style="flex:1">See place</a><a class="btn outline sm" href="directions.html" style="flex:1">Directions</a></div>
+    </div>
+    <h2 style="margin-top:16px">Places on this map</h2>
+  </section>
+
+  <ul class="list" aria-label="Cafes, nearest first">
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Hugos</span><span class="sub">Restaurant · 1 min walk</span>
+      <span class="meta"><span class="verdict v-works"><span class="mark" aria-hidden="true">✓</span>Works for you</span><span class="why">Step-free way in · 3 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Manly Wharf Hotel</span><span class="sub">Pub · 1 min walk</span>
+      <span class="meta"><span class="verdict v-check"><span class="mark" aria-hidden="true">!</span>Check first</span><span class="why">Few seats · 1 person</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Guzman y Gomez</span><span class="sub">Takeaway · 1 min walk</span>
+      <span class="meta"><span class="verdict v-unknown"><span class="mark" aria-hidden="true">?</span>No info yet</span><span class="why">Step-free on OpenStreetMap · not checked</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Manly Art Gallery cafe</span><span class="sub">Cafe · 4 min walk</span>
+      <span class="meta"><span class="verdict v-works"><span class="mark" aria-hidden="true">✓</span>Works for you</span><span class="why">Accessible toilet · 2 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Market Lane Cafe</span><span class="sub">Cafe · 5 min walk</span>
+      <span class="meta"><span class="verdict v-check"><span class="mark" aria-hidden="true">!</span>Check first</span><span class="why">Can get loud · 1 person</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+    <li><a class="row" href="place.html"><span class="body"><span class="title">Showbox Coffee</span><span class="sub">Cafe · 7 min walk</span>
+      <span class="meta"><span class="verdict v-barrier"><span class="mark" aria-hidden="true">✗</span>Has barriers</span><span class="why">Step at the door · 2 people</span></span></span>
+      <svg class="icon chev" aria-hidden="true"><use href="#i-forward"/></svg></a></li>
+  </ul>
+  <button type="button" class="btn outline" style="margin-top:12px">Show 10 more <span class="muted">(18 left)</span></button>
+</main>
+<nav class="tabs" aria-label="Main">
+  <a class="tab" href="find.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>Find</a>
+  <a class="tab" href="saved.html"><svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg>Saved<span class="pip" aria-hidden="true">2</span><span class="sr-only">, 2 updates</span></a>
+  <a class="tab" href="me.html"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Me</a>
+</nav>
+
+<dialog id="key" aria-labelledby="key-h">
+  <div class="dlg-head"><h2 id="key-h" tabindex="-1">What the pins mean</h2><button type="button" class="icon-btn" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <ul class="plain key-list">
+    <li><span class="verdict v-works"><span class="mark" aria-hidden="true">✓</span>Works for you</span></li>
+    <li><span class="verdict v-check"><span class="mark" aria-hidden="true">!</span>Check first</span></li>
+    <li><span class="verdict v-barrier"><span class="mark" aria-hidden="true">✗</span>Has barriers</span></li>
+    <li><span class="verdict v-unknown"><span class="mark" aria-hidden="true">?</span>No info yet</span></li>
+  </ul>
+  <p class="muted small">Only reviews from people with needs like yours can make a place "Works for you".</p>
+  <button type="button" class="btn primary" data-close>Done</button>
+</dialog>
+
+<dialog id="filters" aria-labelledby="f-h">
+  <div class="dlg-head"><h2 id="f-h" tabindex="-1">More filters</h2><button type="button" class="icon-btn" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <p class="muted small">Filters only narrow the list. They never change a verdict.</p>
+  <label class="radio"><input type="checkbox"> Hide places with barriers</label>
+  <label class="radio"><input type="checkbox"> Quiet now <span class="muted small" style="font-weight:400">(from check-ins)</span></label>
+  <label class="radio"><input type="checkbox"> Has an accessible toilet nearby</label>
+  <label class="radio"><input type="checkbox"> Places to stay</label>
+  <button type="button" class="btn primary" data-close>Show 24 places</button>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+  // List/Map switch keeps the same list; the map is an extra view, never the only one.
+  document.addEventListener('ra-seg', e => {
+    const map = e.detail.dataset.view === 'map';
+    document.getElementById('mapview').hidden = !map;
+    raSay(map ? 'Map shown above the list. 24 cafes.' : 'List only.');
+  });
+  // A pin opens the short card under the map and announces it.
+  document.addEventListener('ra-toggle', e => {
+    const b = e.detail; if (!b.classList.contains('pin')) return;
+    const card = document.getElementById('pin-card');
+    const on = b.getAttribute('aria-pressed') === 'true';
+    card.hidden = !on;
+    if (on) {
+      const [name] = b.getAttribute('aria-label').split(',');
+      document.getElementById('pin-name').textContent = name;
+      const v = document.getElementById('pin-verdict');
+      v.className = 'verdict ' + ({works:'v-works',check:'v-check',barrier:'v-barrier',unknown:'v-unknown'})[[...b.classList].find(c => ['works','check','barrier','unknown'].includes(c))];
+      v.innerHTML = '<span class="mark" aria-hidden="true">' + b.textContent.trim() + '</span>' + b.getAttribute('aria-label').split(',').pop().trim();
+      card.querySelector('a').focus();
+    }
+  });
+</script>
+</body>
+</html>
