@@ -8,6 +8,7 @@ import { getUserId, isAdmin } from '@/lib/auth';
 import { decideClaim, domainMatches, listClaimsForAdmin, listRecentReplies, setReplyHidden, VERIFICATIONS } from '@/lib/data/business';
 import { grantRole, listRoleHolders, revokeRole } from '@/lib/data/roles-admin';
 import type { ClaimStatus } from '@/lib/db/schema-venues';
+import { OWNER_MSG, OwnerModeration } from './OwnerModeration';
 
 export const metadata = { title: 'Venue claims & roles · Roam Access admin' };
 
@@ -78,7 +79,7 @@ async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'
     const { data } = await (await clerkClient()).users.getUserList({ userId: ids, limit: 500 });
     for (const u of data) emails.set(u.id, u.primaryEmailAddress?.emailAddress ?? '');
   }
-  const ok = typeof sp.ok === 'string' ? MSG[sp.ok] : null;
+  const ok = typeof sp.ok === 'string' ? (MSG[sp.ok] ?? OWNER_MSG[sp.ok] ?? null) : null;
   const err = sp.err === 'verify' ? 'Choose how you verified the claim before approving it.' : sp.err === 'nouser' ? 'No account with that email — ask them to sign in to the app once first.' : null;
   const pending = claims.filter(c => c.status === 'pending');
 
@@ -159,6 +160,8 @@ async function Inner({ searchParams }: { searchParams: PageProps<'/admin/venues'
           </tbody>
         </table>
       </div>
+
+      <OwnerModeration/>
 
       <h2>Council access</h2>
       <p className="muted">People with the council role can open the council dashboard and its DIAP export. Aggregates only — no names, no individual needs.</p>

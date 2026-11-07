@@ -10,6 +10,7 @@ import { getSensoryReports, parseSensoryInput, saveReviewSensory, sensoryColumns
 import { buildSensoryVM } from './sensory/summary';
 import { getCoverPhotos } from './data/photos';
 import { getBestEntrances } from './data/entrances';
+import { getLiveNotices, getSeenNoticeIds } from './data/owners';
 
 const { venues, reviews, profiles, saved, microAnswers } = schema;
 
@@ -24,7 +25,7 @@ export async function ensureProfile(userId: string) {
 
 export async function getVenueVMs(): Promise<VenueVM[]> {
   const db = getDb();
-  const [vs, rs, confirm, qs, ss, covers, entrances] = await Promise.all([
+  const [vs, rs, confirm, qs, ss, covers, entrances, notices] = await Promise.all([
     db.select().from(venues).where(eq(venues.active, true)),
     db.select().from(reviews).where(eq(reviews.hidden, false)),
     getConfirmationStats(),
@@ -32,6 +33,7 @@ export async function getVenueVMs(): Promise<VenueVM[]> {
     getSensoryReports(),
     getCoverPhotos(),
     getBestEntrances(),
+    getLiveNotices(),
   ]);
   const byVenue = new Map<string, typeof rs>();
   for (const r of rs) byVenue.set(r.venueId, [...(byVenue.get(r.venueId) || []), r]);
@@ -43,12 +45,15 @@ export async function getVenueVMs(): Promise<VenueVM[]> {
   return vs.map(v => {
     const cover = covers.get(v.id);
     const entrance = entrances.get(v.id);
+    const venueNotices = notices.get(v.id);
     return {
       ...buildVenueVM(v, byVenue.get(v.id) || [], confirm.get(v.id), quickByVenue.get(v.id) || []),
       sensory: buildSensoryVM(byVenue.get(v.id) || [], sensoryByVenue.get(v.id) || [], now),
       // Only places with a photo carry one (keeps /api/bootstrap small).
       ...(cover ? { coverPhoto: cover } : {}),
       ...(entrance ? { entrance } : {}),
+      // "Venue says" updates (business portal v2): shown apart from facts, never a verdict.
+      ...(venueNotices ? { notices: venueNotices } : {}),
     };
   });
 }
@@ -57,17 +62,20 @@ export async function getVenueVM(id: string): Promise<VenueVM | null> {
   const db = getDb();
   const [v] = await db.select().from(venues).where(and(eq(venues.id, id), eq(venues.active, true)));
   if (!v) return null;
-  const [rs, confirm, qs, ss, covers, entrances] = await Promise.all([
+  const [rs, confirm, qs, ss, covers, entrances, notices] = await Promise.all([
     db.select().from(reviews).where(and(eq(reviews.venueId, id), eq(reviews.hidden, false))),
     getConfirmationStats(id),
     db.select().from(microAnswers).where(and(eq(microAnswers.venueId, id), eq(microAnswers.hidden, false))),
     getSensoryReports(id),
     getCoverPhotos(id),
     getBestEntrances(id),
+    getLiveNotices(id),
   ]);
+  const venueNotices = notices.get(id);
   return {
     ...buildVenueVM(v, rs, confirm.get(id), qs), sensory: buildSensoryVM(rs, ss),
     coverPhoto: covers.get(id) ?? null, entrance: entrances.get(id) ?? null,
+    ...(venueNotices ? { notices: venueNotices } : {}),
   };
 }
 
@@ -92,12 +100,13 @@ export async function getPilotStats() {
 export async function getBootstrap(userId: string) {
   const db = getDb();
   const profile = await ensureProfile(userId);
-  const [venueVMs, savedRows, mineRows, myStats, pilot] = await Promise.all([
+  const [venueVMs, savedRows, mineRows, myStats, pilot, seenNotices] = await Promise.all([
     getVenueVMs(),
     db.select({ venueId: saved.venueId }).from(saved).where(eq(saved.userId, userId)).orderBy(desc(saved.createdAt)),
     db.selectDistinct({ venueId: reviews.venueId }).from(reviews).where(eq(reviews.userId, userId)),
     getMyStats(userId),
     getPilotStats(),
+    getSeenNoticeIds(userId),
   ]);
   const me: Me = { name: profile.name, needs: profile.needs, onboarded: !!profile.onboardedAt };
   return {
@@ -105,6 +114,9 @@ export async function getBootstrap(userId: string) {
     saved: savedRows.map(s => s.venueId),
     reviewed: mineRows.map(r => r.venueId),
     myStats, pilot,
+    // "Updates from your saved places" (in the app only; see lib/notify):
+    // built from saved places' notices; these are the ones already seen.
+    seenNotices,
   };
 }
 

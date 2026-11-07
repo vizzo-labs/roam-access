@@ -23,6 +23,8 @@ import { SensorySummary } from '../sensory/SensorySummary';
 import { WhatToExpect } from '../sensory/WhatToExpect';
 import { GettingThere } from '../arrival/GettingThere';
 import { useDirections } from '../arrival/directions';
+import { VenueNotices } from '../owners/VenueNotices';
+import { VenueCorrections } from '../owners/VenueCorrections';
 import {
   ActionRow, Button, Card, Freshness as FreshnessBadge, GUTTER, RADIUS, SPACE,
   ScreenHeader, SectionHeader, SkeletonText, TYPE,
@@ -89,11 +91,15 @@ function V2VenueView({ app }) {
     ].filter(Boolean).join(' ');
   };
 
+  // The venue's own phone / website when it gave one ("Venue says"); the
+  // OpenStreetMap ones stay listed underneath in VenueCorrections.
+  const phone = says?.corrections?.phone || v.phone;
+  const website = says?.corrections?.website || v.website;
   const actions = [
     { id: 'dir', label: t('venue.action.directions'), icon: 'directions', primary: true, external: true,
       href: dir.href, ariaLabel: dir.ariaLabel },
-    v.phone && { id: 'call', label: t('venue.action.call'), icon: 'phone', href: 'tel:' + v.phone.replace(/[^+\d]/g, ''), ariaLabel: t('venue.action.callAria', { name: v.name }) },
-    v.website && { id: 'web', label: t('venue.action.website'), icon: 'globe', href: v.website, external: true, ariaLabel: t('venue.action.websiteAria', { name: v.name }) },
+    phone && { id: 'call', label: t('venue.action.call'), icon: 'phone', href: 'tel:' + phone.replace(/[^+\d]/g, ''), ariaLabel: t('venue.action.callAria', { name: v.name }) },
+    website && { id: 'web', label: t('venue.action.website'), icon: 'globe', href: website, external: true, ariaLabel: t('venue.action.websiteAria', { name: v.name }) },
     { id: 'save', label: saved ? t('venue.action.saved') : t('venue.action.save'), icon: 'bookmark', pressed: saved, onClick: () => app.toggleSave(v.id),
       ariaLabel: saved ? t('venue.action.unsaveAria', { name: v.name }) : t('venue.action.saveAria', { name: v.name }) },
     { id: 'share', label: t('venue.action.share'), icon: 'share', onClick: () => shareVenue(app, v, t), ariaLabel: t('venue.action.shareAria', { name: v.name }) },
@@ -143,6 +149,9 @@ function V2VenueView({ app }) {
           </p>
         )}
 
+        {/* updates from the venue ("Venue says · date") — never a verdict */}
+        <VenueNotices venue={v}/>
+
         {/* barriers first when they exist; every fact with its source + recency */}
         <FactList kind="barrier" facts={verdict.barriers}/>
         <FactList kind="works" facts={verdict.works}/>
@@ -181,6 +190,7 @@ function V2VenueView({ app }) {
         <AskPlace key={'ask-' + v.id} app={app} venue={v}/>
         {/* "Venue says" — separate from community facts; never changes the verdict */}
         <VenueSays app={app} venue={v} says={says}/>
+        <VenueCorrections venue={v} corrections={says?.corrections}/>
 
         {/* partner programs, nearest accessible toilet, report a problem (F3) */}
         <VenueAccessExtras app={app} venue={v} nearestToilet={false}/>

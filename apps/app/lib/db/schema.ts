@@ -278,6 +278,8 @@ export * from './schema-sensory';
 export * from './schema-arrival';
 // Getting there 2 (I2) · arrival_steps
 export * from './schema-arrival-steps';
+// Business portal v2 · venue_notices, notice_seen, venue_photos, review_reports, venue_corrections
+export * from './schema-owners';
 export type Facility = typeof facilities.$inferSelect;
 export type VenueBadge = typeof venueBadges.$inferSelect;
 export type TempBarrier = typeof tempBarriers.$inferSelect;

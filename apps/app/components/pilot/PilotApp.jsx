@@ -219,6 +219,9 @@ function PilotScreens({ initial, userId }) {
   const [reviewed, setReviewed] = useState(initial.reviewed);
   const [myStats, setMyStats] = useState(initial.myStats);
   const [pilot, setPilot] = useState(initial.pilot);
+  // Updates from saved places (in the app only — see lib/notify): the ids
+  // this person has marked as seen; the updates come from saved places.
+  const [seenNotices, setSeenNotices] = useState(() => new Set(initial.seenNotices || []));
   const [lastSubmit, setLastSubmit] = useState(null);
   const [origin, setOrigin] = useState({ ...PILOT_AREA.origin, mine: false });
   const visitKey = `ra2-visited-${userId}`;
@@ -329,6 +332,11 @@ function PilotScreens({ initial, userId }) {
     return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit };
   }, [wide, view, query, filters, savedIds, withMins, byId, selectedId, me.needs]);
 
+  // "Updates from your saved places": each saved place's live notices.
+  const savedUpdates = useMemo(() => savedIds
+    .flatMap(id => { const v = byId.get(id); return (v?.notices || []).map(n => ({ ...n, venueId: id, venueName: v.name, seen: seenNotices.has(n.id) })); })
+    .sort((a, b) => (a.at < b.at ? 1 : -1)), [savedIds, byId, seenNotices]);
+
   // "your location" is shown in the app's language; Manly Wharf is a name.
   const shownOrigin = origin.mine ? { ...origin, name: t('data.yourLocation') } : origin;
 
@@ -356,6 +364,16 @@ function PilotScreens({ initial, userId }) {
     venues: withMins,
     venueById: id => byId.get(id),
     world: { saved: savedIds, reviewed, visitedId },
+    // Live updates from places this person saved, newest first.
+    updates: savedUpdates,
+    unseenUpdates: savedUpdates.filter(u => !u.seen).length,
+    markUpdatesSeen: (ids) => {
+      setSeenNotices(s => new Set([...s, ...ids]));
+      api('/api/notices/seen', { method: 'POST', body: JSON.stringify({ ids }) }).catch(() => {
+        setSeenNotices(s => new Set([...s].filter(x => !ids.includes(x))));
+        setToast(t('owner.updates.seenFailed'));
+      });
+    },
     myStats, pilot, lastSubmit,
     layers,
     venueOrigin: venueOriginRef.current,

@@ -3,6 +3,7 @@
 import React from 'react';
 import { C2, F2 } from './palette';
 import { useT } from '../i18n/I18nProvider';
+import { UpdatesCount, UpdatesCountSr } from '../owners/UpdatesCount';
 
 // ── Screen scaffold ───────────────────────────────────────────────────────
 // Flex column: scrollable content + fixed chrome (action bar, tabs) below it,
@@ -43,10 +44,13 @@ function V2TabBar({ active, app }) {
               minHeight: 54, padding: '4px 0', background: 'transparent', border: 0,
               cursor: 'pointer', fontFamily: F2,
             }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-              <path d={it.d} stroke={col} strokeWidth={on ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: col }}>{it.label}</span>
+            <span style={{ position: 'relative', display: 'inline-flex' }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d={it.d} stroke={col} strokeWidth={on ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {it.id === 'saved' && <UpdatesCount sr={false} count={app.unseenUpdates} style={{ position: 'absolute', top: -6, left: 16, border: `2px solid ${C2.paper}`, height: 22 }}/>}
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: col }}>{it.label}{it.id === 'saved' && <UpdatesCountSr count={app.unseenUpdates}/>}</span>
           </button>
         );
       })}
