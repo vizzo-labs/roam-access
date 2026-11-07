@@ -23,7 +23,7 @@ export const pinLabels = t => ({
 });
 
 const NAV = [
-  { id: 'home', label: 'app.nav.explore', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
+  { id: 'home', label: 'app.nav.find', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
   { id: 'saved', label: 'app.nav.saved', views: ['saved'] },
   { id: 'me', label: 'app.nav.me', views: ['me', 'setup', 'setup-name', 'card'] },
 ];

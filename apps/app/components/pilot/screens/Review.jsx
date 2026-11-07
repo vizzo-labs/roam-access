@@ -137,7 +137,7 @@ function V2ReviewView({ app }) {
           const on = choice === o.kind;
           return (
             <button key={o.kind} onClick={() => setChoice(o.kind)} aria-pressed={on} style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 16,
+              width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 16px',
               minHeight: 84, borderRadius: 18, padding: '12px 18px', marginBottom: 10,
               border: on ? `2.5px solid ${meta.fg}` : `1.5px solid ${C2.line}`,
               background: on ? meta.bg : C2.paper, cursor: 'pointer',
@@ -148,7 +148,7 @@ function V2ReviewView({ app }) {
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 19, fontWeight: 800, fontFamily: M2,
               }}>{meta.icon}</span>
-              <span>
+              <span style={{ flex: '1 1 7em', minWidth: 0 }}>
                 <span style={{ display: 'block', fontSize: 18.5, fontWeight: 700, letterSpacing: '-0.01em', marginBottom: 3, color: C2.char }}>{o.label}</span>
                 <span style={{ display: 'block', fontSize: 14.5, color: C2.slate, lineHeight: 1.35 }}>{o.sub}</span>
               </span>

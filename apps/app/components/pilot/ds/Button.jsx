@@ -29,10 +29,12 @@ const Pressable = React.forwardRef(function Pressable(
   );
 });
 
+// Labels wrap (never clip) at large text sizes: the vertical padding keeps a
+// two-line label inside the button; short labels stay one line at 100 %.
 const SIZES = {
-  sm: { minHeight: TARGET.min, padding: '0 14px', fontSize: 15, gap: 6, radius: RADIUS.md, icon: 18 },
-  md: { minHeight: TARGET.std + 4, padding: '0 18px', fontSize: 16.5, gap: 8, radius: RADIUS.md, icon: 20 },
-  lg: { minHeight: TARGET.xl, padding: '0 22px', fontSize: 18, gap: 10, radius: RADIUS.lg - 2, icon: 22 },
+  sm: { minHeight: TARGET.min, padding: '6px 14px', fontSize: 15, gap: 6, radius: RADIUS.md, icon: 18 },
+  md: { minHeight: TARGET.std + 4, padding: '8px 18px', fontSize: 16.5, gap: 8, radius: RADIUS.md, icon: 20 },
+  lg: { minHeight: TARGET.xl, padding: '10px 22px', fontSize: 18, gap: 10, radius: RADIUS.lg - 2, icon: 22 },
 };
 
 function variantStyle(variant) {
@@ -48,6 +50,7 @@ function variantStyle(variant) {
 }
 
 // Button — primary | secondary | outline | ghost | plain | danger | rust; sm 44 · md 52 · lg 60.
+// The label wraps to a second line at large text sizes instead of clipping.
 const Button = React.forwardRef(function Button({
   children, variant = 'primary', size = 'md', icon, iconRight, full = false,
   href, external, onClick, disabled = false, type, style, ...rest
@@ -56,18 +59,19 @@ const Button = React.forwardRef(function Button({
   const off = disabled ? { background: C2.stone, color: C2.slate, border: `1.5px solid ${C2.stone}`, textDecoration: 'none' } : null;
   return (
     <Pressable ref={ref} href={href} external={external} onClick={onClick} disabled={disabled} type={type}
-      style={{
+      className="ds-btn" style={{
         display: full ? 'flex' : 'inline-flex', width: full ? '100%' : undefined,
         alignItems: 'center', justifyContent: 'center', gap: s.gap, boxSizing: 'border-box',
         minHeight: s.minHeight, padding: s.padding, borderRadius: s.radius,
-        fontFamily: F2, fontWeight: 700, fontSize: s.fontSize, letterSpacing: '-0.01em', lineHeight: 1.2,
+        fontFamily: F2, fontWeight: 700, fontSize: s.fontSize, letterSpacing: '-0.01em', lineHeight: 1.25,
+        whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%',
         textAlign: 'center', textDecoration: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
         transition: transition(['background-color', 'border-color', 'color'], 'fast'),
         ...variantStyle(variant), ...off, ...style,
       }} {...rest}>
-      {icon && <Icon name={icon} size={s.icon}/>}
+      {icon && <span className={children ? 'ds-btn-icon' : undefined} style={{ display: 'inline-flex' }}><Icon name={icon} size={s.icon}/></span>}
       {children}
-      {iconRight && <Icon name={iconRight} size={s.icon}/>}
+      {iconRight && <span className={children ? 'ds-btn-icon' : undefined} style={{ display: 'inline-flex' }}><Icon name={iconRight} size={s.icon}/></span>}
     </Pressable>
   );
 });

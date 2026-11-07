@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { C2, F2 } from './palette';
+import { C2 } from './palette';
 import { useT } from '../i18n/I18nProvider';
-import { UpdatesCount, UpdatesCountSr } from '../owners/UpdatesCount';
+import { TabBar } from '../ds/TabBar';
 
 // ── Screen scaffold ───────────────────────────────────────────────────────
 // Flex column: scrollable content + fixed chrome (action bar, tabs) below it,
@@ -20,42 +20,17 @@ function V2Shell({ children, bg = null, scroll = true, bar = null, tabs = null, 
   );
 }
 
+// Find · Saved · Me (ds/TabBar). `active` is the tab id; the Find tab is
+// still the 'home' route.
 function V2TabBar({ active, app }) {
   const t = useT();
   if (app.wide) return null; // the web layout's header carries navigation
   const items = [
-    { id: 'home',  label: t('app.nav.home'),  d: 'M4 11.5 12 4l8 7.5M6 10v9h12v-9' },
-    { id: 'saved', label: t('app.nav.saved'), d: 'M6 4h12v17l-6-4-6 4V4Z' },
-    { id: 'me',    label: t('app.nav.me'),    d: 'M12 11a3.4 3.4 0 1 0 0-6.8A3.4 3.4 0 0 0 12 11ZM4.5 20c1.5-3.5 4.5-5 7.5-5s6 1.5 7.5 5' },
+    { id: 'home',  label: t('app.nav.find'),  icon: 'search' },
+    { id: 'saved', label: t('app.nav.saved'), icon: 'bookmark', count: app.unseenUpdates, countSr: app.unseenUpdates ? t('owner.updates.newSr', { count: app.unseenUpdates }) : null },
+    { id: 'me',    label: t('app.nav.me'),    icon: 'user' },
   ];
-  return (
-    <nav aria-label={t('app.nav.primary')} style={{
-      paddingTop: 8, paddingBottom: 'var(--ra-tabs-pad)',
-      background: C2.paper, borderTop: `1px solid ${C2.hair}`,
-      display: 'flex', flexShrink: 0,
-    }}>
-      {items.map(it => {
-        const on = it.id === active;
-        const col = on ? C2.teal : C2.slate;
-        return (
-          <button key={it.id} onClick={() => app.goto(it.id)} aria-current={on ? 'page' : undefined}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              minHeight: 54, padding: '4px 0', background: 'transparent', border: 0,
-              cursor: 'pointer', fontFamily: F2,
-            }}>
-            <span style={{ position: 'relative', display: 'inline-flex' }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-                <path d={it.d} stroke={col} strokeWidth={on ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              {it.id === 'saved' && <UpdatesCount sr={false} count={app.unseenUpdates} style={{ position: 'absolute', top: -6, left: 16, border: `2px solid ${C2.paper}`, height: 22 }}/>}
-            </span>
-            <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: col }}>{it.label}{it.id === 'saved' && <UpdatesCountSr count={app.unseenUpdates}/>}</span>
-          </button>
-        );
-      })}
-    </nav>
-  );
+  return <TabBar label={t('app.nav.primary')} items={items} active={active} onSelect={id => app.goto(id)}/>;
 }
 
 export { V2Shell, V2TabBar };

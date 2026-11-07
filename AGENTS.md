@@ -50,8 +50,8 @@ import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE,
 
 | Need | Use | Notes |
 |---|---|---|
-| Text styles, spacing, radii, shadows | `TYPE.title2`, `SPACE.md`, `GUTTER` (22), `RADIUS.lg`, `elevation(1)`, `tone('warn')` | Colour helpers read `C2` at call time, so high contrast works. Never put text under 13px; inputs use `TYPE.input` (16px). |
-| An action | `Button` (`primary` · `secondary` · `outline` · `ghost` · `plain` · `danger` · `rust`; `sm` 44 · `md` 52 · `lg` 60) | Pass `href` to make it a link and `external` to say "opens in a new tab". |
+| Text styles, spacing, radii, shadows | `TYPE.title2`, `SPACE.md`, `GUTTER` (22), `RADIUS.lg`, `elevation(1)`, `tone('warn')` | Colour helpers read `C2` at call time, so high contrast works. Body text is 17px; never put text under 13px; inputs use `TYPE.input` (16px). Text size goes to 200 % (`SCALE_MAX`; `data-ra-scale="max"` on `<html>`): check new screens there — wrap, never clip. |
+| An action | `Button` (`primary` · `secondary` · `outline` · `ghost` · `plain` · `danger` · `rust`; `sm` 44 · `md` 52 · `lg` 60) | Pass `href` to make it a link and `external` to say "opens in a new tab". Labels wrap to a second line instead of clipping; at 200 % text the decorative icon drops out. |
 | An icon-only action | `IconButton icon="close" label="Close filters"` | `label` is required and must name the thing. `pressed` makes it a toggle. Use `variant="floating"` over a map. |
 | Icons | `Icon name="directions"` | Always decorative (`aria-hidden`); the names are listed on `/ds`. |
 | A surface | `Card` (`outline` · `filled` · `tint` · `raised` · `brand`; `media` slot) | `onClick` or `href` makes the **whole** card one control, so use spans inside and no nested buttons. |
@@ -65,6 +65,7 @@ import { Button, Card, ListRow, FilterChip, ChipGroup, SourceBadge, TYPE, SPACE,
 | Nothing to show | `EmptyState icon title body action` | Always give a next step. |
 | Inline messages | `Banner tone="info" \| "success" \| "warn" \| "danger" \| "offline"` | `live="polite"` when it appears after an action; `"assertive"` only for errors that block the user. |
 | Venue quick actions | `ActionRow actions=[Directions, Call, Website, Save, Share]` | Keep this order. Leave out an action that doesn't apply; don't disable it. |
+| The phone's main navigation | `TabBar label items active onSelect` (the app uses it through `ui/Shell`'s `V2TabBar`: Find · Saved · Me) | Each tab ≥ 64px with an icon and a 14px word; `aria-current="page"` + a bar + heavier icon, never colour alone. `count` draws a pip; `countSr` is read after the label. |
 | Switching mode or panels | `SegmentedControl` (List · Map; a radiogroup) and `Tabs` + `TabPanel` | Roving tabindex with arrow keys and Home/End. |
 | A modal panel | `Sheet open onClose title footer` | A bottom sheet on phones and a dialog from 960px; focus is trapped and restored; Escape, the scrim and drag-down close it. |
 | The top of a screen | `ScreenHeader back={{ label: 'Back to …', onClick }} headingRef={h} title subtitle actions` | Back is always top-left; it renders the screen's one `<h1>` (pass the `useV2Heading` ref). Use `compact` to put a short title on the Back row. |

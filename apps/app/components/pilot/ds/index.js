@@ -22,3 +22,4 @@ export { ScreenHeader } from './ScreenHeader';
 export { SearchField } from './SearchField';
 export { TextArea } from './TextArea';
 export { ChoiceGroup, CheckRow } from './Choice';
+export { TabBar } from './TabBar';
