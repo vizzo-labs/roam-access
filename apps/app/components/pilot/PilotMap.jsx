@@ -29,6 +29,11 @@ export function PilotMap({
   // Place preview card (desktop): a handle on the map + its pins, and a
   // click on the map itself (not a pin) — used to close the card.
   apiRef = null, onMapClick,
+  // Phones (the map inside Find): every pin at `pinSize` px (≥ 48, never a
+  // quiet dot); `spread` nudges overlapping pins apart (no clusters);
+  // `attribution={false}` drops MapLibre's small credit button — the caller
+  // shows the credit as text instead.
+  pinSize = null, spread = false, attribution = true,
 }) {
   const box = useRef(null);
   const ctx = useRef(null); // { map, lib }
@@ -67,7 +72,9 @@ export function PilotMap({
     // A narrowed search (≤ 80 places) shows every result as a full pin; the
     // whole area or a huge list keeps the quiet dots until street level.
     const fewResults = fit && markers.current.size <= 80;
-    if (map) paintPins(markers.current, selRef.current, colors, icons, fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current, tRef.current);
+    if (!map) return;
+    paintPins(markers.current, selRef.current, colors, icons, !!pinSize || fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current, tRef.current, pinSize);
+    if (spread) spreadPins(map, markers.current, pinSize || 34);
   };
 
   // Create the map once.
@@ -82,7 +89,7 @@ export function PilotMap({
       const map = new lib.Map({
         container: box.current, style: STYLE,
         center: [origin.lng, origin.lat], zoom: 14.2,
-        attributionControl: { compact: true },
+        attributionControl: attribution ? { compact: true } : false,
       });
       // Only a style that never loads is fatal; a stray tile error isn't.
       map.on('error', (e) => {
@@ -295,10 +302,10 @@ export const iconFor = (r) => KIND_ICON[r.kind] || CAT_ICON[r.cat] || 'food';
 const PIN_PATH = 'M16 39C16 39 3 24.5 3 15.5a13 13 0 0 1 26 0C29 24.5 16 39 16 39Z';
 
 // One map pin as SVG markup. `badge` is the verdict symbol (or null).
-export function pinSvg({ w, fill, stroke, iconColor, icon, badge, badgeColor, alert = false }) {
+export function pinSvg({ w, fill, stroke, iconColor, icon, badge, badgeColor, alert = false, strokeWidth = 2 }) {
   const h = Math.round(w * 1.25);
   return `<svg width="${w}" height="${h}" viewBox="0 0 32 40" aria-hidden="true" focusable="false" style="display:block;overflow:visible;filter:drop-shadow(0 1px 2px rgba(26,26,26,.35))">`
-    + `<path d="${PIN_PATH}" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`
+    + `<path d="${PIN_PATH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/>`
     + `<g transform="translate(8.5 8) scale(0.625)"><path d="${PLACE_ICONS[icon]}" fill="none" stroke="${iconColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>`
     + (badge ? `<circle cx="27" cy="5" r="6.5" fill="${PAPER}" stroke="${badgeColor}" stroke-width="1.5"/>`
       + `<text x="27" y="8.2" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="800" font-size="9" fill="${badgeColor}">${badge}</text>` : '')
@@ -321,7 +328,7 @@ function pinButton(r, labels, onClick, t) {
 // Places with a verdict: a coloured pin at every zoom. Places with no info
 // yet: a quiet dot in the overview, a white pin at street level. Selected:
 // the big pin. Only re-draws a pin whose look actually changed.
-function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId, t) {
+function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId, t, size = null) {
   markers.forEach((m, id) => {
     const on = id === selectedId;
     const lift = !on && id === hoverId; // highlighted from the list, not selected
@@ -343,15 +350,41 @@ function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels,
       m.mk.setOffset([0, 10]); // a dot sits on the place, not above it
       return;
     }
-    const w = on ? 46 : lift ? 42 : 34;
+    // `size` (phones): 48px pins; the selected one is bigger with a dark ring.
+    const w = size ? (on ? size + 8 : lift ? size + 4 : size) : (on ? 46 : lift ? 42 : 34);
     m.el.style.width = w + 'px';
     m.el.style.height = Math.round(w * 1.25) + 'px';
     m.el.style.alignItems = 'flex-end';
-    m.mk.setOffset([0, 0]);
+    if (!size) m.mk.setOffset([0, 0]); // sized pins keep their spread offset
+    const ring = size && on ? '#1A1A1A' : null;
     m.el.innerHTML = unknown
-      ? pinSvg({ w, fill: PAPER, stroke: colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: null, alert })
-      : pinSvg({ w, fill: colors[m.kind], stroke: PAPER, iconColor: PAPER, icon: m.icon, badge: icons[m.kind], badgeColor: colors[m.kind], alert });
+      ? pinSvg({ w, fill: PAPER, stroke: ring || colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: size ? icons.unknown : null, badgeColor: colors.unknown, alert, strokeWidth: ring ? 3 : 2 })
+      : pinSvg({ w, fill: colors[m.kind], stroke: ring || PAPER, iconColor: PAPER, icon: m.icon, badge: icons[m.kind], badgeColor: colors[m.kind], alert, strokeWidth: ring ? 3 : 2 });
   });
+}
+
+// Pins that would sit on top of each other (same building, next door) are
+// nudged apart around a small circle, so each stays a separate ≥ 48px
+// target. No clusters: every place stays its own pin. Offsets are in screen
+// pixels, so they're worked out again after every zoom.
+function spreadPins(map, markers, size) {
+  const items = [...markers.values()].map(m => ({ m, p: map.project(m.mk.getLngLat()) }));
+  const used = new Set();
+  for (const a of items) {
+    if (used.has(a)) continue;
+    used.add(a);
+    const group = [a];
+    for (const b of items) {
+      if (used.has(b)) continue;
+      if (group.some(g => Math.hypot(g.p.x - b.p.x, g.p.y - b.p.y) < size)) { group.push(b); used.add(b); }
+    }
+    if (group.length === 1) { a.m.mk.setOffset([0, 0]); continue; }
+    const r = Math.max(size * 0.6, (size * 0.95 * group.length) / (2 * Math.PI));
+    group.forEach((g, i) => {
+      const ang = (2 * Math.PI * i) / group.length - Math.PI / 2;
+      g.m.mk.setOffset([Math.round(Math.cos(ang) * r), Math.round(Math.sin(ang) * r)]);
+    });
+  }
 }
 
 // ── Facility pins (access layers) ────────────────────────────────────────

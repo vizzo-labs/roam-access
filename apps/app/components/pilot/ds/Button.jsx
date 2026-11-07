@@ -64,7 +64,7 @@ const Button = React.forwardRef(function Button({
         alignItems: 'center', justifyContent: 'center', gap: s.gap, boxSizing: 'border-box',
         minHeight: s.minHeight, padding: s.padding, borderRadius: s.radius,
         fontFamily: F2, fontWeight: 700, fontSize: s.fontSize, letterSpacing: '-0.01em', lineHeight: 1.25,
-        whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%',
+        whiteSpace: 'normal', overflowWrap: 'break-word', maxWidth: '100%',
         textAlign: 'center', textDecoration: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
         transition: transition(['background-color', 'border-color', 'color'], 'fast'),
         ...variantStyle(variant), ...off, ...style,

@@ -32,6 +32,19 @@ const find: Translation<typeof en> = {
   'find.showMore': "Mostrar {n} más (quedan {rest})",
   'find.empty.body': "Prueba con un tipo de lugar, como café o playa.",
   'find.empty.seeAll': "Ver todos los lugares",
+  // The map inside Find (a view of the list).
+  'find.map.title': { one: "Mapa de {count} lugar", other: "Mapa de {count} lugares" },
+  'find.map.region': "Mapa. Cada marcador es un botón que abre una ficha corta debajo del mapa.",
+  'find.map.skip': "Saltar el mapa",
+  'find.map.key': "Leyenda",
+  'find.map.keyTitle': "Qué significan los marcadores",
+  'find.map.keyLead': "El color y la marca dicen si un lugar te sirve. Solo las reseñas de personas con necesidades como las tuyas pueden hacer que un lugar “Te sirve”.",
+  'find.map.symbols': "El dibujo del marcador es el tipo de lugar.",
+  'find.map.onThisMap': "Lugares en este mapa",
+  'find.map.next': { one: "Mostrar el siguiente lugar", other: "Mostrar los siguientes {count} lugares" },
+  'find.map.prev': { one: "Mostrar el lugar anterior", other: "Mostrar los {count} lugares anteriores" },
+  'find.map.credit': "Mapa: OpenFreeMap, © OpenMapTiles. Datos:",
+  'find.map.creditOsm': "© colaboradores de OpenStreetMap",
 };
 
 export default find;

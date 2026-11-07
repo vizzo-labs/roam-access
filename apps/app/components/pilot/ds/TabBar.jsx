@@ -46,7 +46,7 @@ function TabBar({ label, items, active, onSelect, style }) {
                 }}>{it.count > 9 ? '9+' : it.count}</span>
               )}
             </span>
-            <span style={{ fontSize: 14, lineHeight: 1.2, fontWeight: on ? 800 : 700, textAlign: 'center', overflowWrap: 'anywhere' }}>
+            <span style={{ fontSize: 14, lineHeight: 1.2, fontWeight: on ? 800 : 700, textAlign: 'center', overflowWrap: 'break-word' }}>
               {it.label}
               {!!it.count && it.countSr && <span className="ra-sr-only">, {it.countSr}</span>}
             </span>

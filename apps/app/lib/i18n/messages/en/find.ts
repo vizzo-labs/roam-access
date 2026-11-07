@@ -29,6 +29,19 @@ const find = {
   'find.showMore': "Show {n} more ({rest} left)",
   'find.empty.body': "Try a kind of place, like cafe or beach.",
   'find.empty.seeAll': "See all places",
+  // The map inside Find (a view of the list).
+  'find.map.title': { one: "Map of {count} place", other: "Map of {count} places" },
+  'find.map.region': "Map. Each pin is a button that opens a short card under the map.",
+  'find.map.skip': "Skip the map",
+  'find.map.key': "Key",
+  'find.map.keyTitle': "What the pins mean",
+  'find.map.keyLead': "The colour and the mark say if a place works for you. Only reviews from people with needs like yours can make a place “Works for you”.",
+  'find.map.symbols': "The picture in a pin is the kind of place.",
+  'find.map.onThisMap': "Places on this map",
+  'find.map.next': { one: "Show the next {count} place", other: "Show the next {count} places" },
+  'find.map.prev': { one: "Show the previous {count} place", other: "Show the previous {count} places" },
+  'find.map.credit': "Map: OpenFreeMap, © OpenMapTiles. Data:",
+  'find.map.creditOsm': "© OpenStreetMap contributors",
 };
 
 export default find;

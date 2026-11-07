@@ -32,6 +32,19 @@ const find: Translation<typeof en> = {
   'find.showMore': "{n}개 더 보기 ({rest}개 남음)",
   'find.empty.body': "카페나 해변처럼 장소 종류로 찾아보세요.",
   'find.empty.seeAll': "모든 장소 보기",
+  // The map inside Find (a view of the list).
+  'find.map.title': { other: "장소 {count}곳 지도" },
+  'find.map.region': "지도. 핀은 버튼이에요. 누르면 지도 아래에 짧은 카드가 열려요.",
+  'find.map.skip': "지도 건너뛰기",
+  'find.map.key': "범례",
+  'find.map.keyTitle': "핀의 뜻",
+  'find.map.keyLead': "색과 표시로 장소가 나에게 맞는지 알 수 있어요. 나와 비슷한 필요가 있는 사람들의 후기만 장소를 “나에게 맞아요”로 만들 수 있어요.",
+  'find.map.symbols': "핀 안의 그림은 장소 종류예요.",
+  'find.map.onThisMap': "이 지도의 장소",
+  'find.map.next': { other: "다음 장소 {count}곳 보기" },
+  'find.map.prev': { other: "이전 장소 {count}곳 보기" },
+  'find.map.credit': "지도: OpenFreeMap, © OpenMapTiles. 데이터:",
+  'find.map.creditOsm': "© OpenStreetMap 기여자",
 };
 
 export default find;

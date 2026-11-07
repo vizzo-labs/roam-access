@@ -55,7 +55,7 @@ app/events/[code]/    mapping-day leaderboard (anonymous by default; ?screen=1 r
   kit                 printable organiser kit: join poster, checklist, run sheet, script
 components/pilot/
   PilotApp.jsx        root: hash routing, server-backed state, a11y prefs
-  PilotMap.jsx        real map; pins are buttons, list view stays primary
+  PilotMap.jsx        real map; pins are buttons, list view stays primary (phones: explore/MapSection inside Find)
   WebLayout.jsx       desktop web app: header + panel + map
   pwa.js              service worker registration + install prompt
   community/          GapsPrompt (Thanks; Me → Answer one quick question) + gapsStore
@@ -67,7 +67,7 @@ components/pilot/
                       List/ListRow, SectionHeader, Skeleton, EmptyState, Banner, ActionRow,
                       SegmentedControl/Tabs, Sheet/SnapSheet, Icon — see AGENTS.md
   screens/            one file per screen: Welcome, Setup, SetupName, Find (Home + results), Voice,
-                      Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet,
+                      Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet,
                       Gaps ("Help fill the gaps")
                       (+ useVenueReviews)
   trust/              source + recency lines, verdict reasons, facts, "Still accurate?",

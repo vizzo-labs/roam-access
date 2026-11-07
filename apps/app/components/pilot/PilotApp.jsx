@@ -18,7 +18,6 @@ import { V2Setup } from './screens/Setup';
 import { V2SetupName } from './screens/SetupName';
 import { V2Voice } from './screens/Voice';
 import { V2Find } from './screens/Find';
-import { V2MapView } from './screens/Map';
 import { V2VenueView } from './screens/Venue';
 import { V2AllReviews } from './screens/AllReviews';
 import { V2ReviewView } from './screens/Review';
@@ -245,6 +244,9 @@ function PilotScreens({ initial, userId }) {
   const [route, setRoute] = useState(() => parseHash(venueIds));
   const [query, setQuery] = useState(null);
   const [filters, setFiltersState] = useState(DEFAULT_FILTERS);
+  // Find's "Show as": the list, or the map above the list (phones). Kept for
+  // the session (not saved): the list is always where people start.
+  const [exploreView, setExploreView] = useState('list');
   const [hoverId, setHoverId] = useState(null);
   const [lastVenueId, setLastVenueId] = useState(null);
   const [prefs, setPrefs] = useState(initialPrefs);
@@ -328,6 +330,13 @@ function PilotScreens({ initial, userId }) {
     else window.location.hash = hash;
   }, []);
 
+  // `#/map` (old links, the arrival layer's Back) = Find with the map view on.
+  useEffect(() => {
+    if (route.view !== 'map' || wide) return;
+    setExploreView('map');
+    goto(query ? 'results' : 'find', null, { replace: true });
+  }, [route.view, wide]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // `pub`: how I appear on reviews (Brief L); relationship null = never chosen.
   const user = { name: me.name, needs: me.needs, done: me.onboarded, pub: me.pub };
 
@@ -359,6 +368,8 @@ function PilotScreens({ initial, userId }) {
     // Explore: filters shared by list + maps; setQuery narrows without navigating.
     filters,
     setFilters: (partial) => setFiltersState(f => ({ ...f, ...partial })),
+    exploreView,
+    setExploreView,
     setQuery,
     // Desktop: hovering/focusing a row highlights its pin (no-op on phones).
     hover: wide ? setHoverId : null,
@@ -555,7 +566,7 @@ function PilotScreens({ initial, userId }) {
 
   const screens = {
     setup: V2Setup, 'setup-name': V2SetupName,
-    find: V2Find, voice: V2Voice, results: V2Find, map: V2MapView,
+    find: V2Find, voice: V2Voice, results: V2Find, map: V2Find,
     venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
     gaps: V2Gaps,
