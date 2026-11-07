@@ -21,6 +21,8 @@ const me: Translation<typeof en> = {
   'me.row.a11y.sub': '文字サイズ · コントラスト · 動き · 言語 · 読み上げ',
   'me.row.card': '私のニーズカード',
   'me.row.card.sub': '行く前に、必要なことを場所に伝える',
+  'me.row.gaps': "かんたんな質問に1つ答える",
+  'me.row.gaps.sub': "近くの場所に「はい」か「いいえ」が必要です",
   'me.row.install': 'アプリをインストール',
   'me.row.install.sub': 'Roam Access をホーム画面に追加',
   'me.row.invite': 'パイロットに誰かを招待',

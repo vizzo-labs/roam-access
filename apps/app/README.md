@@ -58,7 +58,7 @@ components/pilot/
   PilotMap.jsx        real map; pins are buttons, list view stays primary
   WebLayout.jsx       desktop web app: header + panel + map
   pwa.js              service worker registration + install prompt
-  community/          GapsPrompt (Home, Thanks) + gapsStore
+  community/          GapsPrompt (Thanks; Me → Answer one quick question) + gapsStore
   ui/                 primitives: palette (C2 live object, F2, M2), Logo, Mic, Verdict,
                       Shell + TabBar, Buttons, Switch, Plate, TileIcon, Toast, Dictate,
                       useDialog (focus trap), useHeading (focus on navigation)
@@ -66,7 +66,7 @@ components/pilot/
                       + Button, IconButton, Card, Chip/FilterChip, Badge/SourceBadge,
                       List/ListRow, SectionHeader, Skeleton, EmptyState, Banner, ActionRow,
                       SegmentedControl/Tabs, Sheet/SnapSheet, Icon — see AGENTS.md
-  screens/            one file per screen: Welcome, Setup, SetupName, Home, Voice, Results,
+  screens/            one file per screen: Welcome, Setup, SetupName, Find (Home + results), Voice,
                       Map, Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet,
                       Gaps ("Help fill the gaps")
                       (+ useVenueReviews)

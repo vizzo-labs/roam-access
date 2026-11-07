@@ -23,3 +23,4 @@ export { SearchField } from './SearchField';
 export { TextArea } from './TextArea';
 export { ChoiceGroup, CheckRow } from './Choice';
 export { TabBar } from './TabBar';
+export { TileButton } from './TileButton';

@@ -23,7 +23,7 @@ export const pinLabels = t => ({
 });
 
 const NAV = [
-  { id: 'home', label: 'app.nav.find', views: ['home', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps'] },
+  { id: 'find', label: 'app.nav.find', views: ['find', 'voice', 'results', 'map', 'venue', 'reviews', 'review', 'thanks', 'gaps', 'toilets', 'beach', 'facility'] },
   { id: 'saved', label: 'app.nav.saved', views: ['saved'] },
   { id: 'me', label: 'app.nav.me', views: ['me', 'setup', 'setup-name', 'card'] },
 ];
@@ -71,7 +71,7 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
   return (
     <div className="web-app">
       <Header>
-        <button className="web-brand" onClick={() => app.goto('home')} aria-label={t('app.web.brand')}>
+        <button className="web-brand" onClick={() => app.goto('find')} aria-label={t('app.web.brand')}>
           <V2Logo size={30}/>
         </button>
         <span className="web-tag">{t('app.web.tag')}</span>

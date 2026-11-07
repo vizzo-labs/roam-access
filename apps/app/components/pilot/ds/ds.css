@@ -71,7 +71,7 @@
 /* SearchField: the whole pill shows focus (the input's own ring would sit
    awkwardly inside it). */
 .ds-search:focus-within { outline: 3px solid var(--ra-char); outline-offset: 2px; }
-.ds-search input:focus-visible { outline: none; }
+.ds-search input:focus-visible, .ds-search textarea:focus-visible { outline: none; }
 .ds-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 
 /* Text size 200 % (data-ra-scale="max" on <html>): a phone is ~195 CSS px

@@ -21,6 +21,8 @@ const me: Translation<typeof en> = {
   'me.row.a11y.sub': 'Tamaño del texto · contraste · movimiento · idioma · lectura en voz alta',
   'me.row.card': 'Mi tarjeta de necesidades',
   'me.row.card.sub': 'Cuéntale a un lugar lo que necesitas antes de ir',
+  'me.row.gaps': "Responde una pregunta rápida",
+  'me.row.gaps.sub': "Lugares cerca de ti necesitan un sí o un no",
   'me.row.install': 'Instalar la app',
   'me.row.install.sub': 'Añade Roam Access a tu pantalla de inicio',
   'me.row.invite': 'Invitar a alguien a la prueba',

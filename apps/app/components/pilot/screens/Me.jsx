@@ -24,6 +24,7 @@ function V2Me({ app }) {
   const rows = [
     { id: 'a11y', icon: 'a11y', fn: () => app.openA11y() },
     { id: 'card', icon: 'user', fn: () => app.goto('card') },
+    { id: 'gaps', icon: 'question', fn: () => app.goto('gaps') },
     ...(app.installable ? [{ id: 'install', icon: 'plus', fn: () => app.install() }] : []),
     { id: 'invite', icon: 'users', fn: () => app.invite() },
     { id: 'signOut', icon: 'back', fn: () => app.signOut() },
