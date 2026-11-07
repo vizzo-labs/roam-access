@@ -19,6 +19,7 @@ import { V2SetupName } from './screens/SetupName';
 import { V2Voice } from './screens/Voice';
 import { V2Find } from './screens/Find';
 import { V2VenueView } from './screens/Venue';
+import { V2Arrival } from './screens/Arrival';
 import { V2AllReviews } from './screens/AllReviews';
 import { V2ReviewView } from './screens/Review';
 import { V2Thanks } from './screens/Thanks';
@@ -44,14 +45,14 @@ const PREFS_KEY = 'ra2-a11y';
 // `find` is the Find screen; `results` is Find with a search on (its own
 // history entry, so Back returns to Find); `home` is an old name for `find`.
 const ROUTES = [
-  'setup', 'setup-name', 'find', 'voice', 'results', 'map', 'venue', 'reviews', 'review',
+  'setup', 'setup-name', 'find', 'voice', 'results', 'map', 'venue', 'arrival', 'reviews', 'review',
   'thanks', 'saved', 'me', 'gaps', 'card', 'toilets', 'beach', 'facility', 'profile',
 ];
 const ALIASES = { home: 'find' };
 const viewTitle = (t, view) => t(`app.view.${ROUTES.includes(view) ? view : 'find'}`);
 const DARK_VIEWS = ['voice', 'thanks'];
 // Screens that render one venue: an id that isn't in the data is not a route.
-const VENUE_VIEWS = ['venue', 'reviews', 'review', 'thanks'];
+const VENUE_VIEWS = ['venue', 'arrival', 'reviews', 'review', 'thanks'];
 // Text size: up to 200 % (ds SCALE_MAX). Must match SCALES in V2A11ySheet.
 const SCALE_VALUES = [1, 1.25, 1.5, 2];
 // Sizes from before 200 % existed move to the nearest size still offered.
@@ -348,7 +349,7 @@ function PilotScreens({ initial, userId }) {
     const needIds = me.needs;
     let list = [], fit = true;
     if (view === 'saved') list = savedIds.map(id => byId.get(id)).filter(Boolean);
-    else if (query && ['results', 'venue', 'reviews', 'review', 'thanks', 'voice'].includes(view)) list = applyFilters(ra2Search(withMins, query, needIds), filters);
+    else if (query && ['results', 'venue', 'arrival', 'reviews', 'review', 'thanks', 'voice'].includes(view)) list = applyFilters(ra2Search(withMins, query, needIds), filters);
     if (!list.length) { list = withMins; fit = false; }
     const sel = VENUE_VIEWS.includes(view) && selectedId && byId.get(selectedId);
     if (sel && !list.some(v => v.id === sel.id)) list = [...list, sel];
@@ -567,7 +568,7 @@ function PilotScreens({ initial, userId }) {
   const screens = {
     setup: V2Setup, 'setup-name': V2SetupName,
     find: V2Find, voice: V2Voice, results: V2Find, map: V2Find,
-    venue: V2VenueView, reviews: V2AllReviews, review: V2ReviewView,
+    venue: V2VenueView, arrival: V2Arrival, reviews: V2AllReviews, review: V2ReviewView,
     thanks: V2Thanks, saved: V2SavedView, me: V2Me,
     gaps: V2Gaps,
     card: V2NeedsCard,

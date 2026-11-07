@@ -91,3 +91,14 @@
   border-radius: 12px; background: var(--ra-char); color: var(--ra-paper);
   font-weight: 700; font-size: 16px; text-decoration: none;
 }
+
+/* Disclosure: no native marker (our chevron says it), the chevron turns when
+   open (no turn when motion is reduced — transitions are cut globally), and
+   the empty message shows only when the body rendered nothing. */
+.ds-disc-summary::-webkit-details-marker { display: none; }
+.ds-disc-summary::marker { content: ''; }
+.ds-disc-chev { transition: transform 200ms cubic-bezier(0.2, 0, 0, 1); }
+.ds-disc[open] .ds-disc-chev { transform: rotate(180deg); }
+.ds-disc-empty { display: none; }
+.ds-disc-body:empty + .ds-disc-empty { display: block; }
+@media (hover: hover) { .ds-disc-summary:hover { background: rgba(26, 26, 26, 0.04); } }

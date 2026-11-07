@@ -67,7 +67,7 @@ components/pilot/
                       List/ListRow, SectionHeader, Skeleton, EmptyState, Banner, ActionRow,
                       SegmentedControl/Tabs, Sheet/SnapSheet, Icon — see AGENTS.md
   screens/            one file per screen: Welcome, Setup, SetupName, Find (Home + results), Voice,
-                      Venue, AllReviews, Review, Thanks, Saved, Me, A11ySheet,
+                      Venue, Arrival (Getting there), AllReviews, Review, Thanks, Saved, Me, A11ySheet,
                       Gaps ("Help fill the gaps")
                       (+ useVenueReviews)
   trust/              source + recency lines, verdict reasons, facts, "Still accurate?",

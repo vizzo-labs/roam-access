@@ -24,7 +24,7 @@ function ReviewAuthor({ r, style }) {
     <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: '2px 8px', minWidth: 0, ...style }}>
       {a.publicId ? (
         <a href={`/u/${encodeURIComponent(a.publicId)}`} title={t('contrib.profileLink', { name })}
-          style={{ ...strong, display: 'inline-flex', alignItems: 'center', minHeight: 44, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+          style={{ ...strong, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44, minWidth: 44, textDecoration: 'underline', textUnderlineOffset: 3 }}>
           {name}
         </a>
       ) : (

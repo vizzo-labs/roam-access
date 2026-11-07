@@ -1,36 +1,24 @@
 'use client';
 
 import React from 'react';
-import { useVenueReviews } from './useVenueReviews';
 import { V2Shell } from '../ui/Shell';
-import { V2_VERDICT_META, V2Verdict } from '../ui/Verdict';
 import { C2 } from '../ui/palette';
 import { useV2Heading } from '../ui/useHeading';
 import { ra2Verdict } from '@/lib/pilot/match';
 import { verdictSourceT } from '@/lib/trust/labels';
 import { kindLabel, verdictLabel } from '@/lib/i18n/data';
-import { ReadAloud, UserText, useFormat, useT } from '../i18n';
-import { factText, reviewText, reviewWhen } from '../trust/text';
-import { ReviewAuthor } from '../contrib/ReviewAuthor';
-import { ObservedFacts } from '../contrib/ObservedFacts';
-import { FactList } from '../trust/FactList';
-import { Freshness } from '../trust/Freshness';
-import { SourceLine } from '../trust/SourceLine';
-import { VenuePhotos } from '../photos/VenuePhotos';
-import { AskPlace } from '../ask/AskPlace';
-import { useVenueSays, VenueSays, VenueFooterLinks } from './VenueSays';
+import { ReadAloud, useFormat, useT } from '../i18n';
+import { factText } from '../trust/text';
+import { StillRight } from '../trust/StillRight';
+import { useVenueSays } from './VenueSays';
 import { useTrackVenueView } from '../track';
-import { VenueAccessExtras, VenueReportsBanner } from '../layers/VenueAccessExtras';
-import { SensorySummary } from '../sensory/SensorySummary';
-import { WhatToExpect } from '../sensory/WhatToExpect';
-import { GettingThere } from '../arrival/GettingThere';
 import { useDirections } from '../arrival/directions';
-import { VenueNotices } from '../owners/VenueNotices';
-import { VenueCorrections } from '../owners/VenueCorrections';
-import {
-  ActionRow, Button, Card, Freshness as FreshnessBadge, GUTTER, RADIUS, SPACE,
-  ScreenHeader, SectionHeader, SkeletonText, SourceBadge, TYPE,
-} from '../ds';
+import { EntranceCard } from '../arrival/EntranceCard';
+import { KeyFacts } from '../venue/KeyFacts';
+import { TodayBlock } from '../venue/TodayBlock';
+import { PlaceReviews } from '../venue/PlaceReviews';
+import { VenueMore } from '../venue/VenueMore';
+import { ActionRow, Button, GUTTER, SPACE, ScreenHeader, TYPE, VerdictCard } from '../ds';
 
 // Share the public summary page (/v/<id>): works for people without an
 // account, e.g. a carer or a friend you're meeting there.
@@ -44,8 +32,10 @@ async function shareVenue(app, v, t) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// VENUE — summary first (verdict, sources, last confirmed), then
-// the action row, then clear sections. Detail on demand.
+// PLACE — the answer first: the verdict and why (with the date), five
+// actions, Today (temporary problems + "Report a problem today"), For your
+// needs, Getting there, Reviews, then "More about this place" folded away.
+// One main action at the bottom: "Tell us how it was".
 // ─────────────────────────────────────────────────────────────
 function V2VenueView({ app }) {
   const t = useT();
@@ -55,11 +45,6 @@ function V2VenueView({ app }) {
   const needs = app.user?.needs || [];
   const verdict = ra2Verdict(v, needs);
   const saved = app.world.saved.includes(v.id);
-  const meta = V2_VERDICT_META[verdict.kind];
-  const { reviews: loaded, error: reviewsError } = useVenueReviews(app, v.id);
-  // Reviews plus allies' observations (which never count toward the verdict).
-  const written = v.verified + (v.observations || 0);
-  const firstReview = loaded && loaded[0];
 
   React.useEffect(() => { app.markVisited(v.id); }, [v.id]); // eslint-disable-line
   useTrackVenueView(v.id);
@@ -67,27 +52,26 @@ function V2VenueView({ app }) {
   // Directions go to the step-free entrance when someone marked one (I1).
   const dir = useDirections(v, needs);
 
+  // "3 community reviews and 2 quick answers"
   const quick = v.quick || 0;
   const revPart = t('venue.from.reviews', { count: v.verified });
   const quickPart = t('venue.from.quick', { count: quick });
   const from = v.verified && quick ? t('venue.from.both', { reviews: revPart, quick: quickPart }) : quick ? quickPart : revPart;
-  const verdictLead = {
-    works: t('venue.lead.works', { from }),
-    check: v.verified || quick ? t('venue.lead.check', { from }) : t('venue.lead.checkNone'),
-    barrier: t('venue.lead.barrier', { from }),
-    unknown: t('venue.lead.unknown'),
-  }[verdict.kind];
-  const sourceText = verdictSourceT(t, fmt, v, verdict, needs);
+  const community = v.verified > 0 || quick > 0;
+  const sentence = t(`place.verdict.${verdict.kind}`);
+  const source = verdict.kind === 'unknown' && !community ? null
+    : community
+      ? (v.lastConfirmed ? t('place.source.community', { from, date: fmt.date(v.lastConfirmed) }) : t('place.source.communityNoDate', { from }))
+      : t('place.source.osm');
 
-  // Read aloud: the place, its verdict, why, and the top facts — built when
-  // pressed, in the reader's language.
+  // Read aloud: the place, its verdict, the sentence, the source, the facts.
   const readText = () => {
     const list = fs => fmt.list(fs.slice(0, 3).map(f => factText(t, f)));
     return [
       t('venue.read.place', { name: v.name }),
       t('venue.read.verdict', { verdict: verdictLabel(t, verdict.kind) }),
-      verdictLead,
-      sourceText + '.',
+      sentence,
+      source || verdictSourceT(t, fmt, v, verdict, needs) + '.',
       verdict.barriers.length ? t('venue.read.barriers', { list: list(verdict.barriers) }) : '',
       verdict.works.length ? t('venue.read.works', { list: list(verdict.works) }) : '',
       verdict.checks.length ? t('venue.read.checks', { list: list(verdict.checks) }) : '',
@@ -95,27 +79,27 @@ function V2VenueView({ app }) {
   };
 
   // The venue's own phone / website when it gave one ("Venue says"); the
-  // OpenStreetMap ones stay listed underneath in VenueCorrections.
+  // OpenStreetMap ones stay listed under More → Place details.
   const phone = says?.corrections?.phone || v.phone;
   const website = says?.corrections?.website || v.website;
   const actions = [
     { id: 'dir', label: t('venue.action.directions'), icon: 'directions', primary: true, external: true,
       href: dir.href, ariaLabel: dir.ariaLabel },
-    phone && { id: 'call', label: t('venue.action.call'), icon: 'phone', href: 'tel:' + phone.replace(/[^+\d]/g, ''), ariaLabel: t('venue.action.callAria', { name: v.name }) },
-    website && { id: 'web', label: t('venue.action.website'), icon: 'globe', href: website, external: true, ariaLabel: t('venue.action.websiteAria', { name: v.name }) },
     { id: 'save', label: saved ? t('venue.action.saved') : t('venue.action.save'), icon: 'bookmark', pressed: saved, onClick: () => app.toggleSave(v.id),
       ariaLabel: saved ? t('venue.action.unsaveAria', { name: v.name }) : t('venue.action.saveAria', { name: v.name }) },
+    phone && { id: 'call', label: t('venue.action.call'), icon: 'phone', href: 'tel:' + phone.replace(/[^+\d]/g, ''), ariaLabel: t('venue.action.callAria', { name: v.name }) },
+    website && { id: 'web', label: t('venue.action.website'), icon: 'globe', href: website, external: true, ariaLabel: t('venue.action.websiteAria', { name: v.name }) },
     { id: 'share', label: t('venue.action.share'), icon: 'share', onClick: () => shareVenue(app, v, t), ariaLabel: t('venue.action.shareAria', { name: v.name }) },
   ];
 
-  // The community loop stays one tap away at the bottom of the screen.
+  // The one main action, always at the bottom.
   const bar = (
     <div style={{
       padding: `${SPACE.sm}px ${GUTTER}px calc(var(--ra-tabs-pad) + 6px)`, background: C2.paper,
       borderTop: `1px solid ${C2.hair}`, flexShrink: 0,
     }}>
-      <Button full size="lg" icon="edit" onClick={() => app.goto('review', v.id)}>
-        {written > 0 ? t('venue.writeReview') : t('venue.writeFirst')}
+      <Button full size="lg" icon="edit" onClick={() => app.goto('review', v.id)} aria-label={t('place.tellUsAria', { name: v.name })}>
+        {t('place.tellUs')}
       </Button>
     </div>
   );
@@ -126,90 +110,29 @@ function V2VenueView({ app }) {
         back={{ label: t('common.back'), onClick: () => app.goto(app.venueOrigin) }}
         subtitle={[kindLabel(t, v.kind), v.address ? t('venue.subtitleAddress', { address: v.address, area: v.area }) : v.area, t('common.minWalk', { mins: v.mins })].join(' · ')}/>
 
-      <div style={{ padding: `${SPACE.md}px ${GUTTER}px ${SPACE.xl}px` }}>
-        {/* today's temporary problems (F3) — prominent, but never a verdict */}
-        <VenueReportsBanner app={app} venue={v}/>
-
-        {/* SUMMARY — the verdict, why, from whom, how recently */}
-        <section aria-label={t('venue.summary')} style={{ background: meta.bg, borderRadius: RADIUS.lg, padding: 20, marginBottom: SPACE.md }}>
-          <V2Verdict kind={verdict.kind} big/>
-          <p style={{ ...TYPE.body, fontSize: 16.5, color: C2.char, margin: '12px 0 0' }}>{verdictLead}</p>
-          <SourceLine src={verdict.kind === 'unknown' ? 'none' : (v.ev?.length ? 'community' : 'osm')}
-            text={sourceText} style={{ marginTop: 10, color: C2.char }}/>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.xs, marginTop: SPACE.sm }}>
-            <FreshnessBadge date={v.lastConfirmed}/>
-            <a href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, padding: '0 4px', color: C2.teal, ...TYPE.footnote, fontWeight: 700, textUnderlineOffset: 3 }}>
-              {t('venue.howWeDecide')}
+      <div style={{ padding: `${SPACE.sm}px ${GUTTER}px ${SPACE.xl}px` }}>
+        <VerdictCard kind={verdict.kind} heading={t('place.verdict.h')} sentence={sentence} source={source}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.xs, marginTop: SPACE.xs }}>
+            <ReadAloud text={readText} what={t('venue.read.what', { name: v.name })} variant="outline"/>
+            <a href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 6px', color: C2.teal, ...TYPE.callout, fontWeight: 700, textUnderlineOffset: 3 }}>
+              {t('place.howWeDecide')}
             </a>
-            <ReadAloud text={readText} what={t('venue.read.what', { name: v.name })} variant="ghost"/>
           </div>
-        </section>
+          <StillRight key={'still-' + v.id} app={app} venue={v}/>
+        </VerdictCard>
 
-        <ActionRow label={t('venue.actions', { name: v.name })} actions={actions} style={{ marginBottom: dir.toEntrance ? SPACE.xs : SPACE.lg }}/>
+        <ActionRow label={t('venue.actions', { name: v.name })} actions={actions} style={{ marginTop: SPACE.sm }}/>
         {dir.toEntrance && (
-          <p style={{ ...TYPE.footnote, color: C2.char, margin: `0 0 ${SPACE.lg}px`, textAlign: 'center' }}>
+          <p style={{ ...TYPE.footnote, color: C2.char, margin: `${SPACE.xs}px 0 0`, textAlign: 'center' }}>
             {t('arrival.dir.caption', { where: t(`arrival.kind.${dir.entrance.kind}.short`), app: dir.appName })}
           </p>
         )}
 
-        {/* updates from the venue ("Venue says · date") — never a verdict */}
-        <VenueNotices venue={v}/>
-
-        {/* barriers first when they exist; every fact with its source + recency */}
-        <FactList kind="barrier" facts={verdict.barriers}/>
-        <FactList kind="works" facts={verdict.works}/>
-        <FactList kind="check" facts={verdict.checks} style={{ marginBottom: SPACE.md }}/>
-        {/* allies' observations (Brief L) — facts only, never the verdict */}
-        <ObservedFacts venue={v} style={{ marginBottom: SPACE.md }}/>
-
-        <Freshness key={'fresh-' + v.id} app={app} venue={v}/>
-
-        {/* Getting there (I1): the right door, and directions to it */}
-        <GettingThere key={'arrive-' + v.id} app={app} venue={v}/>
-
-        {/* sensory content (F6 #17) — describes the place, never the verdict */}
-        <WhatToExpect key={'story-' + v.id} app={app} venue={v}/>
-        <SensorySummary key={'sensory-' + v.id} app={app} venue={v}/>
-
-        <VenuePhotos app={app} venueId={v.id}/>
-
-        {/* community voice */}
-        <section aria-labelledby="community-h" style={{ marginBottom: SPACE.md }}>
-          <SectionHeader id="community-h" title={t('venue.community.title')} size="sm"
-            description={written > 0 ? t('venue.community.count', { count: written }) : t('venue.community.none')}
-            action={written > 0 ? { label: t('venue.community.readAll'), ariaLabel: t('venue.community.readAllAria', { count: written, name: v.name }), onClick: () => app.goto('reviews', v.id) } : null}/>
-          {written > 0 && !loaded && !reviewsError && <Card variant="filled"><SkeletonText lines={3}/><span className="ra-sr-only" role="status">{t('venue.community.loading')}</span></Card>}
-          {firstReview && (
-            <Card variant="filled">
-              <p style={{ ...TYPE.body, margin: '0 0 10px' }}>“{firstReview.own === false ? reviewText(t, firstReview) : <UserText>{firstReview.text}</UserText>}”</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px' }}>
-                <ReviewAuthor r={firstReview}/>
-                {!firstReview.v && <SourceBadge source="ally"/>}
-                <span style={{ ...TYPE.caption, color: C2.slate }}>{reviewWhen(fmt, firstReview)}</span>
-              </div>
-            </Card>
-          )}
-          {written === 0 && (
-            <Card variant="filled">
-              <p style={{ ...TYPE.callout, margin: 0 }}>{t('venue.community.empty')}</p>
-            </Card>
-          )}
-        </section>
-
-        <AskPlace key={'ask-' + v.id} app={app} venue={v}/>
-        {/* "Venue says" — separate from community facts; never changes the verdict */}
-        <VenueSays app={app} venue={v} says={says}/>
-        <VenueCorrections venue={v} corrections={says?.corrections}/>
-
-        {/* partner programs, nearest accessible toilet, report a problem (F3) */}
-        <VenueAccessExtras app={app} venue={v} nearestToilet={false}/>
-
-        <VenueFooterLinks venue={v} says={says}/>
-        <p style={{ ...TYPE.footnote, textAlign: 'center', margin: '8px 0 0' }}>
-          <a href={`/v/${encodeURIComponent(v.id)}/share`} target="_blank" rel="noopener" style={{ color: C2.teal, fontWeight: 600, display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
-            {t('venue.shareSummary')}<span className="ra-sr-only"> {t('common.opensNewTab')}</span>
-          </a>
-        </p>
+        <TodayBlock app={app} venue={v}/>
+        <KeyFacts app={app} venue={v}/>
+        <EntranceCard app={app} venue={v}/>
+        <PlaceReviews app={app} venue={v}/>
+        <VenueMore app={app} venue={v} says={says}/>
       </div>
     </V2Shell>
   );
