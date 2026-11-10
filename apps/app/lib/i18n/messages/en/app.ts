@@ -48,6 +48,8 @@ const app = {
   'app.map.stopFollowing': 'Stop following my location',
   'app.map.failed': 'The map couldn’t load. The list view has every result.',
   'app.map.searchArea': 'Search this area',
+  'app.map.inArea': { one: "{count} place in this area; use the list to browse them.", other: "{count} places in this area; use the list to browse them." },
+  'app.map.legendTiers': "Zoomed out: a dot. Closer: shape and kind. Street: pin.",
   'app.map.showSymbols': 'Show symbols',
   'app.map.hideSymbols': 'Hide symbols',
   'app.map.legend.cafe': 'Cafe',

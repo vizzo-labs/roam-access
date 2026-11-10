@@ -267,8 +267,9 @@ function PilotScreens({ initial, userId }) {
   // Desktop map: the places of the list on screen, published by Find
   // (explore/useShowOnMap) — the map mirrors the list, never every place.
   const [listPins, setListPins] = useState(null);
-  // "No info yet" places as dots on the map at every zoom (Key / map layers).
-  const [showUnknown, setShowUnknown] = useState(false);
+  // "No info yet" places as grey dots on the map (Key / map layers). On by
+  // default: the map shows every place in view.
+  const [showUnknown, setShowUnknown] = useState(true);
   const [lastVenueId, setLastVenueId] = useState(null);
   const [prefs, setPrefs] = useState(initialPrefs);
   const [a11yOpen, setA11yOpen] = useState(false);
@@ -365,17 +366,29 @@ function PilotScreens({ initial, userId }) {
   // rows; Saved shows the saved places). A place page keeps the list it came
   // from, plus the place. Before Find has shown anything (a deep link), the
   // map shows the places near you, so it always shows something.
+  // Every place with its verdict for this person: what the maps draw when
+  // there's no search (Find's map shows every place in view).
+  const needsKey = me.needs.join(',');
+  const withVerdicts = useMemo(() => withMins.map(v => ({ ...v, verdict: ra2Verdict(v, me.needs) })), [withMins, needsKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const mapView = useMemo(() => {
-    if (!wide) return { list: [], fit: false, fitKey: null };
+    if (!wide) return { list: [], all: null, fit: false, fitKey: null };
     const needIds = me.needs;
-    let list, fit = true, fitKey;
+    let list, fit = true, fitKey, all = null;
     if (view === 'saved') { list = savedIds.map(id => byId.get(id)).filter(Boolean); fitKey = 'saved:' + savedIds.join(','); }
-    else if (listPins) ({ places: list, fitKey, fit } = listPins);
+    else if (listPins) ({ places: list, fitKey, fit, all } = listPins);
     else { list = nearPlaces(withMins, needIds, 5, ra2Verdict); fitKey = 'near'; }
     const sel = VENUE_VIEWS.includes(view) && selectedId && byId.get(selectedId);
     if (sel && !list.some(v => v.id === sel.id)) list = [...list, sel];
-    return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit, fitKey };
-  }, [wide, view, listPins, savedIds, withMins, byId, selectedId, me.needs]);
+    list = list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) }));
+    // The map draws every place of the current search (or every place);
+    // the list's places are its focusable pins. Saved / a place page keep
+    // the search they came from.
+    all = all || withVerdicts;
+    const ids = new Set(all.map(a => a.id));
+    const missing = list.filter(v => !ids.has(v.id));
+    if (missing.length) all = [...all, ...missing];
+    return { list, all, fit, fitKey };
+  }, [wide, view, listPins, savedIds, withMins, withVerdicts, byId, selectedId, me.needs]);
 
   // "Updates from your saved places": each saved place's live notices.
   const savedUpdates = useMemo(() => savedIds
@@ -411,6 +424,8 @@ function PilotScreens({ initial, userId }) {
     showUnknown,
     setShowUnknown,
     showOnMap: setListPins,
+    // Every place with this person's verdict (memoised: the maps' default set).
+    venuesWithVerdict: withVerdicts,
     // Desktop: hovering/focusing a row highlights its pin (no-op on phones).
     hover: wide ? setHoverId : null,
     lastVenueId,
@@ -628,7 +643,7 @@ function PilotScreens({ initial, userId }) {
   );
   if (!wide) return content;
   return (
-    <WebLayout app={app} mapResults={mapView.list} mapFit={mapView.fit} mapFitKey={mapView.fitKey} hoverId={hoverId} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
+    <WebLayout app={app} mapResults={mapView.list} mapAll={mapView.all} mapFit={mapView.fit} mapFitKey={mapView.fitKey} hoverId={hoverId} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
       {content}
     </WebLayout>
   );

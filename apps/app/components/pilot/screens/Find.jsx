@@ -92,7 +92,7 @@ function FindHome({ app }) {
         </div>
         {mapOn && (
           <div style={{ marginTop: SPACE.sm }}>
-            <MapSection app={app} places={near} listHeadingId="near-list-h"/>
+            <MapSection app={app} places={near} everything={app.venuesWithVerdict} listHeadingId="near-list-h"/>
             <h3 id="near-list-h" tabIndex={-1} style={{ ...TYPE.headline, margin: `${SPACE.md}px ${GUTTER}px 0`, color: C2.char }}>{t('find.map.onThisMap')}</h3>
           </div>
         )}
@@ -140,7 +140,13 @@ function FindResults({ app }) {
   // Desktop: the map beside the panel shows the rows on screen. It frames
   // them for a new search or filter, never after "Search this area".
   const fitKey = `${listFor}|${JSON.stringify(app.filters)}|${badgeFilter.on.join(',')}`;
-  useShowOnMap(app, results, fitKey, !area);
+  // The map shows EVERY place of this search and these filters, from
+  // anywhere (not only the area or the page): it already shows all, so
+  // "Search this area" only narrows the list.
+  const needsKey = needs.join(','), filtersKey = JSON.stringify(app.filters), badgeKey = badgeFilter.on.join(',');
+  const mapAll = React.useMemo(() => applyFilters(badgeFilter.apply(ra2Search(app.venues, query, needs)), app.filters),
+    [app.venues, query, needsKey, filtersKey, badgeKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useShowOnMap(app, results, fitKey, !area, mapAll);
   // "Search this area": say how many places it found (once per search).
   React.useEffect(() => {
     if (area && app.takeAreaAnnouncement(area.seq)) app.toast(t('find.area.found', { count: all.length }));
@@ -166,7 +172,7 @@ function FindResults({ app }) {
 
         {mapOn && pageRows.length > 0 && (
           <div style={{ marginTop: SPACE.md }}>
-            <MapSection app={app} places={pageRows} listHeadingId="map-list-h"/>
+            <MapSection app={app} places={pageRows} everything={mapAll} listHeadingId="map-list-h"/>
             <h2 id="map-list-h" tabIndex={-1} style={{ ...TYPE.title3, margin: `${SPACE.lg}px ${GUTTER}px 0`, color: C2.char }}>{t('find.map.onThisMap')}</h2>
             <List label={t('find.map.onThisMap')} style={{ marginTop: SPACE.xs }}>
               {pageRows.map(r => <PlaceRow key={'map-' + r.id} app={app} place={r} selected={r.id === app.lastVenueId}/>)}

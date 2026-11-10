@@ -46,6 +46,8 @@ const app: Translation<typeof en> = {
   'app.map.stopFollowing': "現在地の追跡をやめる",
   'app.map.failed': "地図を読み込めませんでした。リスト表示ですべての結果を見られます。",
   'app.map.searchArea': "このエリアを検索",
+  'app.map.inArea': { one: "このエリアに {count} か所あります。一覧で見てください。", other: "このエリアに {count} か所あります。一覧で見てください。" },
+  'app.map.legendTiers': "縮小：点。近く：形と種類。通り：ピン。",
   'app.map.showSymbols': "記号の説明を表示",
   'app.map.hideSymbols': "記号の説明を隠す",
   'app.map.legend.cafe': "カフェ",

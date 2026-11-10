@@ -46,6 +46,8 @@ const app: Translation<typeof en> = {
   'app.map.stopFollowing': "내 위치 따라가기 중지",
   'app.map.failed': "지도를 불러올 수 없습니다. 목록 보기에 모든 결과가 있습니다.",
   'app.map.searchArea': "이 지역 검색",
+  'app.map.inArea': { one: "이 지역에 장소 {count}곳이 있어요. 목록에서 둘러보세요.", other: "이 지역에 장소 {count}곳이 있어요. 목록에서 둘러보세요." },
+  'app.map.legendTiers': "축소: 점. 가까이: 모양과 종류. 거리: 핀.",
   'app.map.showSymbols': "기호 설명 보기",
   'app.map.hideSymbols': "기호 설명 숨기기",
   'app.map.legend.cafe': "카페",

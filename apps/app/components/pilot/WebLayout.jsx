@@ -1,9 +1,9 @@
 'use client';
 // The pilot as a web app (≥ 960px): header with navigation, the app's screens
 // in a side panel, and a live map beside them — the panel and the map stay in
-// sync: the map shows the pins of the list in the panel (pin → card → venue
-// in the panel; row hover → pin lifted), and "Search this area" reloads the
-// list for what the map shows.
+// sync: the map shows every place of the search in view, the list's places
+// are its focusable pins (pin or dot → card → venue in the panel; row hover →
+// pin lifted), and "Search this area" narrows the list to what the map shows.
 
 import { PilotMap, MapLegend } from './PilotMap';
 import { V2Logo } from './ui/Logo';
@@ -38,7 +38,7 @@ function Header({ children }) {
   );
 }
 
-export function WebLayout({ app, mapResults, mapFit = true, mapFitKey = null, selectedId, hoverId = null, children }) {
+export function WebLayout({ app, mapResults, mapAll = null, mapFit = true, mapFitKey = null, selectedId, hoverId = null, children }) {
   const t = useT();
   const labels = pinLabels(t);
   const active = NAV.find(n => n.views.includes(app.view))?.id;
@@ -58,7 +58,7 @@ export function WebLayout({ app, mapResults, mapFit = true, mapFitKey = null, se
   // Closes when the panel navigates or its place leaves the map.
   const mapApi = React.useRef(null);
   const [previewId, setPreviewId] = React.useState(null);
-  const preview = previewId ? mapResults.find(r => r.id === previewId) || null : null;
+  const preview = previewId ? (mapAll || mapResults).find(r => r.id === previewId) || null : null;
   const navKey = `${app.view}|${app.selectedId}`;
   const [shownNav, setShownNav] = React.useState(navKey);
   if (shownNav !== navKey) { setShownNav(navKey); if (previewId) setPreviewId(null); }
@@ -96,7 +96,7 @@ export function WebLayout({ app, mapResults, mapFit = true, mapFitKey = null, se
       <div className="web-body">
         <div className="web-panel">{children}</div>
         <section className="web-map" aria-label={t('app.web.mapLabel')} onKeyDown={onMapKey}>
-          <PilotMap results={mapResults} selectedId={previewId || selectedId} hoverId={hoverId} onSelect={setPreviewId}
+          <PilotMap results={mapResults} everything={mapAll} selectedId={previewId || selectedId} hoverId={hoverId} onSelect={setPreviewId}
             apiRef={mapApi} onMapClick={() => previewId && closePreview(true)}
             origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras} fitKey={mapFitKey}
             showUnknown={app.showUnknown} onSearchArea={app.searchArea}
