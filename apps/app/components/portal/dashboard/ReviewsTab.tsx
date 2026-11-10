@@ -2,6 +2,7 @@ import { VerdictPill } from '@/components/portal/Portal';
 import { REPLY_MAX } from '@/lib/data/business';
 import { REPORT_NOTE_MAX, REPORT_REASONS } from '@/lib/data/owners';
 import { replyAction, reportAction } from '@/app/business/actions';
+import { siteOrigin } from '@/components/community/site';
 import { HiddenNotice } from './HiddenNotice';
 import { fmtDay, type TabProps } from './types';
 
@@ -10,8 +11,9 @@ type Extra = { reports: Map<string, { reason: string; createdAt: Date }> };
 // Reviews: reply publicly (unchanged review card; the reply sits under it),
 // and "Report this review" to the pilot team. A venue can never edit or hide
 // a review — only the pilot team decides, in /admin/venues.
-export function ReviewsTab({ t, d, readOnly, since, reports }: TabProps & Extra) {
+export async function ReviewsTab({ t, d, readOnly, since, reports }: TabProps & Extra) {
   const reviewLink = `/#/venue/${encodeURIComponent(d.venue.id)}`;
+  const host = (await siteOrigin()).replace(/^https?:\/\//, '');
   return (
     <>
       <h2 id="tab-h" tabIndex={-1}>{t('business.tab.reviewsCount', { count: d.reviews.length })}</h2>
@@ -83,7 +85,7 @@ export function ReviewsTab({ t, d, readOnly, since, reports }: TabProps & Extra)
       }) : <p className="muted">{t('business.reviews.none')}</p>}
       <div className="pt-card dashed">
         <strong>{t('business.reviews.askTitle')}</strong>
-        <p style={{ margin: '0.4rem 0 0' }}>{t('business.reviews.askBody')} <a href={reviewLink}>{`roam-access.vercel.app${reviewLink}`}</a></p>
+        <p style={{ margin: '0.4rem 0 0' }}>{t('business.reviews.askBody')} <a href={reviewLink}>{`${host}${reviewLink}`}</a></p>
         <p className="muted small" style={{ margin: '0.4rem 0 0' }}>{t('business.reviews.askNoRewards')}</p>
       </div>
     </>

@@ -16,9 +16,12 @@ import { getLiveNotices, getPublicVenuePhotos } from '@/lib/data/owners';
 export async function generateMetadata({ params }: PageProps<'/v/[id]'>): Promise<Metadata> {
   const { id } = await params;
   const s = await getVenueSummary(id);
+  const title = s ? `${s.venue.name}: access summary · Roam Access` : 'Place not found · Roam Access';
   return {
-    title: s ? `${s.venue.name}: access summary · Roam Access` : 'Place not found · Roam Access',
+    title,
     robots: { index: false, follow: false },
+    // The link preview when someone shares this page (chat apps, email).
+    openGraph: s ? { title, description: basisLine(s), url: `/v/${encodeURIComponent(s.venue.id)}`, siteName: 'Roam Access', locale: 'en_AU', type: 'website' } : undefined,
   };
 }
 

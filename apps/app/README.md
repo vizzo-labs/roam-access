@@ -1,8 +1,8 @@
 # Roam Access — pilot app
 
 The real pilot: testers sign in, set their access needs, and review **real places around
-Manly** (Manly, Fairlight, Queenscliff, Balgowlah). Live at **https://roam-access.vercel.app**
-(admin: `/admin`).
+Manly** (Manly, Fairlight, Queenscliff, Balgowlah). Live at **https://app.roamaccess.com.au**
+(admin: `/admin`; the old https://roam-access.vercel.app redirects there).
 
 **One app, two shapes:**
 - **Web app (≥ 960px):** header navigation, the screens in a side panel, a live map of the
@@ -208,6 +208,14 @@ npm run dev
 Conventions for contributors and agents (honesty and accessibility rules, testing, PRs):
 the root [`AGENTS.md`](../../AGENTS.md).
 
+### Its address
+
+Production is **https://app.roamaccess.com.au** (`NEXT_PUBLIC_SITE_URL`, set on Vercel
+Production only). Every link that leaves the app — share links, QR codes, printed cards,
+the widget snippet, open data, link previews — is built from it through
+`lib/site-url.ts`; previews and local builds leave it unset and use their own address.
+It is read at build time, so changing it needs a new production build.
+
 ### Two databases
 
 | Where | Database |
@@ -252,7 +260,7 @@ every merge to `main` deploys production (and migrates the production DB). No ma
 ## Before inviting more testers
 
 - **Clerk is a development instance** (shows "Development mode", has usage caps). For a public
-  pilot, create the production instance on your own domain (e.g. `pilot.roamaccess.com.au`)
+  pilot, create the production instance on the app's domain (`app.roamaccess.com.au`)
   and add Clerk's DNS records.
 - **Passwordless sign-in**: Clerk dashboard → User & authentication → turn on email
   verification code, turn off password. Code by email is the most accessible option.

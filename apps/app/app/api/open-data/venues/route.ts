@@ -1,11 +1,12 @@
 import { getOpenDataPlaces, openDataMeta } from '@/lib/data/open-data';
+import { publicOrigin } from '@/lib/site-url';
 
 // Public, no sign-in: every pilot venue as A11yJSON PlaceInfo, ODbL.
 // Each feature is a strict PlaceInfo; ?geojson=1 adds "type": "Feature" for
 // GeoJSON tools (A11yJSON's schema doesn't allow that key).
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const places = await getOpenDataPlaces(url.origin);
+  const places = await getOpenDataPlaces(publicOrigin(url.origin));
   const geojson = url.searchParams.get('geojson') === '1';
   return Response.json(
     { type: 'FeatureCollection', ...openDataMeta(places.length), features: geojson ? places.map(p => ({ type: 'Feature', ...p })) : places },

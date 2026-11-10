@@ -4,6 +4,8 @@
 //
 //   npm run test-user -- create <name> [--port 3456]   → user + sign-in URL
 //   npm run test-user -- signin <name> [--port 3456]   → fresh sign-in URL
+//       add --base https://app.roamaccess.com.au to sign in on a deployed
+//       address instead of localhost (same Clerk instance only)
 //   npm run test-user -- delete <name>                 → Clerk user + dev DB rows
 //                                                         + that user's photo files
 //   npm run test-user -- orphans                       → list photo files in the dev
@@ -42,9 +44,9 @@ async function findUser(email: string) {
   return users.find(u => u.email_addresses.some(e => e.email_address === email)) || null;
 }
 
-async function signInUrl(userId: string, port: string) {
+async function signInUrl(userId: string, base: string) {
   const t = await clerk<{ token: string }>('POST', '/sign_in_tokens', { user_id: userId, expires_in_seconds: 3600 });
-  return `http://localhost:${port}/sign-in?__clerk_ticket=${t.token}`;
+  return `${base}/sign-in?__clerk_ticket=${t.token}`;
 }
 
 async function main() {
@@ -62,7 +64,9 @@ async function main() {
   }
   const portIdx = process.argv.indexOf('--port');
   const port = portIdx > 0 ? process.argv[portIdx + 1] : '3000';
-  if (!cmd || !name) throw new Error('usage: test-user <create|signin|delete> <name> [--port N] · test-user orphans');
+  const baseIdx = process.argv.indexOf('--base');
+  const base = baseIdx > 0 ? new URL(process.argv[baseIdx + 1]).origin : `http://localhost:${port}`;
+  if (!cmd || !name) throw new Error('usage: test-user <create|signin|delete> <name> [--port N | --base URL] · test-user orphans');
   const email = emailFor(name);
   if (!email.endsWith('+clerk_test@example.com')) throw new Error('refusing: not a Clerk test email');
 
@@ -74,7 +78,7 @@ async function main() {
     }
     if (!user) throw new Error(`no test user ${email} — create it first`);
     console.log(`user id: ${user.id}`);
-    console.log(`sign in: ${await signInUrl(user.id, port)}`);
+    console.log(`sign in: ${await signInUrl(user.id, base)}`);
     return;
   }
 
