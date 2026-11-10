@@ -22,7 +22,7 @@ worktree, merging small PRs to `main`. These rules keep that safe. Read this fil
 
 ```
 index.html, privacy.html, accessibility.html, assets/   landing page (GitHub Pages) — don't touch
-app/                 static investor demo (fictional data, JSX compiled by the root package.json) — don't touch
+app/index.html       only a redirect: old /app/ demo links go to the pilot (the demo was retired; git history has it)
 apps/app/            THE PILOT: Next.js 16 + React 19, Clerk, Neon Postgres (Drizzle), MapLibre
   app/               routes: (app)/ page + sign-in/up · admin/ · api/ · ds/ (design-system preview)
   components/pilot/

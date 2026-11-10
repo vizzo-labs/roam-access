@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Roam Access: Find accessible venues across Australia</title>
-  <meta name="description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta name="description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. The free pilot is live around Manly and the Northern Beaches." />
   <meta name="theme-color" content="#FAF9F6" />
 
   <!-- Canonical & crawl directives -->
@@ -24,7 +24,7 @@
   <meta property="og:locale" content="en_AU" />
   <meta property="og:url" content="https://roamaccess.com.au/" />
   <meta property="og:title" content="Roam Access: Find accessible venues across Australia" />
-  <meta property="og:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta property="og:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. The free pilot is live around Manly and the Northern Beaches." />
   <meta property="og:image" content="https://roamaccess.com.au/assets/roam-og.png" />
   <meta property="og:image:secure_url" content="https://roamaccess.com.au/assets/roam-og.png" />
   <meta property="og:image:type" content="image/png" />
@@ -33,7 +33,7 @@
   <meta property="og:image:alt" content="Roam Access wordmark: roam/access" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Roam Access: Find accessible venues across Australia" />
-  <meta name="twitter:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026." />
+  <meta name="twitter:description" content="Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. The free pilot is live around Manly and the Northern Beaches." />
   <meta name="twitter:image" content="https://roamaccess.com.au/assets/roam-og.png" />
   <meta name="twitter:image:alt" content="Roam Access wordmark: roam/access" />
 
@@ -78,7 +78,7 @@
         "@id": "https://roamaccess.com.au/#webpage",
         "url": "https://roamaccess.com.au/",
         "name": "Roam Access: Find accessible venues across Australia",
-        "description": "Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. Launching 2026.",
+        "description": "Australia's first accessibility discovery platform. Find and review venues by real accessibility, built with and for people with disability. The free pilot is live around Manly and the Northern Beaches.",
         "isPartOf": { "@id": "https://roamaccess.com.au/#website" },
         "about": { "@id": "https://roamaccess.com.au/#organization" },
         "inLanguage": "en-AU"
@@ -194,16 +194,16 @@
       display: flex; gap: .5rem; padding: 0; z-index: 200;
     }
     .skip-links a {
-      position: absolute; left: 1rem; top: -100px;
+      position: absolute; left: 1rem; top: -999px;
       background: var(--teal); color: var(--paper);
       padding: .875rem 1.25rem; border-radius: 8px;
       font-weight: 600; font-size: 1rem;
       transition: top .15s ease;
       min-height: var(--tap);
       display: inline-flex; align-items: center;
+      max-width: calc(100vw - 2rem);
     }
-    .skip-links a:nth-of-type(2) { left: 14rem; }
-    .skip-links a:nth-of-type(3) { left: 26rem; }
+    /* Only the focused skip link shows, so they share one spot (no sideways scroll at large text). */
     .skip-links a:focus { top: 1rem; }
 
     /* ───── Headlines ───── */
@@ -212,6 +212,7 @@
       font-weight: 700;
       line-height: 1.05;
       text-wrap: balance;
+      overflow-wrap: break-word; /* long words never push the page sideways at large text */
     }
     .headline-sm {
       letter-spacing: -0.02em;
@@ -506,7 +507,7 @@
         <nav id="nav-primary" class="hidden md:block" aria-label="Primary">
           <ul class="flex items-center gap-1">
             <li><a href="#approach" class="nav-link" data-section="approach">Our approach</a></li>
-            <li><a href="/app/" class="nav-link">Try the demo</a></li>
+            <li><a href="https://app.roamaccess.com.au" class="nav-link">Join the pilot</a></li>
             <li><a href="#involved" class="nav-link" data-section="involved">Get involved</a></li>
             <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="nav-link">Take the survey</a></li>
             <li><a href="#updates" class="btn-rust ml-2" style="min-height:var(--tap); padding: 0 1.125rem; font-size: 1rem;">Stay updated</a></li>
@@ -531,7 +532,7 @@
       <nav id="mobile-nav" class="md:hidden pb-5" aria-label="Mobile" hidden>
         <ul class="flex flex-col pt-2 border-t border-hairline">
           <li><a href="#approach" class="nav-link" style="display:flex; padding: .75rem 0;">Our approach</a></li>
-          <li><a href="/app/" class="nav-link" style="display:flex; padding: .75rem 0;">Try the demo</a></li>
+          <li><a href="https://app.roamaccess.com.au" class="nav-link" style="display:flex; padding: .75rem 0;">Join the pilot</a></li>
           <li><a href="#involved" class="nav-link" style="display:flex; padding: .75rem 0;">Get involved</a></li>
           <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="nav-link" style="display:flex; padding: .75rem 0;">Take the survey</a></li>
           <li><a href="#updates" class="btn-rust mt-3" style="display:flex; min-height:var(--tap-lg);">Stay updated</a></li>
@@ -553,29 +554,25 @@
             for you<span class="text-rust" aria-hidden="true">.</span><span class="visually-hidden">.</span>
           </h1>
           <p class="text-charcoal max-w-2xl mb-10" style="font-size: 1.25rem; line-height: 1.55;">
-            Australia's first accessibility discovery platform built with and for the disability community.
+            Our pilot is live around Manly and the Northern Beaches. It's free, for people with disability, carers and allies.
           </p>
           <div class="flex flex-col sm:flex-row sm:items-center flex-wrap gap-5">
             <a href="https://app.roamaccess.com.au" class="btn-primary" style="padding: 0 1.5rem; min-height: var(--tap-lg);">
               <span>Join the pilot</span>
               <span aria-hidden="true" class="ml-3">→</span>
             </a>
-            <a href="/app/" class="inline-flex items-center text-teal font-semibold" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
-              Try the demo
+            <a href="https://forms.gle/2vSfnNySe9ycRjys9" class="inline-flex items-center text-teal font-semibold" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
+              Take the survey
               <span aria-hidden="true" class="arrow ml-2">→</span>
             </a>
-            <a href="#updates" class="inline-flex items-center text-teal font-semibold" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
-              Or stay in the loop
-              <span aria-hidden="true" class="arrow ml-2">↗</span>
-            </a>
           </div>
-          <p class="mt-4" style="color: var(--slate); font-size: 0.9375rem;">
-            The demo runs on sample data — the venues and reviews are illustrative examples.
+          <p class="mt-5 max-w-2xl" style="color: var(--slate); font-size: 1.0625rem; overflow-wrap: anywhere;">
+            <strong class="text-charcoal font-semibold">Use it on your phone:</strong> open <a href="https://app.roamaccess.com.au" class="text-teal font-semibold">app.roamaccess.com.au</a> and add it to your home screen.
           </p>
 
           <p class="mt-12 flex items-center gap-3" style="color: var(--slate); font-size: 0.9375rem;">
             <span class="inline-block rounded-full" style="width:10px;height:10px;background:var(--rust);" aria-hidden="true"></span>
-            <span class="font-mono" style="letter-spacing: 0.08em;">Currently in research · Launching 2026</span>
+            <span class="font-mono" style="letter-spacing: 0.08em;">Pilot live · Manly &amp; the Northern Beaches</span>
           </p>
         </div>
 
@@ -695,7 +692,7 @@
               Roam Access comes from a team that has spent years working in the disability sector in Australia, watching people struggle with accessibility information that was wrong, missing, or only built for one type of disability. We've been thinking about this for a long time. Now we're building it properly, slowly, with the community shaping every decision.
             </p>
             <p style="color: var(--slate); font-size: 1.0625rem;">
-              Currently validating the product with PWD across Australia. If you want to be part of that, <a href="https://forms.gle/2vSfnNySe9ycRjys9">take the survey</a> or <a href="mailto:helloroamaccess@gmail.com">get in touch</a>.
+              Our pilot is live around Manly and the Northern Beaches, and we're shaping it with the people who use it. If you want to be part of that, <a href="https://app.roamaccess.com.au">join the pilot</a>, <a href="https://forms.gle/2vSfnNySe9ycRjys9">take the survey</a> or <a href="mailto:helloroamaccess@gmail.com">get in touch</a>.
             </p>
           </div>
         </div>
@@ -718,12 +715,15 @@
             <p class="num mb-6">
               For <abbr title="people with disability" style="text-decoration: none;">PWD</abbr>
             </p>
-            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Shape what we build</h3>
+            <h3 class="headline-sm text-charcoal mb-4" style="font-size: 1.5rem;">Try the pilot</h3>
             <p class="text-charcoal mb-8 grow" style="font-size: 1.0625rem;">
-              Take the survey, join our research community, beta test when we launch.
+              Find places around Manly and the Northern Beaches, review the ones you know, and tell us what's missing. Free for people with disability, carers and allies.
             </p>
-            <a href="https://forms.gle/2vSfnNySe9ycRjys9" class="btn-primary">
-              Take the survey <span aria-hidden="true" class="ml-2">→</span>
+            <a href="https://app.roamaccess.com.au" class="btn-primary">
+              Join the pilot <span aria-hidden="true" class="ml-2">→</span>
+            </a>
+            <a href="https://forms.gle/2vSfnNySe9ycRjys9" class="inline-flex items-center text-teal font-semibold mt-3" style="min-height:var(--tap); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px;">
+              Take the survey <span aria-hidden="true" class="arrow ml-2">→</span>
             </a>
           </li>
 
@@ -853,7 +853,7 @@
           <p class="eyebrow mb-4" style="color:#BDB8B2;">Project</p>
           <ul class="flex flex-col gap-1">
             <li><a href="#approach" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">About</a></li>
-            <li><a href="/app/" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Try the demo</a></li>
+            <li><a href="https://app.roamaccess.com.au" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Join the pilot</a></li>
             <li><a href="https://forms.gle/2vSfnNySe9ycRjys9" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">Survey</a></li>
             <li><a href="#involved" class="inline-flex items-center text-paper" style="min-height:var(--tap); font-size:1.0625rem; text-decoration: underline; text-underline-offset: 4px;">For venues</a></li>
           </ul>

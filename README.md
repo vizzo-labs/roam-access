@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  🌐 <a href="https://roamaccess.com.au">roamaccess.com.au</a> &nbsp;·&nbsp; Status: <strong>pre-launch</strong> (in research, launching 2026)
+  🌐 <a href="https://roamaccess.com.au">roamaccess.com.au</a> &nbsp;·&nbsp; Status: <strong>pilot live</strong> around Manly and the Northern Beaches (<a href="https://app.roamaccess.com.au">app.roamaccess.com.au</a>)
 </p>
 
 ---
@@ -20,10 +20,11 @@ across Australia based on **real accessibility**, not what venues claim, but wha
 they actually deliver. It is built with the disability community, for the
 disability community.
 
-This repository currently holds the **pre-launch landing page**. Its three jobs:
+The repo root holds the **landing page** (the pilot app itself is `apps/app`). Its three jobs:
 
 1. Be a credibility anchor for grant applications and outreach.
-2. Drive visitors to the user-research survey (primary call to action).
+2. Send visitors to the pilot at app.roamaccess.com.au (primary call to action) and the
+   user-research survey.
 3. Capture email signups from interested PWD and venues.
 
 > **Heads up:** this repo will grow into the **monorepo** for the whole project
@@ -57,6 +58,7 @@ hostable on GitHub Pages today.
 ├── privacy.html        # Privacy Policy
 ├── accessibility.html  # Accessibility Statement
 ├── 404.html            # branded, noindex "page not found"
+├── app/index.html      # redirect: old /app/ demo links go to the pilot (app.roamaccess.com.au)
 ├── robots.txt          # allows all crawlers; points to the sitemap
 ├── sitemap.xml         # XML sitemap (home + legal pages)
 ├── CNAME               # custom domain for GitHub Pages (roamaccess.com.au)
