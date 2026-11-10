@@ -3,304 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Roam Access — pilot demo</title>
-  <meta name="description" content="Interactive pilot of the Roam Access app. Voice-first, accessible-first. Sample data only." />
-  <meta name="theme-color" content="#F2EFE7" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-
-  <!-- Pre-launch prototype carrying illustrative sample data. Kept out of search. -->
-  <meta name="robots" content="noindex, nofollow" />
-
-  <link rel="icon" type="image/svg+xml" href="../assets/roam-appicon-teal.svg" />
-  <link rel="icon" type="image/png" href="../assets/roam-appicon-teal.png" />
-  <link rel="apple-touch-icon" href="../assets/roam-appicon-teal.png" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Roam Access" />
-  <meta property="og:title" content="Roam Access — pilot demo" />
-  <meta property="og:description" content="Voice-first accessibility discovery, built with the disability community. Interactive pilot, sample data only." />
-
-  <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
-
+  <!-- The static demo that lived here was retired. Old links (including /app/#anything) go to the pilot. -->
+  <meta http-equiv="refresh" content="0; url=https://app.roamaccess.com.au/" />
+  <title>Roam Access has moved to app.roamaccess.com.au</title>
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://app.roamaccess.com.au/" />
+  <meta name="theme-color" content="#FAF9F6" />
+  <link rel="icon" type="image/svg+xml" href="/assets/roam-appicon-teal.svg" />
+  <link rel="icon" type="image/png" href="/assets/roam-appicon-teal.png" />
   <style>
-    /* ── Fonts — self-hosted; no visitor data leaves this origin ─────────── */
-    @font-face {
-      font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap;
-      src: url('fonts/inter-latin-var.woff2') format('woff2');
+    :root { --teal:#0A4F4F; --teal-deep:#073838; --paper:#FAF9F6; --charcoal:#1A1A1A; --slate:#5A5651; }
+    *{box-sizing:border-box}
+    html{font-size:18px}
+    body{
+      margin:0; min-height:100vh; min-height:100dvh;
+      display:flex; align-items:center; justify-content:center;
+      padding:2rem 1.25rem; text-align:center;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--paper); color:var(--charcoal);
+      line-height:1.6;
     }
-    @font-face {
-      font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap;
-      src: url('fonts/jetbrains-mono-latin-var.woff2') format('woff2');
+    main{display:flex; flex-direction:column; align-items:center; gap:1.5rem}
+    h1{font-size:clamp(1.75rem,5vw,2.75rem); letter-spacing:-0.03em; line-height:1.1; margin:0; max-width:20ch}
+    p{font-size:1.125rem; color:var(--slate); margin:0; max-width:46ch}
+    a{color:var(--teal); font-weight:600; text-decoration:underline; text-underline-offset:4px}
+    a:focus-visible{outline:3px solid var(--charcoal); outline-offset:3px; border-radius:4px}
+    .go{
+      display:inline-flex; align-items:center; min-height:56px; padding:.5rem 1.5rem; line-height:1.3;
+      background:var(--teal); color:var(--paper); border-radius:8px; text-decoration:none;
     }
-
-    :root {
-      --ra-scale: 1;
-      --ra-paper: #FAF9F6;
-      --ra-char: #1A1A1A;
-      --ra-teal: #0A4F4F;
-      --ra-rust: #9C2D0E;
-      --ra-hair: #E5E2DA;
-      --ra-line: #8A8680;
-      --ra-canvas: #F2EFE7;
-    }
-    :root[data-ra-contrast="high"] { --ra-hair: #4A4742; --ra-line: #5A5651; }
-
-    html, body { margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', -apple-system, system-ui, sans-serif;
-      color: var(--ra-char); background: var(--ra-canvas);
-      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
-    }
-
-    /* ── Text size: zoom scales type + spacing together, reaching every
-         px-valued inline style without rewriting them ─────────────────── */
-    #root { zoom: var(--ra-scale); }
-
-    /* ── Motion: honoured from the OS, forceable from the in-app panel ── */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        transition-duration: 0.001ms !important;
-        animation-duration: 0.001ms !important;
-      }
-    }
-    [data-ra-motion="reduce"] *, [data-ra-motion="reduce"] *::before, [data-ra-motion="reduce"] *::after {
-      transition-duration: 0.001ms !important;
-      animation-duration: 0.001ms !important;
-    }
-
-    /* ── Focus: replaced, never removed ─────────────────────────────────── */
-    :focus-visible { outline: 3px solid var(--ra-char); outline-offset: 2px; border-radius: 6px; }
-    [data-ra-oncolor] :focus-visible,
-    [data-ra-oncolor]:focus-visible { outline-color: var(--ra-paper); }
-    @media (prefers-contrast: more) { :focus-visible { outline-width: 4px; } }
-
-    ::placeholder { color: #5A5651; opacity: 1; }
-    :root[data-ra-contrast="high"] ::placeholder { color: #3A3733; }
-
-    .ra-sr-only {
-      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
-    }
-    .ra-skip {
-      position: absolute; left: 8px; top: -80px; z-index: 500;
-      background: var(--ra-char); color: var(--ra-paper);
-      padding: 12px 18px; border-radius: 10px;
-      font-size: 16px; font-weight: 600; text-decoration: none;
-      transition: top .12s ease;
-    }
-    .ra-skip:focus { top: 8px; }
-
-    /* ── Screen scaffold (used by every app screen) ─────────────────────── */
-    .v2-screen {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      overflow: hidden;
-    }
-    .v2-scroll {
-      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
-      padding-top: var(--ra-shell-top);
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-    }
-    .v2-fixed { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-
-    /* ── Voice animation ────────────────────────────────────────────────── */
-    @keyframes ra-bar { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
-    .ra-bar { animation: ra-bar 1.05s ease-in-out infinite; transform-origin: center; }
-    @keyframes ra-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(156,45,14,.5); } 60% { box-shadow: 0 0 0 18px rgba(156,45,14,0); } }
-    .ra-pulse { animation: ra-pulse 1.6s ease-out infinite; }
-    [data-ra-motion="reduce"] .ra-bar, [data-ra-motion="reduce"] .ra-pulse { animation: none; }
-
-    /* ── Mobile: the app IS the page ────────────────────────────────────── */
-    html:not(.framed) {
-      --ra-shell-top: calc(env(safe-area-inset-top, 0px) + 14px);
-      --ra-tabs-pad: calc(env(safe-area-inset-bottom, 0px) + 12px);
-    }
-    html:not(.framed) .stage-chrome, html:not(.framed) .phone-hw { display: none; }
-    /* iOS Safari rules this layout:
-       — never size the app with `position: fixed; inset: 0`: fixed elements
-         are laid out against the LAYOUT viewport (toolbar collapsed), so the
-         bottom bar renders under the toolbar — and inner scrolling never
-         collapses the toolbar, so it stays buried forever.
-       — 100dvh tracks the VISIBLE viewport instead, and normal flow avoids
-         the fixed-position scroll quirks entirely.
-       — overflow:hidden must sit on BOTH html and body with
-         overscroll-behavior:none, or touch swipes rubber-band the document
-         and the inner scroller feels stuck. */
-    html:not(.framed), html:not(.framed) body {
-      height: 100%;
-      overflow: hidden;
-      overscroll-behavior: none;
-    }
-    html:not(.framed) .phone-wrap { width: 100%; height: 100%; }
-    html:not(.framed) .phone {
-      position: relative; border: 0; border-radius: 0; box-shadow: none;
-      width: 100%; height: 100%; height: 100dvh; padding: 0;
-      transform: none; background: var(--ra-paper); box-sizing: border-box;
-    }
-    html:not(.framed) .phone-screen { position: absolute; inset: 0; border-radius: 0; width: auto; height: auto; }
-
-    /* ── Desktop: a phone on a stage ────────────────────────────────────── */
-    html.framed { --ra-shell-top: 62px; --ra-tabs-pad: 30px; }
-    html.framed body {
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; overflow: hidden;
-    }
-    .stage-chrome {
-      position: fixed; left: 0; right: 0; z-index: 2;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-    }
-    .stage-chrome > * { pointer-events: auto; }
-    .stage-head { top: 0; padding: 20px 28px; justify-content: space-between; }
-    .stage-head .logo { display: flex; align-items: baseline; gap: 10px; }
-    .stage-head .tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em;
-      text-transform: uppercase; color: #5A5651;
-    }
-    .stage-foot { bottom: 0; padding: 18px 28px; }
-    .stage-foot p {
-      margin: 0; font-size: 13px; color: #5A5651; text-align: center; line-height: 1.5;
-    }
-    .stage-foot a { color: var(--ra-teal); }
-
-    .phone-wrap { position: relative; z-index: 1; }
-    .phone {
-      position: relative; width: 393px; height: 852px;
-      background: #000; border-radius: 54px;
-      box-shadow: 0 40px 90px rgba(26,26,26,.28), 0 0 0 1px rgba(0,0,0,.14);
-      padding: 10px; box-sizing: content-box;
-      transform: scale(var(--stage-scale, 1)); transform-origin: center;
-    }
-    .phone-screen {
-      position: relative; width: 393px; height: 852px;
-      border-radius: 44px; overflow: hidden; background: var(--ra-paper);
-    }
-    /* hardware chrome (decorative) */
-    .phone-hw { pointer-events: none; }
-    .ph-island {
-      position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
-      width: 126px; height: 37px; border-radius: 24px; background: #000; z-index: 50;
-    }
-    .ph-status {
-      position: absolute; top: 0; left: 0; right: 0; z-index: 40;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 21px 36px 0; box-sizing: border-box; color: #000;
-    }
-    :root[data-ra-dark="1"] .ph-status { color: #fff; }
-    .ph-status .ph-time {
-      font-weight: 600; font-size: 17px; line-height: 22px; width: 60px;
-      font-family: 'Inter', -apple-system, system-ui;
-      font-feature-settings: 'tnum';
-    }
-    .ph-status .ph-icons { display: flex; align-items: center; gap: 7px; }
-    .ph-home {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      width: 139px; height: 5px; border-radius: 100px; background: rgba(0,0,0,.28); z-index: 60;
-    }
-    :root[data-ra-dark="1"] .ph-home { background: rgba(255,255,255,.65); }
-
-    .noscript-note { max-width: 620px; margin: 80px auto; padding: 0 24px; font-size: 17px; line-height: 1.6; }
+    .go:hover{background:var(--teal-deep)}
   </style>
 </head>
 <body>
-  <a class="ra-skip" href="#ra-main">Skip to main content</a>
-
-  <!-- Desktop stage chrome -->
-  <header class="stage-chrome stage-head" aria-label="About this demo">
-    <span class="logo" aria-hidden="true">
-      <svg width="120" height="29" viewBox="0 0 920 220">
-        <g transform="translate(110,150)" font-family="Inter, sans-serif" font-weight="700" font-size="110">
-          <text fill="#0A4F4F" letter-spacing="-5" x="0" y="0">roam</text>
-          <text fill="#9C2D0E" x="293" y="0">/</text>
-          <text fill="#0A4F4F" letter-spacing="-5" x="338" y="0">access</text>
-        </g>
-      </svg>
-    </span>
-    <span class="tag">Pilot demo · interactive</span>
-  </header>
-
-  <div class="phone-wrap">
-    <div class="phone">
-      <div class="phone-screen">
-        <div id="root"></div>
-        <!-- phone hardware chrome (decorative, desktop only) -->
-        <div class="phone-hw" aria-hidden="true">
-          <div class="ph-island"></div>
-          <div class="ph-status">
-            <span class="ph-time" id="ph-time">9:41</span>
-            <span class="ph-icons">
-              <svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill="currentColor"/><rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill="currentColor"/><rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill="currentColor"/><rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill="currentColor"/></svg>
-              <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill="currentColor"/><path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill="currentColor"/><circle cx="8.5" cy="10.5" r="1.5" fill="currentColor"/></svg>
-              <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35" fill="none"/><rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/><path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill="currentColor" fill-opacity="0.4"/></svg>
-            </span>
-          </div>
-          <div class="ph-home"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <footer class="stage-chrome stage-foot">
-    <p>
-      Fully interactive — click through, or tap the mic and actually speak.
-      Venues and reviews are fictional sample data.
-      <a href="/">roamaccess.com.au</a>
-    </p>
-  </footer>
-
-  <noscript>
-    <div class="noscript-note">
-      <h1>Roam Access pilot demo</h1>
-      <p>This interactive pilot needs JavaScript. Everything about the product itself is on the main site, which works without it.</p>
-      <p><a href="/">Go to roamaccess.com.au</a> &middot; <a href="/accessibility.html">Accessibility statement</a></p>
-    </div>
-  </noscript>
-
-  <script>
-    // Frame the app in a phone on large screens; run full-bleed on small ones.
-    (function () {
-      var mq = window.matchMedia('(min-width: 700px) and (min-height: 600px)');
-      function apply() {
-        document.documentElement.classList.toggle('framed', mq.matches);
-        if (mq.matches) {
-          var s = Math.min(1, (window.innerHeight - 150) / 872, (window.innerWidth - 64) / 413);
-          document.documentElement.style.setProperty('--stage-scale', String(Math.max(0.4, s)));
-        }
-      }
-      apply();
-      window.addEventListener('resize', apply);
-
-      // Skip link: focus main directly — writing "#ra-main" into the hash
-      // would be read as a route change and reset the app to Home.
-      document.querySelector('.ra-skip').addEventListener('click', function (e) {
-        e.preventDefault();
-        var main = document.getElementById('ra-main');
-        if (main) main.focus();
-      });
-
-      // Live clock in the frame's status bar.
-      function tick() {
-        var d = new Date();
-        var h = d.getHours() % 12 || 12;
-        var el = document.getElementById('ph-time');
-        if (el) el.textContent = h + ':' + String(d.getMinutes()).padStart(2, '0');
-      }
-      tick();
-      setInterval(tick, 15000);
-    })();
-  </script>
-
-  <!-- React vendored: no CDN between our users and the page. -->
-  <script src="vendor/react.production.min.js?v=f1c54d090c"></script>
-  <script src="vendor/react-dom.production.min.js?v=f1c54d090c"></script>
-
-  <!-- Compiled from app/src/*.jsx by `npm run build`. Order matters:
-       each file reads globals published by the ones before it. -->
-  <script src="js/data.js?v=f1c54d090c"></script>
-  <script src="js/primitives.js?v=f1c54d090c"></script>
-  <script src="js/screens-a.js?v=f1c54d090c"></script>
-  <script src="js/screens-b.js?v=f1c54d090c"></script>
-  <script src="js/app.js?v=f1c54d090c"></script>
+  <main>
+    <h1>Roam Access has moved to <a href="https://app.roamaccess.com.au/">app.roamaccess.com.au</a></h1>
+    <p>The pilot is live, and free, around Manly and the Northern Beaches.</p>
+    <a class="go" href="https://app.roamaccess.com.au/">Open the Roam Access pilot</a>
+    <p><a href="/">Back to the Roam Access home page</a></p>
+  </main>
 </body>
 </html>
