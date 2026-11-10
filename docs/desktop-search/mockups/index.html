@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Desktop search options · Roam Access mockups</title>
+<link rel="stylesheet" href="desk.css">
+<style>
+  body { padding: 32px 24px 64px; background: var(--stone); }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 30px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+  .opt { background: var(--paper); border: 1.5px solid var(--hair); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .opt h2 { font-size: 20px; }
+  .opt p { font-size: 15px; }
+  .opt .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+  .opt .links a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--teal); background: var(--teal-soft); text-decoration: none; }
+  .opt .links a.main { background: var(--teal); color: var(--paper); }
+  .rec { display: inline-block; font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--paper); background: var(--teal); border-radius: 6px; padding: 2px 8px; }
+  .note { background: var(--paper); border-radius: var(--r-lg); padding: 16px 18px; margin-top: 20px; font-size: 15px; }
+  ul { margin: 8px 0 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Desktop search — three options<span class="dot" aria-hidden="true">.</span></h1>
+  <p class="lead" style="margin-top:8px">Search and filters along the top, like Domain and realestate.com.au; the list beside the map; the place details are what differs. Open each one at 1440×900, then try 1280 and 1024. Every page has a small toolbar (bottom-left) to switch state and text size. The spec with trade-offs and a recommendation is <a href="../spec.md">spec.md</a>.</p>
+  <div class="opts">
+    <section class="opt" aria-labelledby="oa">
+      <h2 id="oa">Option A — drawer over the map <span class="rec">recommended</span></h2>
+      <p>Click a place and a 560 px drawer slides in beside the list, over the map. Verdict and actions first; Today, For your needs, Getting there, Reviews and More are folded rows whose summary already says the gist. The list and the map stay where they are, so you can compare places without losing your spot.</p>
+      <div class="links"><a class="main" href="option-a.html?state=place">Open with a place</a><a href="option-a.html?state=results">Results</a><a href="option-a.html">Before a search</a></div>
+    </section>
+    <section class="opt" aria-labelledby="ob">
+      <h2 id="ob">Option B — full place page</h2>
+      <p>Click a place and it opens as a page, like a property listing: the phone's place page in a calm left column and a quiet right column with the photo, a mini-map, the address and the one main action. Back returns you to the list where you were.</p>
+      <div class="links"><a class="main" href="option-b.html?state=place">Open with a place</a><a href="option-b.html?state=results">Results</a><a href="option-b.html">Before a search</a></div>
+    </section>
+    <section class="opt" aria-labelledby="oc">
+      <h2 id="oc">Option C — one panel, as today</h2>
+      <p>The place page replaces the list in the same panel (today's structure) under the new top bar. Least change. Included so the other two can be judged against the current shape.</p>
+      <div class="links"><a class="main" href="option-c.html?state=place">Open with a place</a><a href="option-c.html?state=results">Results</a><a href="option-c.html">Before a search</a></div>
+    </section>
+  </div>
+  <div class="note">
+    <strong>What is real and what is sample.</strong> The 232 places, their kinds, suburbs, walking minutes from Manly Wharf and OpenStreetMap wheelchair tags are a read-only snapshot of the dev database. The dev database held no reviews, so twelve places carry sample community facts and quotes, each marked <span class="sample">sample</span>, only so every verdict state can be seen. The map ground is drawn, not tiles; the pins are at real coordinates.
+    <ul>
+      <li>The person is “Alex”: wheelchair or mobility aid + seats and rest spots. Change it with the “For:” chip.</li>
+      <li>The map mirrors the list on screen (one page of 10), hides overlapping pins instead of clustering, hides “No info yet” places at the overview zoom and offers “Search this area” — the behaviours the map thread is building.</li>
+      <li>Keyboard: Tab through top bar → chips → list → “Skip the map” → map controls and pins. A drawer or page takes focus to its heading; Escape or Close returns it to the card you came from.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>
