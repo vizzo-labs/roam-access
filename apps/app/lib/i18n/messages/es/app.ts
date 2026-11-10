@@ -46,6 +46,8 @@ const app: Translation<typeof en> = {
   'app.map.stopFollowing': "Dejar de seguir mi ubicación",
   'app.map.failed': "No se pudo cargar el mapa. La lista tiene todos los resultados.",
   'app.map.searchArea': "Buscar en esta zona",
+  'app.map.inArea': { one: "{count} lugar en esta zona; usa la lista para verlos.", other: "{count} lugares en esta zona; usa la lista para verlos." },
+  'app.map.legendTiers': "Alejado: un punto. Más cerca: forma y tipo. Calle: marcador.",
   'app.map.showSymbols': "Mostrar símbolos",
   'app.map.hideSymbols': "Ocultar símbolos",
   'app.map.legend.cafe': "Café",

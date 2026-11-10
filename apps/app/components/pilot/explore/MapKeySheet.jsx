@@ -4,15 +4,14 @@ import React from 'react';
 import { C2 } from '../ui/palette';
 import { CheckRow, SPACE, Sheet, TYPE } from '../ds';
 import { useT } from '../i18n';
-import { PLACE_ICONS, PLACE_ICON_LEGEND, dotSvg, markSvg, pinSvg } from '../PilotMap';
+import { PLACE_ICONS, PLACE_ICON_LEGEND, legendSymbols } from '../PilotMap';
 import { PIN, pinLabels } from '../WebLayout';
 
-// "Key" on the phone map: what the pins mean, in a dialog — so no legend
-// ever covers the map. Verdict = colour + mark + words; the picture inside a
-// pin is the kind of place.
-// Zoomed out, the verdict is also the SHAPE (circle · diamond · octagon), so
-// each row shows the shape and the pin. `onShowUnknown` adds the opt-in for
-// "No info yet" dots at every zoom.
+// "Key" on the phone map: what the markers mean, in a dialog — so no legend
+// ever covers the map. Every place in view is on the map: zoomed out it's a
+// dot, closer in a shape with the kind of place, at street zoom a pin. The
+// verdict is colour AND shape (circle · diamond · octagon) and, on a pin, a
+// mark; grey = no info yet. `onShowUnknown` adds the "No info yet" switch.
 function MapKeySheet({ open, onClose, showUnknown = false, onShowUnknown = null }) {
   const t = useT();
   const labels = pinLabels(t);
@@ -23,9 +22,8 @@ function MapKeySheet({ open, onClose, showUnknown = false, onShowUnknown = null 
       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: SPACE.xs }}>
         {['works', 'check', 'barrier', 'unknown'].map(k => (
           <li key={k} style={row}>
-            <span aria-hidden="true" style={{ lineHeight: 0, flexShrink: 0, display: 'inline-flex', alignItems: 'flex-end', justifyContent: 'center', gap: 6, width: 64 }} dangerouslySetInnerHTML={{ __html: k === 'unknown'
-              ? dotSvg({ w: 16, fill: PIN.colors.unknown }) + pinSvg({ w: 32, fill: C2.paper, stroke: PIN.colors.unknown, iconColor: PIN.colors.unknown, icon: 'food', badge: PIN.icons.unknown, badgeColor: PIN.colors.unknown })
-              : markSvg({ w: 24, kind: k, fill: PIN.colors[k], icon: 'food' }) + pinSvg({ w: 32, fill: PIN.colors[k], stroke: C2.paper, iconColor: C2.paper, icon: 'food', badge: PIN.icons[k], badgeColor: PIN.colors[k] }) }}/>
+            <span aria-hidden="true" style={{ lineHeight: 0, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6, width: 86 }}
+              dangerouslySetInnerHTML={{ __html: legendSymbols(k, PIN.colors, PIN.icons, { dot: 1.4, mark: 24, pin: 32 }) }}/>
             <span style={{ fontWeight: 700 }}>{labels[k]}</span>
           </li>
         ))}

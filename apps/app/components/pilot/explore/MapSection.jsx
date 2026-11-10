@@ -13,25 +13,24 @@ import { invalidateGaps } from '../community/gapsStore';
 const HEIGHT = 300;
 
 // The map on phones: a VIEW of the list on Find, never the only way and never
-// a whole screen. It shows the pins of the places in the list on screen (≤ 12,
-// so ≤ 14 tab stops in the map), 48px category pins with the verdict mark,
-// nudged apart where they'd overlap in a street — no clusters. Zoomed out
-// they're small verdict shapes and only the higher-ranked of two overlapping
-// pins shows; "No info yet" places appear as dots when zoomed in close
-// (or always, from the Key). Pan or zoom → "Search this area" reloads the
-// list (and so the pins) for what the map shows. "Key" opens a dialog
-// instead of a legend over the map; "Skip the map" (shown on focus) jumps to
-// the list. A pin opens the place's card UNDER the map; Escape or its Close
-// returns focus to the pin.
-//   <MapSection app={app} places={rows} listHeadingId="map-list-h"/>
-function MapSection({ app, places, listHeadingId }) {
+// a whole screen. It shows EVERY place of the search in view (`everything`),
+// small when zoomed out (dots → verdict shapes → pins at street zoom), with
+// no clusters and nothing hidden; the places of the list page (≤ 10) are its
+// focusable pins, in list order. Tapping any dot opens its card. Pan or zoom
+// → "Search this area" narrows the list to what the map shows. "Key" opens a
+// dialog instead of a legend over the map; "Skip the map" (shown on focus)
+// jumps to the list. A pin opens the place's card UNDER the map; Escape or
+// its Close returns focus to the pin.
+//   <MapSection app={app} places={rows} everything={all} listHeadingId="map-list-h"/>
+function MapSection({ app, places, everything = null, listHeadingId }) {
   const t = useT();
   const [selId, setSelId] = React.useState(null);
   const [keyOpen, setKeyOpen] = React.useState(false);
   const mapApi = React.useRef(null);
   const cardRef = React.useRef(null);
-  const sel = places.find(p => p.id === selId) || null;
-  if (selId && !sel) setSelId(null); // its page moved on
+  const all = everything || places;
+  const sel = all.find(p => p.id === selId) || null;
+  if (selId && !sel) setSelId(null); // it left the search
 
   function select(id) {
     setSelId(id);
@@ -49,14 +48,14 @@ function MapSection({ app, places, listHeadingId }) {
 
   return (
     <section aria-labelledby="map-h" style={{ padding: `0 ${GUTTER}px` }}>
-      <h2 id="map-h" className="ra-sr-only">{t('find.map.title', { count: places.length })}</h2>
+      <h2 id="map-h" className="ra-sr-only">{t('find.map.title', { count: all.length })}</h2>
       <a href={`#${listHeadingId}`} onClick={skip} className="ra-skip-local">{t('find.map.skip')}</a>
       <div role="group" aria-label={t('find.map.region')} style={{
         position: 'relative', height: HEIGHT, borderRadius: RADIUS.lg, overflow: 'hidden', isolation: 'isolate',
         border: `1.5px solid ${C2.line}`,
       }}>
-        <PilotMap results={places} selectedId={selId} onSelect={select} origin={app.origin}
-          pinSize={48} spread attribution={false} apiRef={mapApi} onMapClick={() => sel && close()}
+        <PilotMap results={places} everything={all} selectedId={selId} onSelect={select} origin={app.origin}
+          pinSize={48} attribution={false} apiRef={mapApi} onMapClick={() => sel && close()}
           colors={PIN.colors} icons={PIN.icons} labels={pinLabels(t)} topPad={72} bottomPad={24}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
           locateStyle={{ right: 10, bottom: 10 }} alertIds={app.layers.alertIds}

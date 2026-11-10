@@ -46,6 +46,8 @@ const app: Translation<typeof en> = {
   'app.map.stopFollowing': "停止跟随我的位置",
   'app.map.failed': "地图无法加载。列表视图包含所有结果。",
   'app.map.searchArea': "搜索此区域",
+  'app.map.inArea': { one: "此区域有 {count} 个地点；请用列表浏览。", other: "此区域有 {count} 个地点；请用列表浏览。" },
+  'app.map.legendTiers': "缩小：圆点。放大：形状和类型。街道：图钉。",
   'app.map.showSymbols': "显示图标说明",
   'app.map.hideSymbols': "隐藏图标说明",
   'app.map.legend.cafe': "咖啡馆",
