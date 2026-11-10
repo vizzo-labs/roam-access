@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { RA2_NEEDS } from '@/lib/pilot-data';
+import { publicOrigin } from '@/lib/site-url';
 import { SUMMARY_LABEL, auDate, basisLine, getVenueSummary, type SummaryKind } from '@/lib/data/summary';
 
 // The embeddable widget: a tiny, self-contained HTML page for an <iframe> on a
@@ -27,7 +28,7 @@ const HEADERS = {
 export async function GET(req: NextRequest, ctx: RouteContext<'/v/[id]/embed'>) {
   const { id } = await ctx.params;
   const s = await getVenueSummary(id);
-  const origin = req.nextUrl.origin;
+  const origin = publicOrigin(req.nextUrl.origin);
   if (!s) {
     return new Response(page('Place not found', `<p>This place isn’t in Roam Access. <a href="${origin}/" target="_blank" rel="noopener">Visit Roam Access<span class="sr"> (opens in a new tab)</span></a></p>`), { status: 404, headers: HEADERS });
   }

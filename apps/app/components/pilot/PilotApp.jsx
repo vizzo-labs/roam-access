@@ -38,6 +38,7 @@ import { useAccessLayers } from './layers/useAccessLayers';
 import { I18nProvider, useT } from './i18n';
 import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
 import { AppSkeleton } from './explore/AppSkeleton';
+import { clientOrigin } from '@/lib/site-url';
 
 const PREFS_KEY = 'ra2-a11y';
 
@@ -542,7 +543,7 @@ function PilotScreens({ initial, userId }) {
     },
 
     invite: async () => {
-      const url = window.location.origin;
+      const url = clientOrigin();
       const text = t('app.invite.text');
       try {
         if (navigator.share) { await navigator.share({ title: t('app.invite.title'), text, url }); return; }

@@ -5,6 +5,19 @@ people with the same needs. Several agents work on this repo in parallel, each i
 worktree, merging small PRs to `main`. These rules keep that safe. Read this file, then
 `apps/app/README.md` and `apps/app/AGENTS.md`, before you change anything.
 
+## Addresses
+
+- **Pilot app (production): https://app.roamaccess.com.au.** The old
+  https://roam-access.vercel.app redirects there (308, same path and query) once the new
+  domain is live. Previews keep their own `*.vercel.app` URLs and never redirect.
+- **Landing page: https://roamaccess.com.au** (GitHub Pages, from `main`'s repo root).
+- Links that leave the app (share links, `/v/[id]`, QR codes, printed cards, the widget
+  snippet, the organiser kit, open data, link previews) come from **one setting**,
+  `NEXT_PUBLIC_SITE_URL` (`apps/app/lib/site-url.ts`): set on Vercel Production only;
+  unset, the app uses the address it is served from. Never hard-code a domain — use
+  `siteOrigin()` (server), `publicOrigin(req…origin)` (route handlers) or `clientOrigin()`
+  (browser).
+
 ## Repo layout
 
 ```
@@ -240,6 +253,6 @@ Every PR, from `apps/app`:
   DB** — so your migration must be additive and idempotent.
 - After merging, wait for the production deployment to be **Ready**
   (`npx vercel@latest ls roam-access`, or `gh pr view <n> --json statusCheckRollup`), then
-  smoke-test https://roam-access.vercel.app (signed-out page loads; nothing you touched is
+  smoke-test https://app.roamaccess.com.au (signed-out page loads; nothing you touched is
   broken). If production fails, tell the orchestrator (parent thread) at once.
 - Never commit `.env*` or `.vercel` (both gitignored).

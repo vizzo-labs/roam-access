@@ -19,11 +19,12 @@ import { TodayBlock } from '../venue/TodayBlock';
 import { PlaceReviews } from '../venue/PlaceReviews';
 import { VenueMore } from '../venue/VenueMore';
 import { ActionRow, Button, GUTTER, SPACE, ScreenHeader, TYPE, VerdictCard } from '../ds';
+import { clientOrigin } from '@/lib/site-url';
 
 // Share the public summary page (/v/<id>): works for people without an
 // account, e.g. a carer or a friend you're meeting there.
 async function shareVenue(app, v, t) {
-  const url = `${window.location.origin}/v/${encodeURIComponent(v.id)}`;
+  const url = `${clientOrigin()}/v/${encodeURIComponent(v.id)}`;
   try {
     if (navigator.share) { await navigator.share({ title: t('venue.shareTitle', { name: v.name }), text: t('venue.shareText', { name: v.name }), url }); return; }
     await navigator.clipboard.writeText(url);
