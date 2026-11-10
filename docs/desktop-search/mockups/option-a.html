@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Option A · drawer over the map · Roam Access desktop mockup</title>
+<link rel="stylesheet" href="desk.css">
+</head>
+<body data-option="a">
+<a class="skip" href="#panel">Skip to results</a>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <section class="filterbar" id="filterbar" aria-label="Filters"></section>
+  <div class="body">
+    <main class="panel" id="panel" tabindex="-1" aria-label="Places"></main>
+    <section class="map" id="map" aria-label="Map of the places in the list"></section>
+    <aside class="drawer" id="drawer" aria-labelledby="d-h" tabindex="-1"></aside>
+  </div>
+</div>
+<div class="sr-only" aria-live="polite" id="live"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<aside class="demo" id="demo" aria-label="Mockup toolbar"></aside>
+<script src="data.js"></script>
+<script src="desk.js"></script>
+</body>
+</html>
