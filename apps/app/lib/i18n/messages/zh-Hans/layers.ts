@@ -130,6 +130,7 @@ const layers: Translation<typeof en> = {
   'layers.toggle.beach': '海滩无障碍',
   'layers.toggle.locked': '（在此列表中始终显示）',
   'layers.toggle.squarePins': '方形标记是列表信息，不是评定结果。',
+  'layers.toggle.unknown': '还没有信息（灰色圆点）',
   'layers.toggle.menu': '图层',
   'layers.toggle.menuOn': '图层（已开 {count} 个）',
   'layers.pin.changingPlaces': 'Changing Places 洗手间',

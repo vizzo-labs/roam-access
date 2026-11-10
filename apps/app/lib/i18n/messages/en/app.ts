@@ -47,6 +47,7 @@ const app = {
   'app.map.showMe': 'Show my location on the map',
   'app.map.stopFollowing': 'Stop following my location',
   'app.map.failed': 'The map couldn’t load. The list view has every result.',
+  'app.map.searchArea': 'Search this area',
   'app.map.showSymbols': 'Show symbols',
   'app.map.hideSymbols': 'Hide symbols',
   'app.map.legend.cafe': 'Cafe',

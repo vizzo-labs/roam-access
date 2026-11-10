@@ -45,6 +45,7 @@ const app: Translation<typeof en> = {
   'app.map.showMe': "Mostrar mi ubicación en el mapa",
   'app.map.stopFollowing': "Dejar de seguir mi ubicación",
   'app.map.failed': "No se pudo cargar el mapa. La lista tiene todos los resultados.",
+  'app.map.searchArea': "Buscar en esta zona",
   'app.map.showSymbols': "Mostrar símbolos",
   'app.map.hideSymbols': "Ocultar símbolos",
   'app.map.legend.cafe': "Café",

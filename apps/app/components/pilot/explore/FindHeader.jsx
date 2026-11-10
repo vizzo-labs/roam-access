@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { C2 } from '../ui/palette';
-import { Button, GUTTER, SPACE, SearchField, SegmentedControl, TYPE } from '../ds';
+import { Button, GUTTER, RemovableChip, SPACE, SearchField, SegmentedControl, TYPE } from '../ds';
 import { useT } from '../i18n';
 import { ra2ParseQuery } from '@/lib/pilot/match';
 import { countsLine } from './filters';
@@ -12,7 +12,9 @@ import { EnglishSearchNote } from './EnglishSearchNote';
 // The top of Find when a search or category is on: Back (to Find), the
 // search box with the words, then "24 places." (the screen's h1, focused on
 // arrival), one summary line, the chips, and "Show as List · Map" on phones.
-function FindHeader({ app, headingRef, queryLabel, initialText, total, counts, searched, badgeFilter, view = 'list', onView }) {
+// `area` (after "Search this area"): a chip says the list is limited to the
+// map area; removing it shows places everywhere again.
+function FindHeader({ app, headingRef, queryLabel, initialText, total, counts, searched, badgeFilter, view = 'list', onView, area = null }) {
   const t = useT();
   const [text, setText] = React.useState(initialText);
   // A new search resets the box (adjusting state while rendering, so the
@@ -35,12 +37,18 @@ function FindHeader({ app, headingRef, queryLabel, initialText, total, counts, s
 
       <h1 ref={headingRef} tabIndex={-1} style={{ ...TYPE.title2, margin: `${SPACE.md}px 0 0`, color: C2.char }}>
         {t('common.places', { count: total })}<span aria-hidden="true" style={{ color: C2.rust }}>.</span>
-        <span className="ra-sr-only"> {t('find.results.srFor', { query: queryLabel })}</span>
+        <span className="ra-sr-only"> {area ? t('find.results.srForArea', { query: queryLabel }) : t('find.results.srFor', { query: queryLabel })}</span>
       </h1>
       <p style={{ ...TYPE.footnote, color: C2.char, margin: '4px 0 0' }}>
         {line && <>{line}. </>}
         <span style={{ color: C2.slate }}>{t('find.walkingFrom', { origin: app.origin.name })}</span>
       </p>
+
+      {area && (
+        <RemovableChip onRemove={app.clearArea} removeLabel={t('find.area.clear')} style={{ marginTop: SPACE.sm }}>
+          {t('find.area.chip')}
+        </RemovableChip>
+      )}
 
       <ExploreFilters app={app} counts={counts} searched={searched} badgeFilter={badgeFilter} style={{ marginTop: SPACE.sm }}/>
 

@@ -1,7 +1,9 @@
 'use client';
 // The pilot as a web app (≥ 960px): header with navigation, the app's screens
-// in a side panel, and a live map of the pilot area beside them — the panel
-// and the map stay in sync (pin → venue in the panel; venue → pin selected).
+// in a side panel, and a live map beside them — the panel and the map stay in
+// sync: the map shows the pins of the list in the panel (pin → card → venue
+// in the panel; row hover → pin lifted), and "Search this area" reloads the
+// list for what the map shows.
 
 import { PilotMap, MapLegend } from './PilotMap';
 import { V2Logo } from './ui/Logo';
@@ -36,12 +38,11 @@ function Header({ children }) {
   );
 }
 
-export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId = null, children }) {
+export function WebLayout({ app, mapResults, mapFit = true, mapFitKey = null, selectedId, hoverId = null, children }) {
   const t = useT();
   const labels = pinLabels(t);
   const active = NAV.find(n => n.views.includes(app.view))?.id;
   const initial = (app.user?.name || 'You').charAt(0).toUpperCase();
-  const kinds = [...new Set(mapResults.map(r => r.verdict.kind))];
   // Access layers (F3): the toilets / beach lists always show their layer.
   const L = app.layers;
   const facility = app.view === 'facility' ? L.facilityById(app.selectedId) : null;
@@ -97,12 +98,14 @@ export function WebLayout({ app, mapResults, mapFit = true, selectedId, hoverId 
         <section className="web-map" aria-label={t('app.web.mapLabel')} onKeyDown={onMapKey}>
           <PilotMap results={mapResults} selectedId={previewId || selectedId} hoverId={hoverId} onSelect={setPreviewId}
             apiRef={mapApi} onMapClick={() => previewId && closePreview(true)}
-            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras}
+            origin={app.origin} colors={PIN.colors} icons={PIN.icons} labels={labels} topPad={70} bottomPad={40} fit={mapFit && !fitExtras} fitKey={mapFitKey}
+            showUnknown={app.showUnknown} onSearchArea={app.searchArea}
             onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
             extras={extras} selectedExtraId={facility?.id || null} onSelectExtra={id => app.goto('facility', id)}
             fitExtras={fitExtras} alertIds={L.alertIds}/>
-          <MapLegend compact kinds={kinds} colors={PIN.colors} icons={PIN.icons} labels={labels} style={{ top: 16, left: 16 }}/>
-          <LayerToggles shown={L.shown} forced={forced} onChange={L.setShown} style={{ top: 76, right: 16 }}/>
+          <MapLegend compact colors={PIN.colors} icons={PIN.icons} labels={labels} style={{ top: 16, left: 16 }}/>
+          <LayerToggles shown={L.shown} forced={forced} onChange={L.setShown} style={{ top: 76, right: 16 }}
+            unknown={{ on: app.showUnknown, onChange: app.setShowUnknown }}/>
           {preview && <MapPlacePreview key={preview.id} app={app} place={preview} mapApi={mapApi} onClose={closePreview}/>}
         </section>
       </div>

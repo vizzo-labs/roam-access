@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { PILOT_AREA } from '@/lib/pilot-data';
 import { WebLayout, WebWelcome } from './WebLayout';
 import { useInstall } from './pwa';
-import { ra2Search, ra2Verdict } from '@/lib/pilot/match';
+import { ra2Verdict } from '@/lib/pilot/match';
 import { C2, F2, RA2SetContrast } from './ui/palette';
 import { V2Toast } from './ui/Toast';
 import { V2BigBtn } from './ui/Buttons';
@@ -36,7 +36,7 @@ import { NamePrompt } from './contrib/NamePrompt';
 import { useBadgeMoment } from './contrib/useBadgeMoment';
 import { useAccessLayers } from './layers/useAccessLayers';
 import { I18nProvider, useT } from './i18n';
-import { DEFAULT_FILTERS, applyFilters } from './explore/filters';
+import { DEFAULT_FILTERS, nearPlaces } from './explore/filters';
 import { AppSkeleton } from './explore/AppSkeleton';
 import { clientOrigin } from '@/lib/site-url';
 
@@ -193,6 +193,14 @@ function SignedOut() {
   return <WebWelcome origin={PILOT_AREA.origin} signIn={app.signIn}>{screen}</WebWelcome>;
 }
 
+// Dev-only `?mapStress=1`: ~3,000 synthetic places across Greater Sydney,
+// made in the browser and never sent anywhere (explore/mapStress.js).
+async function withMapStress(data) {
+  const { mapStressOn, stressVenues } = await import('./explore/mapStress');
+  if (!mapStressOn()) return data;
+  return { ...data, venues: [...data.venues, ...stressVenues()] };
+}
+
 function PilotApp() {
   const t = useT();
   const { userId } = useAuth();
@@ -200,7 +208,9 @@ function PilotApp() {
   const [failed, setFailed] = useState(false);
   const load = useCallback(() => {
     setFailed(false);
-    api('/api/bootstrap').then(setData, () => setFailed(true));
+    api('/api/bootstrap')
+      .then(withMapStress)
+      .then(setData, () => setFailed(true));
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -250,6 +260,15 @@ function PilotScreens({ initial, userId }) {
   // the session (not saved): the list is always where people start.
   const [exploreView, setExploreView] = useState('list');
   const [hoverId, setHoverId] = useState(null);
+  // "Search this area": the map bounds the list is limited to ({ w, s, e, n,
+  // seq }), until the next search. Only narrows; never changes a verdict.
+  const [area, setArea] = useState(null);
+  const areaAnnounced = useRef(0);
+  // Desktop map: the places of the list on screen, published by Find
+  // (explore/useShowOnMap) — the map mirrors the list, never every place.
+  const [listPins, setListPins] = useState(null);
+  // "No info yet" places as dots on the map at every zoom (Key / map layers).
+  const [showUnknown, setShowUnknown] = useState(false);
   const [lastVenueId, setLastVenueId] = useState(null);
   const [prefs, setPrefs] = useState(initialPrefs);
   const [a11yOpen, setA11yOpen] = useState(false);
@@ -342,20 +361,21 @@ function PilotScreens({ initial, userId }) {
   // `pub`: how I appear on reviews (Brief L); relationship null = never chosen.
   const user = { name: me.name, needs: me.needs, done: me.onboarded, pub: me.pub };
 
-  // Web layout: the map always shows places (grouped into bubbles until you
-  // zoom in). A search or saved list narrows it and frames the best matches;
-  // otherwise it's every place in the area, without moving the camera.
+  // Web layout: the map mirrors the list in the panel (Find publishes its
+  // rows; Saved shows the saved places). A place page keeps the list it came
+  // from, plus the place. Before Find has shown anything (a deep link), the
+  // map shows the places near you, so it always shows something.
   const mapView = useMemo(() => {
-    if (!wide) return { list: [], fit: false };
+    if (!wide) return { list: [], fit: false, fitKey: null };
     const needIds = me.needs;
-    let list = [], fit = true;
-    if (view === 'saved') list = savedIds.map(id => byId.get(id)).filter(Boolean);
-    else if (query && ['results', 'venue', 'arrival', 'reviews', 'review', 'thanks', 'voice'].includes(view)) list = applyFilters(ra2Search(withMins, query, needIds), filters);
-    if (!list.length) { list = withMins; fit = false; }
+    let list, fit = true, fitKey;
+    if (view === 'saved') { list = savedIds.map(id => byId.get(id)).filter(Boolean); fitKey = 'saved:' + savedIds.join(','); }
+    else if (listPins) ({ places: list, fitKey, fit } = listPins);
+    else { list = nearPlaces(withMins, needIds, 5, ra2Verdict); fitKey = 'near'; }
     const sel = VENUE_VIEWS.includes(view) && selectedId && byId.get(selectedId);
     if (sel && !list.some(v => v.id === sel.id)) list = [...list, sel];
-    return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit };
-  }, [wide, view, query, filters, savedIds, withMins, byId, selectedId, me.needs]);
+    return { list: list.map(v => (v.verdict ? v : { ...v, verdict: ra2Verdict(v, needIds) })), fit, fitKey };
+  }, [wide, view, listPins, savedIds, withMins, byId, selectedId, me.needs]);
 
   // "Updates from your saved places": each saved place's live notices.
   const savedUpdates = useMemo(() => savedIds
@@ -373,6 +393,24 @@ function PilotScreens({ initial, userId }) {
     exploreView,
     setExploreView,
     setQuery,
+    // Map: "Search this area", "No info yet" dots, and (desktop) the list's pins.
+    area,
+    searchArea: (bounds) => {
+      const seq = Date.now();
+      setArea({ ...bounds, seq });
+      window.RA2_NAVIGATED = true; // the results heading takes focus
+      if (view !== 'results') goto('results');
+    },
+    clearArea: () => setArea(null),
+    // True once per "Search this area": its result is announced one time.
+    takeAreaAnnouncement: (seq) => {
+      if (areaAnnounced.current === seq) return false;
+      areaAnnounced.current = seq;
+      return true;
+    },
+    showUnknown,
+    setShowUnknown,
+    showOnMap: setListPins,
     // Desktop: hovering/focusing a row highlights its pin (no-op on phones).
     hover: wide ? setHoverId : null,
     lastVenueId,
@@ -454,6 +492,7 @@ function PilotScreens({ initial, userId }) {
 
     runSearch: (parsed) => {
       setQuery(parsed);
+      setArea(null); // a new search looks everywhere again
       goto('results', null, { replace: parseHash(idsRef.current).view === 'voice' });
     },
 
@@ -589,7 +628,7 @@ function PilotScreens({ initial, userId }) {
   );
   if (!wide) return content;
   return (
-    <WebLayout app={app} mapResults={mapView.list} mapFit={mapView.fit} hoverId={hoverId} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
+    <WebLayout app={app} mapResults={mapView.list} mapFit={mapView.fit} mapFitKey={mapView.fitKey} hoverId={hoverId} selectedId={VENUE_VIEWS.includes(view) ? selectedId : null}>
       {content}
     </WebLayout>
   );
