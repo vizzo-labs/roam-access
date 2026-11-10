@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { PwaInit } from '@/components/pilot/pwa';
-import { SITE_URL } from '@/lib/site-url';
+import { metadataOrigin } from '@/lib/site-url';
 import './globals.css';
 
 export const metadata: Metadata = {
-  // Absolute URLs in link previews use the public address when one is set
-  // (NEXT_PUBLIC_SITE_URL); otherwise Next uses this deployment's own URL.
-  ...(SITE_URL ? { metadataBase: new URL(SITE_URL) } : {}),
+  // Absolute URLs in link previews (og:url): the public address when one is
+  // set (NEXT_PUBLIC_SITE_URL), else this deployment's own.
+  metadataBase: new URL(metadataOrigin()),
   title: 'Roam Access pilot',
   description: 'Find places in Manly that actually work for you — a pilot built with the disability community.',
   // Pilot with sign-in and reviews of real businesses: keep it out of search.
