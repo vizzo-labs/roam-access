@@ -15,10 +15,10 @@ import { BrowseGrid, ALL } from '../explore/BrowseGrid';
 import { FindHeader } from '../explore/FindHeader';
 import { EnglishSearchNote } from '../explore/EnglishSearchNote';
 import { MapSection } from '../explore/MapSection';
-import { CLEAR_FILTERS, PAGE, applyFilters, filtersOn, verdictCounts } from '../explore/filters';
+import { CLEAR_FILTERS, PAGE, applyFilters, filtersOn, inArea, nearPlaces, verdictCounts } from '../explore/filters';
+import { useShowOnMap } from '../explore/useShowOnMap';
 
 const NEAR_ROWS = 5;
-const hasCommunityFact = v => [...v.works, ...v.check, ...v.barriers].some(f => f.src === 'community');
 
 // ─────────────────────────────────────────────────────────────
 // FIND — one screen for finding a place (Home + Results merged).
@@ -41,10 +41,10 @@ function FindHome({ app }) {
   const showPrompt = visited && !app.world.reviewed.includes(visited.id);
   // Nearest places that anyone in the pilot has said something about; the
   // rest of the five are simply the nearest.
-  const byDistance = app.venues.map(v => ({ ...v, verdict: ra2Verdict(v, needs) })).sort((a, b) => a.mins - b.mins);
-  const known = byDistance.filter(hasCommunityFact).slice(0, NEAR_ROWS);
-  const near = [...known, ...byDistance.filter(v => !known.includes(v))].slice(0, NEAR_ROWS);
+  const near = nearPlaces(app.venues, needs, NEAR_ROWS, ra2Verdict);
   const mapOn = !app.wide && app.exploreView === 'map';
+  // Desktop: the map beside the panel shows these same places.
+  useShowOnMap(app, near, `near:${app.origin.lat},${app.origin.lng}`, true);
 
   return (
     <V2Shell tabs app={app} active="find">
@@ -110,10 +110,13 @@ function FindHome({ app }) {
 function FindResults({ app }) {
   const t = useT();
   const query = app.query || ALL;
-  const h = useV2Heading('results-' + query.label);
+  const area = app.area;
+  // After "Search this area" the heading takes focus again (the new list).
+  const h = useV2Heading('results-' + query.label + (area ? '@' + area.seq : ''));
   const needs = app.user?.needs || [];
   const badgeFilter = useBadgeFilter(app);
-  const searched = badgeFilter.apply(ra2Search(app.venues, query, needs));
+  const pool = area ? app.venues.filter(v => inArea(area, v)) : app.venues;
+  const searched = badgeFilter.apply(ra2Search(pool, query, needs));
   const all = applyFilters(searched, app.filters);
   const counts = verdictCounts(searched);
   const queryLabel = ra2QueryLabel(query, t);
@@ -127,12 +130,21 @@ function FindResults({ app }) {
   const initialText = query.raw || (query.cats.length || query.tags.length ? queryLabel : '');
   // The map view shows one page at a time: these ≤ 10 places are its pins.
   const [mapPage, setMapPage] = React.useState(backTo >= 0 ? Math.floor(backTo / PAGE) : 0);
-  const [shownFor, setShownFor] = React.useState(initialText);
-  if (shownFor !== initialText) { setShownFor(initialText); setLimit(PAGE); setMapPage(0); }
+  const listFor = initialText + (area ? '@' + area.seq : '');
+  const [shownFor, setShownFor] = React.useState(listFor);
+  if (shownFor !== listFor) { setShownFor(listFor); setLimit(PAGE); setMapPage(0); }
   const results = all.slice(0, limit);
   const mapOn = !app.wide && app.exploreView === 'map';
   const page = Math.min(mapPage, Math.max(0, Math.ceil(all.length / PAGE) - 1));
   const pageRows = all.slice(page * PAGE, (page + 1) * PAGE);
+  // Desktop: the map beside the panel shows the rows on screen. It frames
+  // them for a new search or filter, never after "Search this area".
+  const fitKey = `${listFor}|${JSON.stringify(app.filters)}|${badgeFilter.on.join(',')}`;
+  useShowOnMap(app, results, fitKey, !area);
+  // "Search this area": say how many places it found (once per search).
+  React.useEffect(() => {
+    if (area && app.takeAreaAnnouncement(area.seq)) app.toast(t('find.area.found', { count: all.length }));
+  }, [area?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const listRef = React.useRef(null);
   React.useEffect(() => {
@@ -148,7 +160,7 @@ function FindResults({ app }) {
   return (
     <V2Shell tabs app={app} active="find">
       <div ref={listRef}>
-        <FindHeader app={app} headingRef={h} queryLabel={queryLabel} initialText={initialText}
+        <FindHeader app={app} headingRef={h} queryLabel={queryLabel} initialText={initialText} area={area}
           total={all.length} counts={counts} searched={searched} badgeFilter={badgeFilter}
           view={mapOn ? 'map' : 'list'} onView={app.setExploreView}/>
 

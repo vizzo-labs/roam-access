@@ -137,6 +137,7 @@ const layers = {
   'layers.toggle.beach': 'Beach access',
   'layers.toggle.locked': '(always shown on this list)',
   'layers.toggle.squarePins': 'Square pins are listings, not verdicts.',
+  'layers.toggle.unknown': 'No info yet (grey dots)',
   'layers.toggle.menu': 'Layers',
   'layers.toggle.menuOn': 'Layers ({count} on)',
   'layers.pin.changingPlaces': 'Changing Places toilet',

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { C2 } from '../ui/palette';
-import { facilitySvg } from '../PilotMap';
+import { dotSvg, facilitySvg } from '../PilotMap';
 import { Button, ChipGroup, FilterChip, RADIUS, SPACE, TYPE, elevation } from '../ds';
 import { useT } from '../i18n';
 import { FACILITY_ICON } from './layerUtils';
@@ -22,7 +22,9 @@ const pin = icon => (
   <span aria-hidden="true" style={{ lineHeight: 0, display: 'inline-flex' }} dangerouslySetInnerHTML={{ __html: facilitySvg({ w: 16, icon }) }}/>
 );
 
-export function LayerToggles({ shown, onChange, forced = {}, style = {} }) {
+// `unknown` ({ on, onChange }): also offer "No info yet" places as grey dots
+// at every zoom (otherwise they appear only when zoomed in close).
+export function LayerToggles({ shown, onChange, forced = {}, unknown = null, style = {} }) {
   const t = useT();
   return (
     <div style={{
@@ -44,6 +46,12 @@ export function LayerToggles({ shown, onChange, forced = {}, style = {} }) {
             </FilterChip>
           );
         })}
+        {unknown && (
+          <FilterChip selected={!!unknown.on} onChange={sel => unknown.onChange(sel)} style={{ justifyContent: 'flex-start' }}>
+            {!unknown.on && <span aria-hidden="true" style={{ lineHeight: 0, display: 'inline-flex' }} dangerouslySetInnerHTML={{ __html: dotSvg({ w: 12, fill: '#475569' }) }}/>}
+            {!unknown.on && ' '}{t('layers.toggle.unknown')}
+          </FilterChip>
+        )}
       </ChipGroup>
       <p style={{ ...TYPE.caption, fontWeight: 400, color: C2.slate, margin: `${SPACE.xs}px 0 0`, maxWidth: 190, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
         {pin('toilet')}<span>{t('layers.toggle.squarePins')}</span>

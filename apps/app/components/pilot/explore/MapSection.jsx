@@ -15,7 +15,11 @@ const HEIGHT = 300;
 // The map on phones: a VIEW of the list on Find, never the only way and never
 // a whole screen. It shows the pins of the places in the list on screen (≤ 12,
 // so ≤ 14 tab stops in the map), 48px category pins with the verdict mark,
-// nudged apart where they'd overlap — no clusters. "Key" opens a dialog
+// nudged apart where they'd overlap in a street — no clusters. Zoomed out
+// they're small verdict shapes and only the higher-ranked of two overlapping
+// pins shows; "No info yet" places appear as dots when zoomed in close
+// (or always, from the Key). Pan or zoom → "Search this area" reloads the
+// list (and so the pins) for what the map shows. "Key" opens a dialog
 // instead of a legend over the map; "Skip the map" (shown on focus) jumps to
 // the list. A pin opens the place's card UNDER the map; Escape or its Close
 // returns focus to the pin.
@@ -55,7 +59,9 @@ function MapSection({ app, places, listHeadingId }) {
           pinSize={48} spread attribution={false} apiRef={mapApi} onMapClick={() => sel && close()}
           colors={PIN.colors} icons={PIN.icons} labels={pinLabels(t)} topPad={72} bottomPad={24}
           onLocate={app.locateFromMap} onLocateError={app.locateError} autoLocate={app.origin.mine}
-          locateStyle={{ right: 10, bottom: 10 }} alertIds={app.layers.alertIds}/>
+          locateStyle={{ right: 10, bottom: 10 }} alertIds={app.layers.alertIds}
+          showUnknown={app.showUnknown} onSearchArea={app.searchArea} searchAreaStyle={{ top: 10 }}
+          initialBounds={app.area} fit={!app.area}/>
         <Button size="sm" variant="outline" aria-haspopup="dialog" onClick={() => setKeyOpen(true)}
           style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 6, minHeight: 48, boxShadow: '0 4px 14px rgba(26,26,26,0.14)' }}>
           {t('find.map.key')}
@@ -81,7 +87,7 @@ function MapSection({ app, places, listHeadingId }) {
             onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } }}/>
         </div>
       )}
-      <MapKeySheet open={keyOpen} onClose={() => setKeyOpen(false)}/>
+      <MapKeySheet open={keyOpen} onClose={() => setKeyOpen(false)} showUnknown={app.showUnknown} onShowUnknown={app.setShowUnknown}/>
     </section>
   );
 }

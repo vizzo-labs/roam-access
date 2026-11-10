@@ -2,26 +2,41 @@
 // Real map: MapLibre GL + OpenFreeMap vector tiles (free, no key; data ©
 // OpenStreetMap contributors, credited in the corner).
 //
-// Every place is always on the map, with detail by zoom (like any street
-// map): places with access info are full pins at every zoom; places with no
-// info yet are quiet dots in the overview and become "?" pins at street level.
-// Pins are real <button>s; the list view stays the primary, fully accessible
-// way to browse.
+// The map mirrors the list: it shows the pins of the places the caller passes
+// (the list or page on screen), never every place in the area, so it scales
+// to a whole city. No clusters. Instead:
+//  - Overview (zoom < 15): small markers, a category icon in a verdict shape
+//    (circle = works, diamond = check first, octagon = barriers), no badge.
+//    Street zoom, hover and selection: the full pin with the verdict badge.
+//  - Where two pins would overlap, only the higher-ranked one (list order;
+//    the selected, hovered and focused pins always win) is shown; the others
+//    appear as you zoom in. The result only changes with zoom, so it stays
+//    put while panning. From zoom 17 (phones, `spread`: from 15) overlapping
+//    pins are nudged apart instead, so a place in the same building as
+//    another is still reachable.
+//  - "No info yet" places are hidden until street zoom (16), then quiet dots;
+//    `showUnknown` shows them at every zoom.
+//  - Pins outside the view are hidden, so keyboard focus only reaches the
+//    pins you can see, in list order.
+// Pins are real <button>s; the list stays the primary, fully accessible way.
 
 import { useEffect, useRef, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useT } from './i18n';
 import { kindLabel } from '@/lib/i18n/data';
 import { prefersReducedMotion } from './ds/tokens';
+import { Button } from './ds/Button';
 
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 const TEAL = '#0A4F4F', PAPER = '#FAF9F6';
-// From this zoom (street level) every place gets a full-size pin.
-const DETAIL_ZOOM = 15;
+// Zoom levels (≈ 13 a few suburbs, 15 a neighbourhood, 17 one block).
+const STREET_ZOOM = 15;   // from here: full pins with the verdict badge
+const UNKNOWN_ZOOM = 16;  // from here: "No info yet" places as quiet dots
+const NUDGE_ZOOM = 17;    // from here: overlapping pins nudged apart, not hidden
 
 export function PilotMap({
   results, selectedId, hoverId = null, onSelect, origin, colors, icons, labels,
-  topPad = 150, bottomPad = 210, fit = true,
+  topPad = 150, bottomPad = 210, fit = true, fitKey = null, initialBounds = null,
   onLocate, onLocateError, autoLocate = false, locateStyle = { right: 16, top: 16 },
   // Access layers (F3): facility pins (toilets, beach items) drawn as square
   // markers, and ids of places with a live temporary report (⚠ corner mark).
@@ -29,15 +44,20 @@ export function PilotMap({
   // Place preview card (desktop): a handle on the map + its pins, and a
   // click on the map itself (not a pin) — used to close the card.
   apiRef = null, onMapClick,
-  // Phones (the map inside Find): every pin at `pinSize` px (≥ 48, never a
-  // quiet dot); `spread` nudges overlapping pins apart (no clusters);
-  // `attribution={false}` drops MapLibre's small credit button — the caller
-  // shows the credit as text instead.
+  // Phones (the map inside Find): pins at `pinSize` px (≥ 48); `spread`
+  // nudges overlapping pins apart from street zoom (no clusters, nothing
+  // hidden there); `attribution={false}` drops MapLibre's small credit button —
+  // the caller shows the credit as text instead.
   pinSize = null, spread = false, attribution = true,
+  // "No info yet" places at every zoom (the Key / map layers option).
+  showUnknown = false,
+  // "Search this area": shown after the person pans or zooms; called with
+  // the visible bounds { w, s, e, n }.
+  onSearchArea = null, searchAreaStyle = { top: 16 },
 }) {
   const box = useRef(null);
   const ctx = useRef(null); // { map, lib }
-  const markers = useRef(new Map()); // id → { mk, el, dot, kind }
+  const markers = useRef(new Map()); // id → { mk, el, kind, icon, state, look, ... }
   const byIdRef = useRef(new Map());
   const selRef = useRef(selectedId);
   selRef.current = selectedId;
@@ -51,11 +71,16 @@ export function PilotMap({
   onLocateErrorRef.current = onLocateError;
   const onMapClickRef = useRef(onMapClick);
   const geoRef = useRef(null);
-  const extraMarkers = useRef(new Map()); // id → { mk, el, state }
+  const extraMarkers = useRef(new Map()); // id → { mk, el, x, alert, state }
   const onSelectExtraRef = useRef(onSelectExtra);
   const alertRef = useRef(alertIds);
+  const selExtraRef = useRef(selectedExtraId);
+  const unknownRef = useRef(showUnknown);
   // Latest props for the marker callbacks; runs before the effects below.
-  useEffect(() => { onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId; onMapClickRef.current = onMapClick; });
+  useEffect(() => {
+    onSelectExtraRef.current = onSelectExtra; alertRef.current = alertIds; hoverRef.current = hoverId;
+    onMapClickRef.current = onMapClick; selExtraRef.current = selectedExtraId; unknownRef.current = showUnknown;
+  });
   // Pins are built outside React: they read the current words from a ref and
   // are rebuilt when the language changes (it's part of the keys below).
   const t = useT();
@@ -65,17 +90,40 @@ export function PilotMap({
   const [failed, setFailed] = useState(false);
   const [following, setFollowing] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [areaBtn, setAreaBtn] = useState(false);
 
-  const repaint = useRef(() => {});
-  repaint.current = () => {
+  // Layout = pick each pin's look for this zoom, hide the lower-ranked of
+  // two overlapping pins, then hide pins outside the view. The first two
+  // steps only re-run when the zoom (or the pins) change; panning only
+  // re-checks what's in view.
+  const lay = useRef({ zoom: null, bearing: null, dirty: true, frame: 0 });
+  const layout = useRef(() => {});
+  const schedule = useRef(() => {});
+  useEffect(() => { layout.current = () => {
     const map = ctx.current?.map;
-    // A narrowed search (≤ 80 places) shows every result as a full pin; the
-    // whole area or a huge list keeps the quiet dots until street level.
-    const fewResults = fit && markers.current.size <= 80;
     if (!map) return;
-    paintPins(markers.current, selRef.current, colors, icons, !!pinSize || fewResults || map.getZoom() >= DETAIL_ZOOM, alertRef.current, labels, hoverRef.current, tRef.current, pinSize);
-    if (spread) spreadPins(map, markers.current, pinSize || 34);
+    const L = lay.current;
+    const zoom = map.getZoom(), bearing = map.getBearing();
+    const opts = { colors, icons, t: tRef.current, size: pinSize, zoom, showUnknown: unknownRef.current };
+    const focused = typeof document !== 'undefined' ? document.activeElement : null;
+    if (L.dirty || L.zoom !== zoom || L.bearing !== bearing) {
+      L.dirty = false; L.zoom = zoom; L.bearing = bearing;
+      paintPins(markers.current, selRef.current, alertRef.current, hoverRef.current, opts);
+      paintExtras(extraMarkers.current, selExtraRef.current, opts);
+      L.items = rankedItems(map, markers.current, extraMarkers.current, selRef.current, hoverRef.current, selExtraRef.current, focused);
+      // Nudging moves a pin by up to ~70px: fine in a street, misleading
+      // (kilometres) zoomed out, so below street zoom overlaps are hidden.
+      if (zoom >= (spread ? STREET_ZOOM : NUDGE_ZOOM)) nudgeApart(L.items, pinSize || 44);
+      else hideOverlaps(L.items);
+    }
+    cullOutsideView(map, L.items || [], focused);
   };
+  // During a pan or zoom: at most one layout per frame.
+  schedule.current = () => {
+    if (lay.current.frame) return;
+    lay.current.frame = requestAnimationFrame(() => { lay.current.frame = 0; layout.current(); });
+  }; });
+  const relayout = () => { lay.current.dirty = true; layout.current(); };
 
   // Create the map once.
   useEffect(() => {
@@ -86,17 +134,25 @@ export function PilotMap({
       // The worker is copied to /public at build time (see package.json):
       // MapLibre's default URL is relative to its own file, which bundling moves.
       lib.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+      const b = initialBounds;
       const map = new lib.Map({
         container: box.current, style: STYLE,
-        center: [origin.lng, origin.lat], zoom: 14.2,
+        ...(b ? { bounds: [[b.w, b.s], [b.e, b.n]] } : { center: [origin.lng, origin.lat], zoom: 14.2 }),
         attributionControl: attribution ? { compact: true } : false,
       });
       // Only a style that never loads is fatal; a stray tile error isn't.
       map.on('error', (e) => {
         if (!map.isStyleLoaded() && /style/i.test(String(e?.error?.message || e?.error?.url || ''))) setFailed(true);
       });
-      map.on('zoomend', () => repaint.current());
+      map.on('move', () => schedule.current());
+      map.on('moveend', () => layout.current());
+      map.on('resize', () => schedule.current());
       map.on('click', () => onMapClickRef.current?.());
+      // A pan or zoom by the person (mouse, touch, keys — not our own
+      // fitBounds/easeTo, which carry no originalEvent) offers "Search this area".
+      let byPerson = false;
+      map.on('movestart', (e) => { if (e.originalEvent) byPerson = true; });
+      map.on('moveend', (e) => { if (byPerson || e.originalEvent) setAreaBtn(true); byPerson = false; });
 
       // "You are here": MapLibre draws the dot + accuracy circle; our own
       // 48px button (below) drives it, because the built-in one is too small.
@@ -119,10 +175,14 @@ export function PilotMap({
 
       ctx.current = { map, lib };
       if (apiRef) apiRef.current = { map, pinEl: id => markers.current.get(id)?.el || null };
+      // Dev only: a handle for the headless map checks (zoom, pan, frame times).
+      if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') window.__raMap = map;
       setReady(true);
     }).catch((e) => { console.warn('[roam-access] map failed to load', e); setFailed(true); });
+    const lays = lay.current;
     return () => {
       cancelled = true;
+      if (lays.frame) cancelAnimationFrame(lays.frame);
       if (ctx.current) ctx.current.map.remove();
       ctx.current = null;
       if (apiRef) apiRef.current = null;
@@ -132,8 +192,8 @@ export function PilotMap({
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // New result set: rebuild the pins, then frame the best matches. DOM order
-  // is result order, so keyboard users reach the best matches first.
+  // New result set: rebuild the pins. DOM order is result order, so keyboard
+  // users reach the best matches first.
   const key = t.locale + '#' + results.map(r => r.id + ':' + r.verdict.kind).join('|');
   useEffect(() => {
     if (!ready || !ctx.current) return;
@@ -143,24 +203,35 @@ export function PilotMap({
     markers.current.clear();
     for (const r of results) {
       const el = pinButton(r, labels, () => onSelectRef.current(r.id), t);
-      // Anchored at the pin's tip, which sits exactly on the place.
+      // Anchored at the bottom centre; the look decides the offset (a pin's
+      // tip, or the centre of a small marker, sits exactly on the place).
       const mk = new lib.Marker({ element: el, anchor: 'bottom' }).setLngLat([r.lng, r.lat]).addTo(map);
-      markers.current.set(r.id, { mk, el, kind: r.verdict.kind, icon: iconFor(r), state: null });
+      markers.current.set(r.id, { mk, el, kind: r.verdict.kind, icon: iconFor(r), state: null, lngLat: [r.lng, r.lat] });
     }
-    if (fit && results.length) {
-      const bounds = new lib.LngLatBounds();
-      const focus = results.slice(0, 20);
-      const sel = results.find(r => r.id === selectedId);
-      if (sel && !focus.includes(sel)) focus.push(sel);
-      focus.forEach(r => bounds.extend([r.lng, r.lat]));
-      map.fitBounds(bounds, { padding: { top: topPad, bottom: bottomPad, left: 48, right: 48 }, maxZoom: 16, duration: 0 });
-    }
-    repaint.current();
+    relayout();
   }, [ready, key]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Frame the best matches when the list itself changes (a new search,
+  // filters) — not when it grows ("Show more") or after "Search this area"
+  // (fit = false), where the person chose the view.
+  const fitDone = useRef(null);
+  const fk = fitKey ?? key;
+  useEffect(() => {
+    if (!ready || !ctx.current || !fit || !results.length || fitDone.current === fk) return;
+    fitDone.current = fk;
+    const { map, lib } = ctx.current;
+    const bounds = new lib.LngLatBounds();
+    const focus = results.slice(0, 20);
+    const sel = results.find(r => r.id === selectedId);
+    if (sel && !focus.includes(sel)) focus.push(sel);
+    focus.forEach(r => bounds.extend([r.lng, r.lat]));
+    map.fitBounds(bounds, { padding: { top: topPad, bottom: bottomPad, left: 48, right: 48 }, maxZoom: 16, duration: 0 });
+    setAreaBtn(false);
+  }, [ready, fk, fit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reports come and go without the result set changing: repaint the marks.
   const alertKey = alertIds ? [...alertIds].sort().join('|') : '';
-  useEffect(() => { if (ready) repaint.current(); }, [ready, alertKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (ready) relayout(); }, [ready, alertKey, showUnknown]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Facility pins (access layers): rebuilt when the set or a report changes.
   const extraKey = t.locale + '#' + extras.map(x => `${x.id}:${x.muted ? 1 : 0}:${alertIds?.has(x.id) ? 1 : 0}`).join('|');
@@ -177,20 +248,21 @@ export function PilotMap({
       Object.assign(el.style, { background: 'transparent', border: '0', padding: '0', cursor: 'pointer', lineHeight: '0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' });
       el.addEventListener('click', (e) => { e.stopPropagation(); onSelectExtraRef.current?.(x.id); });
       const mk = new lib.Marker({ element: el, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).addTo(map);
-      extraMarkers.current.set(x.id, { mk, el, x, alert, state: null });
+      extraMarkers.current.set(x.id, { mk, el, x, alert, state: null, lngLat: [x.lng, x.lat] });
     }
-    paintExtras(extraMarkers.current, selectedExtraId);
+    relayout();
     // fitExtras: true = frame them all; a number = frame the first N.
     if (fitExtras && extras.length) {
       const bounds = new lib.LngLatBounds();
       (typeof fitExtras === 'number' ? extras.slice(0, fitExtras) : extras).forEach(x => bounds.extend([x.lng, x.lat]));
       map.fitBounds(bounds, { padding: { top: topPad, bottom: bottomPad, left: 48, right: 48 }, maxZoom: 16, duration: 0 });
+      setAreaBtn(false);
     }
   }, [ready, extraKey, fitExtras]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!ready || !ctx.current) return;
-    paintExtras(extraMarkers.current, selectedExtraId);
+    relayout();
     const sel = extraMarkers.current.get(selectedExtraId)?.x;
     if (sel) {
       const { map } = ctx.current;
@@ -202,12 +274,12 @@ export function PilotMap({
     }
   }, [ready, selectedExtraId, extraKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (ready) repaint.current(); }, [ready, hoverId]);
+  useEffect(() => { if (ready) relayout(); }, [ready, hoverId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Selection: the big pin; bring it into view if it's off-screen.
   useEffect(() => {
     if (!ready || !ctx.current) return;
-    repaint.current();
+    relayout();
     const sel = byIdRef.current.get(selectedId);
     if (sel) {
       const { map } = ctx.current;
@@ -219,6 +291,15 @@ export function PilotMap({
     }
   }, [ready, selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // A pin that takes keyboard focus is never hidden while it has it.
+  useEffect(() => {
+    const el = box.current;
+    if (!ready || !el) return;
+    const onFocus = () => relayout();
+    el.addEventListener('focusin', onFocus);
+    return () => el.removeEventListener('focusin', onFocus);
+  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function locate() {
     const geo = geoRef.current;
     if (!geo) return;
@@ -226,8 +307,23 @@ export function PilotMap({
     if (!geo.trigger()) setLocating(false);
   }
 
+  function searchArea() {
+    const map = ctx.current?.map;
+    if (!map || !onSearchArea) return;
+    const b = map.getBounds();
+    setAreaBtn(false);
+    onSearchArea({ w: b.getWest(), s: b.getSouth(), e: b.getEast(), n: b.getNorth() });
+  }
+
   return (
     <>
+      {/* First in the DOM, so it comes before the pins in the tab order. */}
+      {ready && !failed && onSearchArea && areaBtn && (
+        <Button variant="secondary" size="md" icon="search" onClick={searchArea}
+          style={{ position: 'absolute', zIndex: 7, left: '50%', transform: 'translateX(-50%)', width: 'max-content', maxWidth: 'calc(100% - 32px)', boxShadow: '0 4px 14px rgba(26,26,26,0.18)', ...searchAreaStyle }}>
+          {t('app.map.searchArea')}
+        </Button>
+      )}
       {/* isolate: pins/bubbles stack inside the map, never over the legend */}
       <div ref={box} style={{ position: 'absolute', inset: 0, background: '#EDEAE2', isolation: 'isolate' }}/>
       {ready && !failed && (
@@ -325,66 +421,161 @@ function pinButton(r, labels, onClick, t) {
   return el;
 }
 
-// Places with a verdict: a coloured pin at every zoom. Places with no info
-// yet: a quiet dot in the overview, a white pin at street level. Selected:
-// the big pin. Only re-draws a pin whose look actually changed.
-function paintPins(markers, selectedId, colors, icons, detail, alertIds, labels, hoverId, t, size = null) {
+// Small overview marker: the category icon in a verdict SHAPE, so the
+// verdict never relies on colour alone even without the badge:
+// circle = works for you, diamond = check first, octagon = has barriers.
+const MARK_SHAPES = {
+  works: '<circle cx="16" cy="16" r="14"/>',
+  check: '<path d="M16 1.2 30.8 16 16 30.8 1.2 16Z" stroke-linejoin="round"/>',
+  barrier: '<path d="M10.2 1.5h11.6l8.7 8.7v11.6l-8.7 8.7H10.2l-8.7-8.7V10.2Z" stroke-linejoin="round"/>',
+};
+export function markSvg({ w, kind, fill, icon, alert = false }) {
+  const shape = (MARK_SHAPES[kind] || MARK_SHAPES.works);
+  return `<svg width="${w}" height="${w}" viewBox="0 0 32 32" aria-hidden="true" focusable="false" style="display:block;overflow:visible;filter:drop-shadow(0 1px 2px rgba(26,26,26,.35))">`
+    + `<g fill="${fill}" stroke="${PAPER}" stroke-width="2">${shape}</g>`
+    + `<g transform="translate(8.2 8.2) scale(0.65)"><path d="${PLACE_ICONS[icon] || PLACE_ICONS.food}" fill="none" stroke="${PAPER}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>`
+    + (alert ? `<g transform="translate(-2 2)">${ALERT_MARK}</g>` : '')
+    + `</svg>`;
+}
+// "No info yet": a quiet dot (the button around it is still ≥ 44px).
+export function dotSvg({ w = 14, fill }) {
+  return `<svg width="${w}" height="${w}" viewBox="0 0 14 14" aria-hidden="true" focusable="false" style="display:block">`
+    + `<circle cx="7" cy="7" r="6" fill="${fill}" stroke="${PAPER}" stroke-width="2"/></svg>`;
+}
+
+// Each place pin's look for this zoom: 'full' (pin + badge), 'mark' (small
+// overview marker), 'dot' ("No info yet" at street zoom, or when asked) or
+// 'hidden'. Only re-draws a pin whose look actually changed.
+function paintPins(markers, selectedId, alertIds, hoverId, { colors, icons, t, size, zoom, showUnknown }) {
+  const P = size || 44;      // full pin width (phones pass 48)
+  const T = size || 44;      // smallest target for marks and dots
   markers.forEach((m, id) => {
     const on = id === selectedId;
     const lift = !on && id === hoverId; // highlighted from the list, not selected
     const unknown = m.kind === 'unknown';
     const alert = !!alertIds?.has(id);
     // A live report always gets a full pin, so its ⚠ mark is visible.
-    const quiet = unknown && !on && !lift && !detail && !alert;
-    const state = `${on}|${lift}|${quiet}|${alert}`;
+    const look = on || lift || (unknown && alert) ? 'full'
+      : unknown ? (showUnknown || zoom >= UNKNOWN_ZOOM ? 'dot' : 'hidden')
+      : zoom >= STREET_ZOOM ? 'full' : 'mark';
+    m.look = look;
+    m.rank = on ? 0 : lift ? 1 : 2;
     if (m.baseLabel == null) m.baseLabel = m.el.getAttribute('aria-label');
     m.el.setAttribute('aria-label', alert ? t('app.map.withAlert', { label: m.baseLabel }) : m.baseLabel);
     m.el.setAttribute('aria-pressed', String(on));
-    m.el.style.zIndex = on ? '5' : lift ? '4' : quiet ? '1' : unknown ? '2' : '3';
+    m.el.style.zIndex = on ? '5' : lift ? '4' : look === 'dot' ? '1' : unknown ? '2' : '3';
+    const state = `${look}|${on}|${lift}|${alert}|${P}`;
     if (m.state === state) return;
     m.state = state;
-    if (quiet) {
-      m.el.style.width = m.el.style.height = '20px';
+    if (look === 'hidden') { m.box = null; return; }
+    if (look === 'dot' || look === 'mark') {
+      const vis = look === 'dot' ? 14 : (size ? 34 : 30);
+      m.el.style.width = m.el.style.height = T + 'px';
       m.el.style.alignItems = 'center';
-      m.el.innerHTML = `<span aria-hidden="true" style="display:block;width:12px;height:12px;border-radius:999px;background:${colors.unknown};opacity:.6;border:1.5px solid ${PAPER};box-sizing:border-box"></span>`;
-      m.mk.setOffset([0, 10]); // a dot sits on the place, not above it
+      m.el.innerHTML = look === 'dot' ? dotSvg({ fill: colors.unknown }) : markSvg({ w: vis, kind: m.kind, fill: colors[m.kind], icon: m.icon, alert });
+      m.base = [0, T / 2]; // its centre sits on the place
+      m.box = { x0: -T / 2, x1: T / 2, y0: -T / 2, y1: T / 2 };
       return;
     }
-    // `size` (phones): 48px pins; the selected one is bigger with a dark ring.
-    const w = size ? (on ? size + 8 : lift ? size + 4 : size) : (on ? 46 : lift ? 42 : 34);
+    // Full pin; the selected one is bigger (with a dark ring on phones).
+    const w = on ? P + 8 : lift ? P + 4 : P;
+    const h = Math.round(w * 1.25);
     m.el.style.width = w + 'px';
-    m.el.style.height = Math.round(w * 1.25) + 'px';
+    m.el.style.height = h + 'px';
     m.el.style.alignItems = 'flex-end';
-    if (!size) m.mk.setOffset([0, 0]); // sized pins keep their spread offset
+    m.base = [0, 0]; // the pin's tip sits on the place
+    m.box = { x0: -w / 2, x1: w / 2, y0: -h, y1: 0 };
     const ring = size && on ? '#1A1A1A' : null;
     m.el.innerHTML = unknown
-      ? pinSvg({ w, fill: PAPER, stroke: ring || colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: size ? icons.unknown : null, badgeColor: colors.unknown, alert, strokeWidth: ring ? 3 : 2 })
+      ? pinSvg({ w, fill: PAPER, stroke: ring || colors.unknown, iconColor: colors.unknown, icon: m.icon, badge: icons.unknown, badgeColor: colors.unknown, alert, strokeWidth: ring ? 3 : 2 })
       : pinSvg({ w, fill: colors[m.kind], stroke: ring || PAPER, iconColor: PAPER, icon: m.icon, badge: icons[m.kind], badgeColor: colors[m.kind], alert, strokeWidth: ring ? 3 : 2 });
   });
 }
 
-// Pins that would sit on top of each other (same building, next door) are
-// nudged apart around a small circle, so each stays a separate ≥ 48px
-// target. No clusters: every place stays its own pin. Offsets are in screen
-// pixels, so they're worked out again after every zoom.
-function spreadPins(map, markers, size) {
-  const items = [...markers.values()].map(m => ({ m, p: map.project(m.mk.getLngLat()) }));
+// Everything that could be drawn, best first: the focused pin, the selected
+// place and facility, the hovered row, then the list in its order, then the
+// facility pins (nearest first). Screen positions are worked out once here.
+function rankedItems(map, markers, extras, selectedId, hoverId, selectedExtraId, focused) {
+  const items = [];
+  const add = (m) => {
+    if (!m.box) { show(m, false); return; }
+    const p = map.project(m.lngLat);
+    const forced = m.el === focused || m.rank < 2;
+    items.push({ m, x: p.x, y: p.y, forced, pri: m.el === focused ? -1 : m.rank });
+  };
+  markers.forEach(add);
+  extras.forEach(add);
+  // Stable sort: forced first, then list order (Map keeps insertion order).
+  return items.sort((a, b) => a.pri - b.pri);
+}
+
+// Priority declutter: walk the ranked items and keep one only if its target
+// doesn't overlap one already kept. Screen-space, so panning never changes
+// the result; zooming in brings the hidden ones back.
+function hideOverlaps(items) {
+  const kept = [];
+  const GAP = 2;
+  for (const it of items) {
+    it.m.nudge = [0, 0];
+    const b = it.m.box;
+    // The box is already relative to the place (marks and dots are centred on it).
+    const r = { x0: it.x + b.x0 - GAP, x1: it.x + b.x1 + GAP, y0: it.y + b.y0 - GAP, y1: it.y + b.y1 + GAP };
+    it.rect = r;
+    const hit = !it.forced && kept.some(k => r.x0 < k.x1 && r.x1 > k.x0 && r.y0 < k.y1 && r.y1 > k.y0);
+    it.collided = hit;
+    if (!hit) kept.push(r);
+  }
+}
+
+// Street zoom (phones: from zoom 15): pins that would sit on top of each
+// other (same building, next door) are nudged apart around a small circle,
+// so each stays a separate target. Nothing is hidden, nothing grouped.
+function nudgeApart(items, size) {
   const used = new Set();
+  for (const it of items) it.collided = false;
   for (const a of items) {
     if (used.has(a)) continue;
     used.add(a);
     const group = [a];
     for (const b of items) {
       if (used.has(b)) continue;
-      if (group.some(g => Math.hypot(g.p.x - b.p.x, g.p.y - b.p.y) < size)) { group.push(b); used.add(b); }
+      if (group.some(g => Math.hypot(g.x - b.x, g.y - b.y) < size)) { group.push(b); used.add(b); }
     }
-    if (group.length === 1) { a.m.mk.setOffset([0, 0]); continue; }
+    if (group.length === 1) { a.m.nudge = [0, 0]; continue; }
     const r = Math.max(size * 0.6, (size * 0.95 * group.length) / (2 * Math.PI));
     group.forEach((g, i) => {
       const ang = (2 * Math.PI * i) / group.length - Math.PI / 2;
-      g.m.mk.setOffset([Math.round(Math.cos(ang) * r), Math.round(Math.sin(ang) * r)]);
+      g.m.nudge = [Math.round(Math.cos(ang) * r), Math.round(Math.sin(ang) * r)];
     });
   }
+  for (const it of items) {
+    const b = it.m.box, n = it.m.nudge;
+    it.rect = { x0: it.x + n[0] + b.x0, x1: it.x + n[0] + b.x1, y0: it.y + n[1] + b.y0, y1: it.y + n[1] + b.y1 };
+  }
+}
+
+// Only pins inside the view are shown (and so focusable). Runs every frame
+// while panning: positions move, the decluttering result doesn't.
+function cullOutsideView(map, items, focused) {
+  const c = map.getContainer();
+  const W = c.clientWidth, H = c.clientHeight;
+  for (const it of items) {
+    const m = it.m;
+    const p = map.project(m.lngLat);
+    const dx = p.x - it.x, dy = p.y - it.y;
+    const r = it.rect;
+    const inView = r.x1 + dx > 0 && r.x0 + dx < W && r.y1 + dy > 0 && r.y0 + dy < H;
+    const offset = [m.base[0] + (m.nudge?.[0] || 0), m.base[1] + (m.nudge?.[1] || 0)];
+    const key = offset.join(',');
+    if (m.offsetKey !== key) { m.offsetKey = key; m.mk.setOffset(offset); }
+    show(m, !it.collided && (inView || m.el === focused));
+  }
+}
+
+function show(m, on) {
+  if (m.shown === on) return;
+  m.shown = on;
+  m.el.style.display = on ? 'flex' : 'none';
 }
 
 // ── Facility pins (access layers) ────────────────────────────────────────
@@ -406,17 +597,24 @@ export function facilitySvg({ w, icon, muted = false, alert = false }) {
 const ALERT_MARK = `<path d="M5 -4 11.5 7.5H-1.5Z" fill="#1A1A1A" stroke="${PAPER}" stroke-width="1.5" stroke-linejoin="round"/>`
   + `<path d="M5 -0.5v3.5" stroke="${PAPER}" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="5.2" r="0.9" fill="${PAPER}"/>`;
 
-function paintExtras(markers, selectedId) {
+// Facility pins follow the same rules: the small square pin in the
+// overview, the full one at street zoom or when selected.
+function paintExtras(markers, selectedId, { size, zoom }) {
+  const P = size || 44, T = size || 44;
   markers.forEach((m, id) => {
     const on = id === selectedId;
-    const state = `${on}`;
+    m.rank = on ? 0 : 3;
     m.el.setAttribute('aria-pressed', String(on));
     m.el.style.zIndex = on ? '6' : '4';
+    const w = on ? P + 8 : zoom >= STREET_ZOOM ? P : 30;
+    const bw = Math.max(w, T), bh = Math.max(Math.round(w * 1.25), T);
+    m.base = [0, 0];
+    m.box = { x0: -bw / 2, x1: bw / 2, y0: -bh, y1: 0 };
+    const state = `${w}`;
     if (m.state === state) return;
     m.state = state;
-    const w = on ? 44 : 32;
-    m.el.style.width = w + 'px';
-    m.el.style.height = Math.round(w * 1.25) + 'px';
+    m.el.style.width = bw + 'px';
+    m.el.style.height = bh + 'px';
     m.el.innerHTML = facilitySvg({ w, icon: m.x.icon, muted: m.x.muted, alert: m.alert });
   });
 }
@@ -431,20 +629,21 @@ export function MapLegend({ kinds, colors, icons, labels, compact = false, style
     <div style={{
       position: 'absolute', zIndex: 2, background: PAPER, border: '1px solid #8A8680', borderRadius: 12,
       padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 5,
-      font: '600 12.5px Inter, system-ui, sans-serif', color: '#1A1A1A', ...style,
+      font: '600 13px Inter, system-ui, sans-serif', color: '#1A1A1A', ...style,
     }}>
-      {['works', 'check', 'barrier', 'unknown'].filter(k => k !== 'unknown' || kinds.includes('unknown')).map(k => (
+      {/* Zoomed out: the shape; zoomed in: the pin with its mark. */}
+      {['works', 'check', 'barrier', 'unknown'].filter(k => k !== 'unknown' || !kinds || kinds.includes('unknown')).map(k => (
         <span key={k} style={row}>
-          <span aria-hidden="true" style={{ lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: k === 'unknown'
-            ? pinSvg({ w: 20, fill: PAPER, stroke: colors.unknown, iconColor: colors.unknown, icon: 'food', badge: null })
-            : pinSvg({ w: 20, fill: colors[k], stroke: PAPER, iconColor: PAPER, icon: 'food', badge: icons[k], badgeColor: colors[k] }) }}/>
+          <span aria-hidden="true" style={{ lineHeight: 0, display: 'inline-flex', alignItems: 'flex-end', gap: 4, width: 40, justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: k === 'unknown'
+            ? dotSvg({ w: 12, fill: colors.unknown }) + pinSvg({ w: 20, fill: PAPER, stroke: colors.unknown, iconColor: colors.unknown, icon: 'food', badge: null })
+            : markSvg({ w: 16, kind: k, fill: colors[k], icon: 'food' }) + pinSvg({ w: 20, fill: colors[k], stroke: PAPER, iconColor: PAPER, icon: 'food', badge: icons[k], badgeColor: colors[k] }) }}/>
           {labels[k]}
         </span>
       ))}
       {compact && (
         <button type="button" aria-expanded={open} onClick={() => setOpen(o => !o)} style={{
-          minHeight: 32, marginTop: 2, padding: '0 2px', border: 0, background: 'transparent', textAlign: 'left',
-          font: '700 12.5px Inter, system-ui, sans-serif', color: TEAL, textDecoration: 'underline', textUnderlineOffset: 3, cursor: 'pointer',
+          minHeight: 44, marginTop: 2, padding: '0 2px', border: 0, background: 'transparent', textAlign: 'left',
+          font: '700 13px Inter, system-ui, sans-serif', color: TEAL, textDecoration: 'underline', textUnderlineOffset: 3, cursor: 'pointer',
         }}>{open ? t('app.map.hideSymbols') : t('app.map.showSymbols')}</button>
       )}
       {open && (

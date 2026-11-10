@@ -45,6 +45,7 @@ const app: Translation<typeof en> = {
   'app.map.showMe': "지도에 내 위치 표시",
   'app.map.stopFollowing': "내 위치 따라가기 중지",
   'app.map.failed': "지도를 불러올 수 없습니다. 목록 보기에 모든 결과가 있습니다.",
+  'app.map.searchArea': "이 지역 검색",
   'app.map.showSymbols': "기호 설명 보기",
   'app.map.hideSymbols': "기호 설명 숨기기",
   'app.map.legend.cafe': "카페",

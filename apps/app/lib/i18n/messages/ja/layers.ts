@@ -130,6 +130,7 @@ const layers: Translation<typeof en> = {
   'layers.toggle.beach': 'ビーチのアクセス',
   'layers.toggle.locked': '（この一覧では常に表示）',
   'layers.toggle.squarePins': '四角いピンは掲載情報で、判定ではありません。',
+  'layers.toggle.unknown': 'まだ情報なし（灰色の点）',
   'layers.toggle.menu': 'レイヤー',
   'layers.toggle.menuOn': 'レイヤー（{count}件オン）',
   'layers.pin.changingPlaces': 'Changing Places トイレ',

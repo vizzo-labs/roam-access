@@ -130,6 +130,7 @@ const layers: Translation<typeof en> = {
   'layers.toggle.beach': 'Acceso a la playa',
   'layers.toggle.locked': '(siempre visible en esta lista)',
   'layers.toggle.squarePins': 'Los marcadores cuadrados son listados, no veredictos.',
+  'layers.toggle.unknown': 'Sin información todavía (puntos grises)',
   'layers.toggle.menu': 'Capas',
   'layers.toggle.menuOn': 'Capas ({count} activas)',
   'layers.pin.changingPlaces': 'baño Changing Places',

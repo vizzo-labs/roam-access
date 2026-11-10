@@ -130,6 +130,7 @@ const layers: Translation<typeof en> = {
   'layers.toggle.beach': '해변 접근',
   'layers.toggle.locked': '(이 목록에서는 항상 표시)',
   'layers.toggle.squarePins': '네모 핀은 등록 정보이며 판정이 아니에요.',
+  'layers.toggle.unknown': '아직 정보 없음 (회색 점)',
   'layers.toggle.menu': '레이어',
   'layers.toggle.menuOn': '레이어 ({count}개 켜짐)',
   'layers.pin.changingPlaces': 'Changing Places 화장실',

@@ -63,3 +63,16 @@ function labelFor(cats, tags) {
   const base = tiles.length ? tiles.map(t => t.label).join(' & ') : 'All places';
   return tags.includes('quiet') ? `Quiet ${base.charAt(0).toLowerCase()}${base.slice(1)}` : base;
 }
+
+// "Near you": the nearest places anyone in the pilot has said something
+// about, then simply the nearest. Shared by Find and the desktop map.
+const hasCommunityFact = v => [...v.works, ...v.check, ...v.barriers].some(f => f.src === 'community');
+export function nearPlaces(venues, needs, n, verdictOf) {
+  const byDistance = venues.map(v => ({ ...v, verdict: verdictOf(v, needs) })).sort((a, b) => a.mins - b.mins);
+  const known = byDistance.filter(hasCommunityFact).slice(0, n);
+  return [...known, ...byDistance.filter(v => !known.includes(v))].slice(0, n);
+}
+
+// "Search this area": only places inside the map's bounds { w, s, e, n }.
+// It only narrows the list; it never changes a verdict.
+export const inArea = (area, v) => !area || (v.lat >= area.s && v.lat <= area.n && v.lng >= area.w && v.lng <= area.e);

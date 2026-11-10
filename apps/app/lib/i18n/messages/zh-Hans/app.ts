@@ -45,6 +45,7 @@ const app: Translation<typeof en> = {
   'app.map.showMe': "在地图上显示我的位置",
   'app.map.stopFollowing': "停止跟随我的位置",
   'app.map.failed': "地图无法加载。列表视图包含所有结果。",
+  'app.map.searchArea': "搜索此区域",
   'app.map.showSymbols': "显示图标说明",
   'app.map.hideSymbols': "隐藏图标说明",
   'app.map.legend.cafe': "咖啡馆",
