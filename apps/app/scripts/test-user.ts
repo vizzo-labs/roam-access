@@ -13,6 +13,12 @@
 //
 // Only ever touches `<name>+clerk_test@example.com` users, and only deletes DB
 // rows on the DEV database. Never use this on real users.
+//
+// Test users live on the Clerk DEVELOPMENT instance only (sk_test_… key, the
+// one Preview and Development use). Production runs a separate Clerk
+// production instance (sk_live_…) on app.roamaccess.com.au, where
+// `+clerk_test` addresses are not test addresses and sign-in tickets would
+// create real sessions — so this script refuses a live key.
 
 import { connectPg } from './lib/pg';
 import { deleteUserPhotoFiles, listOrphanPhotoFiles } from './lib/test-user-photos';
@@ -27,6 +33,7 @@ function emailFor(name: string) {
 
 async function clerk<T>(method: string, path: string, body?: unknown): Promise<T> {
   if (!key) throw new Error('CLERK_SECRET_KEY is not set — run `npx vercel env pull .env.local --yes`.');
+  if (!key.startsWith('sk_test_')) throw new Error('refusing: CLERK_SECRET_KEY is not a development-instance key (sk_test_…). Test users live on the dev instance only — pull the Development env (`npx vercel env pull .env.local --yes --environment development`).');
   const res = await fetch(API + path, {
     method,
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },

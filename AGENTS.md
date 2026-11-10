@@ -229,6 +229,9 @@ Every PR, from `apps/app`:
    (`POST /v1/users`, then `POST /v1/sign_in_tokens`) — open the printed
    `/sign-in?__clerk_ticket=<token>` URL in the browser. For `/admin`, add that email to
    `ADMIN_EMAILS` in **your local `.env.local` only**.
+   Test users live on the Clerk **development** instance (Preview, Development, `.env.local`);
+   production uses a separate production instance with live keys that only work on
+   `app.roamaccess.com.au`. The script refuses a live key — never make test users there.
 5. **Clean up**: `npm run test-user -- delete <thread-slug>` removes the Clerk user and its
    dev-DB rows (profile, reviews, saved). Never touch real users or their data.
 
