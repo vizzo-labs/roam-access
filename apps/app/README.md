@@ -246,7 +246,8 @@ migrations were introduced: a no-op on production, builds the dev database from 
 ### Test users
 
 Headless sign-up is blocked by Clerk's bot protection, so tests sign in with Backend-API
-test users (`<name>+clerk_test@example.com`):
+test users (`<name>+clerk_test@example.com`) on the Clerk **development** instance (the keys
+`vercel env pull` gives you; the script refuses production's live key):
 
 ```bash
 npm run test-user -- create my-feature --port 3456   # prints a one-time /sign-in?__clerk_ticket=… URL
@@ -259,15 +260,34 @@ every merge to `main` deploys production (and migrates the production DB). No ma
 
 ## Before inviting more testers
 
-- **Clerk is a development instance** (shows "Development mode", has usage caps). For a public
-  pilot, create the production instance on the app's domain (`app.roamaccess.com.au`)
-  and add Clerk's DNS records.
+- **Sign-in runs on two Clerk instances** (see "Sign-in: two Clerk instances" below).
 - **Passwordless sign-in**: Clerk dashboard → User & authentication → turn on email
   verification code, turn off password. Code by email is the most accessible option.
 - **Privacy**: access needs are disability information (sensitive under the Privacy Act).
   Testers can delete everything from Me → Delete my account. Update `privacy.html` on the
   landing page to cover the pilot before going wide.
 - **Admins**: set `ADMIN_EMAILS` (comma-separated, verified emails) in Vercel env vars.
+
+## Sign-in: two Clerk instances
+
+| Vercel environment | Clerk instance | Keys | Where it works |
+|---|---|---|---|
+| Production | **production** (`roamaccess.com.au`, Frontend API `clerk.roamaccess.com.au`) | `pk_live_…` / `sk_live_…` | only on `*.roamaccess.com.au` — the app is `app.roamaccess.com.au` |
+| Preview, Development (and `.env.local`) | **development** (`*.clerk.accounts.dev`) | `pk_test_…` / `sk_test_…` | any host: previews, localhost |
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are separate Vercel env vars per
+  environment. The publishable key is inlined at build time: changing it needs a new production
+  build (`vercel redeploy` of the latest production deployment, or a merge to `main`).
+- The two instances have **different users**. Someone who signed up on the dev instance gets a new
+  user id on production; `npm run relink-user -- --from <old id> --to <new id>` moves their
+  profile and every row keyed by it in one checked transaction (dry run unless `--apply`; the
+  production database also needs `VERCEL_ENV=production` and `--production`, and the
+  founder's go).
+- Test users (`npm run test-user`) live on the **dev instance only**: the script refuses a live
+  key. Never create `+clerk_test` users on production.
+- Admins are matched by verified email (`ADMIN_EMAILS`), so they carry over between instances.
+- View-count de-duplication hashes with `VIEWS_HASH_SECRET`; set it per environment so changing
+  Clerk keys doesn't change the hashes (otherwise it falls back to `CLERK_SECRET_KEY`).
 
 ## Photos & AI (F2)
 
