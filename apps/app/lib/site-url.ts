@@ -34,3 +34,17 @@ export function publicOrigin(fallback: string): string {
 export function clientOrigin(): string {
   return SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
 }
+
+/**
+ * Server, build time: the public origin, else this deployment's own address
+ * (Vercel's branch URL on previews, the production domain on production,
+ * localhost locally). For metadataBase, so link previews get absolute URLs.
+ */
+export function metadataOrigin(): string {
+  if (SITE_URL) return SITE_URL;
+  const env = process.env.VERCEL_ENV;
+  const host = env === 'preview' ? (process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL)
+    : env === 'production' ? (process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL)
+    : '';
+  return normaliseOrigin(host) || `http://localhost:${process.env.PORT || 3000}`;
+}
