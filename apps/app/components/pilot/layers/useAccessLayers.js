@@ -26,6 +26,13 @@ async function call(path, body) {
   return json;
 }
 
+// Dev-only `?mapStress=1`: synthetic toilets across Sydney (never sent anywhere).
+async function withStressFacilities(d) {
+  const { mapStressOn, stressFacilities } = await import('../explore/mapStress');
+  if (!mapStressOn()) return d;
+  return { ...d, facilities: [...(d.facilities || []), ...stressFacilities()] };
+}
+
 export function useAccessLayers() {
   const [data, setData] = React.useState({ facilities: [], badges: {}, reports: [], loaded: false, failed: false });
   const [shown, setShown] = React.useState(readShown);
@@ -33,7 +40,7 @@ export function useAccessLayers() {
   const [now, setNow] = React.useState(() => Date.now());
 
   const load = React.useCallback(() => {
-    call('/api/layers').then(
+    call('/api/layers').then(withStressFacilities).then(
       d => setData({ ...d, loaded: true, failed: false }),
       () => setData(x => ({ ...x, loaded: true, failed: true })),
     );
